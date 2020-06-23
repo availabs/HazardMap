@@ -2,7 +2,7 @@ import React from "react"
 
 import MapLayer from "components/AvlMap/MapLayer"
 
-import { falcorGraph } from "store/falcorGraph"
+import { falcorGraph } from "store/falcorGraphNew"
 
 import get from "lodash.get"
 // import styled from "styled-components"
@@ -45,6 +45,7 @@ class StormEventsLayer extends MapLayer {
       ['geo', fips, 'counties', 'geoid']
     )
       .then(response => {
+        console.log('counties')
         this.counties = Object.values(response.json.geo)
           .reduce((out,state) => {
             if(state.counties){

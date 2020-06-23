@@ -16,21 +16,24 @@ class NationalLanding extends React.Component {
 
   render() {
     return (
-      <AvlMap
-        layers={[
-          this.StormEventsLayer
-        ]}
-        height={'100%'}
-        center={[0,0]}
-        zoom={4}
-        year={2018}
-        hazards={this.props.hazards}
-        fips={''}
-        styles={[
-          { name: 'Blank', style: 'mapbox://styles/am3081/ck80d5hds0r9y1ip3cs3aplld'}
-        ]}
-        sidebar={true}
-      />
+      <div style={{height: '100%'}}>
+        <AvlMap
+          layers={[
+            this.StormEventsLayer
+          ]}
+          height={'100%'}
+          center={[0,0]}
+          zoom={4}
+          year={2018}
+          hazards={this.props.hazards}
+          fips={''}
+          styles={[
+            { name: 'Blank', style: 'mapbox://styles/am3081/ck80d5hds0r9y1ip3cs3aplld'}
+          ]}
+          sidebar={false}
+          attributes={false}
+        />
+      </div>
     )
   }
 }
@@ -49,8 +52,7 @@ export default
   path: '/',
   mainNav: true,
   exact: true,
-  name: 'Home',
-  icon: 'HomeOutline',
+  name: 'Storm Events',
   layoutSettings: {
     fixed: true,
     maxWidth: '',//'max-w-7xl',
@@ -62,19 +64,20 @@ export default
   component: {
     type: 'div',
     props: {
-      className: 'h-screen pt-16 w-screen overflow-hidden focus:outline-none'
+      className: 'w-full overflow-hidden pt-16 focus:outline-none',
+      style:{height: 'calc(100vh - 1rem)'}
     },
     children: [
       {
         type: 'div',
         props: {
-          className: 'flex flex-col lg:flex-row h-full'
+          className: 'flex flex-col lg:flex-row h-full box-border'
         },
         children: [
           {
             type: 'div',
             props: {
-              className: 'flex-1 h-full order-last lg:order-none'
+              className: 'flex-1 h-full order-last lg:order-none overflow-hidden'
             },
             children: [
               NationalLanding
@@ -83,13 +86,13 @@ export default
           {
             type: 'div',
             props: {
-              className: 'h-56 lg:h-auto lg:w-1/6 p-2 lg:min-w-64'
+              className: 'h-56 lg:h-auto lg:w-1/6 p-2 lg:min-w-64 '
             },
             children: [
               {
                 type: 'div',
                 props: {
-                  className: 'bg-white rounded h-full w-full shadow'
+                  className: ' bg-white rounded h-full w-full shadow '
                 }
               }
             ]
