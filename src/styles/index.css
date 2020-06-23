@@ -1,0 +1,64 @@
+@tailwind base;
+
+/*
+DRAFT JS
+*/
+
+.draft-js-editor .public-DraftEditor-content h1 {
+  @apply text-3xl;
+  @apply font-extrabold;
+}
+.draft-js-editor .public-DraftEditor-content h2 {
+  @apply text-2xl;
+  @apply font-bold;
+}
+.draft-js-editor .public-DraftEditor-content h3 {
+  @apply text-xl;
+  @apply font-semibold;
+}
+.draft-js-editor .public-DraftEditor-content h4 {
+  @apply text-base;
+  @apply font-medium;
+}
+.draft-js-editor .public-DraftEditor-content h5 {
+  @apply text-sm;
+  @apply font-medium;
+}
+.draft-js-editor .public-DraftEditor-content h6 {
+  @apply text-xs;
+  @apply font-medium;
+}
+
+.hoverable .show-on-hover {
+  display: none;
+}
+.hoverable:hover .show-on-hover {
+  display: block;
+}
+.hoverable:hover .show-on-hover.show-on-bottom {
+  top: 100%;
+}
+.hoverable:hover .show-on-hover.show-on-top {
+  bottom: 100%;
+}
+
+.scrollbar::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+  background-color: #bbb;
+}
+.scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: #888;
+}
+.scrollbar::-webkit-scrollbar-thumb:hover {
+
+}
+
+@tailwind components;
+
+@tailwind utilities;
+
+.custom-bg {
+	background-color: #f0f7f9;
+}
