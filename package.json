@@ -57,7 +57,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:nowatch": "CI=true react-scripts test --env=jsdom",
-    "lint": "eslint --fix src/**/*.js --max-warnings=10",
+    "lint": "eslint --fix src/**/*.js --max-warnings=20",
     "eject": "react-scripts eject"
   },
   "husky": {
