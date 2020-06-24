@@ -39,13 +39,25 @@ for(let i = start_year; i <= end_year; i++) {
 
 
 class StormEventsLayer extends MapLayer {
+    receiveProps(oldProps, newProps){
+        if ((newProps.year) && this.filters.year.value !== newProps.year) {
+            this.filters.year.value = newProps.year ?
+                [newProps.year] : newProps.year ? newProps.year : null;
+        }
+    }
+    onPropsChange(oldProps, newProps){
+        if ((newProps.year) && this.filters.year.value !== newProps.year) {
+            this.filters.year.value = newProps.year ?
+                [newProps.year] : newProps.year ? newProps.year : null;
+            this.doAction(["fetchLayerData"]);
+        }
+    }
   onAdd(map) {
     this.map = map
     falcorGraph.get(
       ['geo', fips, 'counties', 'geoid']
     )
       .then(response => {
-        console.log('counties')
         this.counties = Object.values(response.json.geo)
           .reduce((out,state) => {
             if(state.counties){
@@ -58,22 +70,24 @@ class StormEventsLayer extends MapLayer {
 
   }
 
+
+
   fetchData() {
     if(this.counties.length === 0){
       return Promise.resolve() 
     }
-    console.time('get severeWeather')
+    console.log('in fetch',this.filters.year.value,this.filters.hazard.value)
+    //console.time('get severeWeather',)
     return falcorGraph.get(
       ['severeWeather',this.counties, [this.filters.hazard.value], this.filters.year.value, ['total_damage', 'num_episodes']]
     ).then(d => {
-      console.timeEnd('get severeWeather')
+      //console.timeEnd('get severeWeather')
       this.render(this.map)
     })
   }
 
   
   render(map) {
-    console.log('render map', map)
     let data = falcorGraph.getCache()
     let hazard = this.filters.hazard.value
     let year = this.filters.year.value
@@ -96,7 +110,6 @@ class StormEventsLayer extends MapLayer {
         a[c] = colorScale(lossByCounty[c])
         return a
       },{})
-
      map.setPaintProperty(
           'counties',
           'fill-color',
@@ -106,7 +119,7 @@ class StormEventsLayer extends MapLayer {
                "hsl(0, 3%, 94%)"
           ]
       );
-    console.log('lossDomain', colors)
+    //console.log('lossDomain', colors)
   }
 }
 

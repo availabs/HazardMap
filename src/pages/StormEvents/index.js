@@ -1,18 +1,44 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { reduxFalcor } from 'utils/redux-falcor'
+import { reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get'
 
 import AvlMap from "components/AvlMap"
 
 import StoemEventsLayerFactory from "./StormEventsLayer"
-
+import StackedBarGraph from "./components /bar /stackedBarGraph";
+import StormEventsLayer from "./StormEventsLayer";
 class NationalLanding extends React.Component {
+
+  constructor(props) {
+    super(props);
+    // Don't call this.setState() here!
+    this.state = {
+      update: {
+        layer: 'Tracts Layer',
+        filter: 'hazard',
+        year: 'allTime',
+        initialLoad: true
+      }
+    };
+
+  }
   StormEventsLayer = StoemEventsLayerFactory({ active: true });
-  
+
+  setYear =(year) => {
+    if (this.state.update.year !== year) {
+      let update = Object.assign({}, this.state.update);    //creating copy of object
+      update.year = year;  //updating value
+      update.initialLoad = false;
+      this.setState({update})
+    }
+  }
+
   fetchFalcorDeps () {
     return this.props.falcor.get(['riskIndex','hazards'])
   }
+
+
 
   render() {
     return (
@@ -32,7 +58,18 @@ class NationalLanding extends React.Component {
           ]}
           sidebar={false}
           attributes={false}
+          layerProps={ {
+            [this.StormEventsLayer.name]: {
+              year: parseInt(this.state.update.year)
+            }
+          } }
         />
+        <div style={{height:'500px',width:'100%',position:'absolute'}}>
+          <StackedBarGraph
+              setYear = {this.setYear.bind(this)}
+              initialLoad={this.state.update.initialLoad}
+          />
+        </div>
       </div>
     )
   }
@@ -80,7 +117,7 @@ export default
               className: 'flex-1 h-full order-last lg:order-none overflow-hidden'
             },
             children: [
-              NationalLanding
+              connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
             ]
           },
           {
