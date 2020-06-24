@@ -42,7 +42,7 @@ class NationalLanding extends React.Component {
 
   render() {
     return (
-      <div style={{height: '100%'}}>
+      <div className='h-full'>
         <AvlMap
           layers={[
             this.StormEventsLayer
@@ -64,8 +64,9 @@ class NationalLanding extends React.Component {
             }
           } }
         />
-        <div style={{height:'500px',width:'100%',position:'absolute'}}>
+        <div className='relative bottom-56 h-64 z-90 w-full'>
           <StackedBarGraph
+              height={300}
               setYear = {this.setYear.bind(this)}
               initialLoad={this.state.update.initialLoad}
           />

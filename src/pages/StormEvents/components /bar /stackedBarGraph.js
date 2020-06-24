@@ -93,18 +93,18 @@ class StackedBarGraph extends React.Component{
             return a
         },[])
         return(
-            <div style={ { width: "100%", height: "500px" } }>
-                {data.length > 0 ?
+            <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
+                
                     <ResponsiveBar
                         data={data}
                         keys={hazard_list}
                         indexBy="year"
-                        margin={{ top: 50, right: 150, bottom: 50, left: 60 }}
-                        padding={0.3}
+                        margin={{ top: 50, right: 50, bottom: 100, left: 90 }}
+                        padding={0.1}
                         colors={{ scheme: 'spectral' }}
                         enableLabel={false}
                         enableGridX={false}
-                        enableGridY= {true}
+                        enableGridY= {false}
                         axisTop={null}
                         axisRight={null}
                         axisBottom={{
@@ -133,11 +133,11 @@ class StackedBarGraph extends React.Component{
                             base: 10,
                             max: 'auto',
                         }}*/
-                        legends={[
+                        /*legends={[
                             {
                                 dataFrom: 'keys',
                                 anchor: 'bottom-right',
-                                direction: 'column',
+                                direction: 'row',
                                 justify: false,
                                 translateX: 120,
                                 translateY: 0,
@@ -156,7 +156,7 @@ class StackedBarGraph extends React.Component{
                                     }
                                 ]
                             }
-                        ]}
+                        ]}*/
                         animate={true}
                         motionStiffness={90}
                         motionDamping={15}
@@ -166,8 +166,7 @@ class StackedBarGraph extends React.Component{
                             }
                         }
                     />
-                    :
-                    <div><h2>Loading ...</h2></div>
+                   
                 }
             </div>
         )
