@@ -38,38 +38,44 @@ class NationalLanding extends React.Component {
     return this.props.falcor.get(['riskIndex','hazards'])
   }
 
-
-
   render() {
     return (
-      <div className='h-full'>
-        <AvlMap
-          layers={[
-            this.StormEventsLayer
-          ]}
-          height={'100%'}
-          center={[0,0]}
-          zoom={4}
-          year={2018}
-          hazards={this.props.hazards}
-          fips={''}
-          styles={[
-            { name: 'Blank', style: 'mapbox://styles/am3081/ck80d5hds0r9y1ip3cs3aplld'}
-          ]}
-          sidebar={false}
-          attributes={false}
-          layerProps={ {
-            [this.StormEventsLayer.name]: {
-              year: parseInt(this.state.update.year)
-            }
-          } }
-        />
-        <div className='relative bottom-56 h-64 z-90 w-full'>
-          <StackedBarGraph
-              height={300}
-              setYear = {this.setYear.bind(this)}
-              initialLoad={this.state.update.initialLoad}
-          />
+      <div className='flex flex-col lg:flex-row h-full box-border'>
+        <div className='flex-1 h-full order-last lg:order-none overflow-hidden'>
+          <div className='h-full'>
+            <AvlMap
+              layers={[
+                this.StormEventsLayer
+              ]}
+              height={'100%'}
+              center={[0,0]}
+              zoom={4}
+              year={2018}
+              hazards={this.props.hazards}
+              fips={''}
+              styles={[
+                { name: 'Blank', style: 'mapbox://styles/am3081/ck80d5hds0r9y1ip3cs3aplld'}
+              ]}
+              sidebar={false}
+              attributes={false}
+              layerProps={ {
+                [this.StormEventsLayer.name]: {
+                  year: parseInt(this.state.update.year)
+                }
+              } }
+            />
+            <div className='relative bottom-56 h-64 z-90 w-full'>
+              <StackedBarGraph
+                  height={300}
+                  setYear = {this.setYear.bind(this)}
+                  initialLoad={this.state.update.initialLoad}
+              />
+            </div>
+          </div>
+        </div>
+        <div className='h-56 lg:h-auto lg:w-1/6 p-2 lg:min-w-64'>
+          <div className='bg-white rounded h-full w-full shadow'>
+          </div>
         </div>
       </div>
     )
@@ -105,38 +111,8 @@ export default
       className: 'w-full overflow-hidden pt-16 focus:outline-none',
       style:{height: 'calc(100vh - 1rem)'}
     },
-    children: [
-      {
-        type: 'div',
-        props: {
-          className: 'flex flex-col lg:flex-row h-full box-border'
-        },
-        children: [
-          {
-            type: 'div',
-            props: {
-              className: 'flex-1 h-full order-last lg:order-none overflow-hidden'
-            },
-            children: [
-              connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
-            ]
-          },
-          {
-            type: 'div',
-            props: {
-              className: 'h-56 lg:h-auto lg:w-1/6 p-2 lg:min-w-64 '
-            },
-            children: [
-              {
-                type: 'div',
-                props: {
-                  className: ' bg-white rounded h-full w-full shadow '
-                }
-              }
-            ]
-          }
-        ]
-      }
+    children: [ 
+      connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
     ]
 
   }
