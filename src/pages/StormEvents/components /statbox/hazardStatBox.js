@@ -4,7 +4,10 @@ import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import {falcorGraph} from "../../../../store/falcorGraphNew";
 import { fnum } from "utils/sheldusUtils"
+import * as d3 from "d3";
 var _ = require('lodash')
+var format =  d3.format("~s")
+const fmt = (d) => d < 1000 ? d : format(d)
 const hazards = [
     {value:'wind', name:'Wind'},
     {value:'wildfire', name:'Wildfire'},
@@ -93,7 +96,7 @@ class HazardStatBox extends React.Component{
                                                 </span>
                                             </div>
                                         </dd>
-                                        <div className="ml-2 text-sm leading-5 font-medium text-gray-500"># Episodes : {hazard.num_episodes}</div>
+                                        <div className="ml-2 text-sm leading-5 font-medium text-gray-500"># Episodes : {fmt(hazard.num_episodes)}</div>
                                     </dl>
                                 </div>
                             </div>
