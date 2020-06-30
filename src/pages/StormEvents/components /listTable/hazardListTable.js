@@ -31,7 +31,6 @@ const hazards = [
 class HazardListTable extends React.Component{
     constructor(props) {
         super(props);
-
         this.state={
             hazards: hazards.reduce((a,c) =>{
                 a.push(c.value)
@@ -39,11 +38,7 @@ class HazardListTable extends React.Component{
             },[]),
             currentHazard :''
         }
-
     }
-
-
-
 
     fetchFalcorDeps(){
         return this.props.falcor.get(['severeWeather',"",this.state.hazards,this.props.year,['total_damage', 'num_episodes','annualized_damage']]) // "" is for the whole country
@@ -115,10 +110,7 @@ class HazardListTable extends React.Component{
                                                 className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
                                                 onClick={(e) =>{
                                                     e.persist()
-
                                                     this.props.setHazard(hazard.value)
-
-
                                                 }}
                                                 >
                                                 {hazard.name}
