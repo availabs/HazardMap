@@ -45,12 +45,9 @@ class NationalLanding extends React.Component {
         super(props);
         // Don't call this.setState() here!
         this.state = {
-            update: {
-                layer: 'Tracts Layer',
-                year: 'allTime',
-                hazard: 'riverine',
-                initialLoad: true,
-            },
+            layer: 'Tracts Layer',
+            year: 'allTime',
+            hazard: 'riverine',
             select: {
                 domain: [...years, 'allTime'],
                 value: []
@@ -65,20 +62,14 @@ class NationalLanding extends React.Component {
     }
 
     setYear = (year) => {
-        if (this.state.update.year !== year) {
-            let update = Object.assign({}, this.state.update);    //creating copy of object
-            update.year = year;  //updating value
-            update.initialLoad = false;
-            this.setState({update})
+        if (this.state.year !== year) {
+            this.setState({year})
         }
     }
 
     setHazard = (hazard) =>{
-        if (this.state.update.hazard !== hazard) {
-            let update = Object.assign({}, this.state.update);    //creating copy of object
-            update.hazard = hazard;  //updating value
-            update.initialLoad = false;
-            this.setState({update})
+        if (this.state.hazard !== hazard) {
+            this.setState({hazard})
         }
     }
 
@@ -118,9 +109,8 @@ class NationalLanding extends React.Component {
                             attributes={false}
                             layerProps={{
                                 [this.StormEventsLayer.name]: {
-                                    year: this.state.update.year,
-                                    hazard : this.state.update.hazard,
-                                    initialLoad : this.state.update.initialLoad
+                                    year: this.state.year,
+                                    hazard : this.state.hazard
 
                                 }
                             }}
@@ -129,8 +119,8 @@ class NationalLanding extends React.Component {
                             <StackedBarGraph
                                 height={300}
                                 setYear={this.setYear.bind(this)}
-                                initialLoad={this.state.update.initialLoad}
-                                hazard={this.state.update.hazard}
+                                initialLoad={this.state.initialLoad}
+                                hazard={this.state.hazard}
                             />
                         </div>
                     </div>
@@ -142,7 +132,7 @@ class NationalLanding extends React.Component {
                                 multi={false}
                                 placeholder={"Select a year.."}
                                 domain={this.state.select.domain}
-                                value={this.state.update.year}
+                                value={this.state.year}
                                 onChange={this.handleChange}
                             />
                         </div>
@@ -152,10 +142,9 @@ class NationalLanding extends React.Component {
                             />*/}
                         <HazardListTable
                             geoid={[""]}
-                            year={this.state.update.year}
+                            year={this.state.year}
                             setHazard={this.setHazard.bind(this)}
-                            activeHazard={this.state.update.hazard}
-                            initialLoad={this.state.update.initialLoad}
+                            activeHazard={this.state.hazard}
                         />
                     </div>
                 </div>

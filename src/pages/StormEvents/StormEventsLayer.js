@@ -45,8 +45,7 @@ class StormEventsLayer extends MapLayer {
         }
         if(oldProps.hazard !== newProps.hazard){
             hazard = newProps.hazard
-            /*this.filters.hazard.value = newProps.hazard ?
-                [newProps.hazard] : newProps.hazard ? newProps.hazard : null;*/
+            this.filters.hazard.value = newProps.hazard 
         }
     }
 
@@ -58,9 +57,8 @@ class StormEventsLayer extends MapLayer {
         }
         if(oldProps.hazard !== newProps.hazard){
             hazard =  newProps.hazard
-            /*this.filters.hazard.value = newProps.hazard ?
-                [newProps.hazard] : newProps.hazard ? newProps.hazard : null;
-            this.doAction(["fetchLayerData"]);*/
+            this.filters.hazard.value = newProps.hazard
+            this.doAction(["fetchLayerData"]);
         }
     }
 
@@ -90,7 +88,6 @@ class StormEventsLayer extends MapLayer {
         if(hazard){
             this.filters.hazard.value = hazard
         }
-        console.log('in fetch',this.filters.year.value,this.filters.hazard.value)
         return falcorGraph.get(
             ['severeWeather', this.counties,this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes']]
         ).then(d => {
