@@ -35,7 +35,7 @@ const end_year = 2019
 for(let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
-let hazard = null
+let hazard = "riverine"
 class StackedBarGraph extends React.Component{
     constructor(props) {
         super(props);

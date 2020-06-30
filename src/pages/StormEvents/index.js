@@ -156,7 +156,6 @@ class NationalLanding extends React.Component {
                             setHazard={this.setHazard.bind(this)}
                             activeHazard={this.state.update.hazard}
                             initialLoad={this.state.update.initialLoad}
-
                         />
                     </div>
                 </div>

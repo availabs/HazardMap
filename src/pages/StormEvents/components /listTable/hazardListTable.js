@@ -28,6 +28,7 @@ const hazards = [
     {value:'coastal', name:'Coastal Hazards'}
 ]
 let activeHazard = 'riverine'
+let intialLoad = true
 
 class HazardListTable extends React.Component{
     constructor(props) {
@@ -38,7 +39,7 @@ class HazardListTable extends React.Component{
                 a.push(c.value)
                 return a
             },[]),
-            currentHazard :''
+            currentHazard :false
         }
 
     }
@@ -47,6 +48,9 @@ class HazardListTable extends React.Component{
     componentDidUpdate(oldProps,oldState){
         if(oldProps.activeHazard !== this.props.activeHazard){
             activeHazard = this.props.activeHazard
+        }
+        if(oldState.currentHazard !== this.state.currentHazard){
+            intialLoad = this.state.currentHazard
         }
     }
 
@@ -81,6 +85,7 @@ class HazardListTable extends React.Component{
 
     render(){
         let listTableData = this.processData()
+        console.log('in render',intialLoad)
         return(
                 <div className="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200"
                     key={0}>
@@ -119,12 +124,18 @@ class HazardListTable extends React.Component{
                                                 className="text-indigo-600 hover:text-indigo-900"
                                                 onClick={(e) =>{
                                                     e.persist()
-                                                    if(this.props.initialLoad){
+                                                    if(intialLoad){
                                                         this.props.setHazard(hazard.value)
                                                         this.setState({
-                                                            currentHazard : hazard.value
+                                                            currentHazard : false
+                                                        })
+                                                    }else{
+                                                        this.props.setHazard(null)
+                                                        this.setState({
+                                                            currentHazard : false
                                                         })
                                                     }
+
                                                 }}
                                                 >
                                                 {hazard.name}
