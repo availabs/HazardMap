@@ -37,9 +37,9 @@ class HazardListTable extends React.Component{
                 a.push(c.value)
                 return a
             },[]),
-            currentHazard :false
+            currentHazard :''
         }
-        this.toggleClickHazard = this.toggleClickHazard.bind(this)
+
     }
 
     fetchFalcorDeps(){
@@ -47,15 +47,6 @@ class HazardListTable extends React.Component{
             .then(response =>{
                 return response
             })
-    }
-
-    toggleClickHazard(){
-        if(this.state.currentHazard === true){
-            this.props.setHazard(null)
-            this.setState({
-                currentHazard : false
-            })
-        }
     }
 
     processData(){
@@ -116,13 +107,14 @@ class HazardListTable extends React.Component{
                                                 style ={{color:hazardcolors[hazard.value]}}
                                                 onClick={(e) =>{
                                                     e.persist()
-                                                    if(this.state.currentHazard === false){
+                                                    console.log('in on click',this.state.currentHazard)
+                                                    if(this.state.currentHazard !== hazard.value){
                                                         this.props.setHazard(hazard.value)
                                                         this.setState({
-                                                            currentHazard : true
+                                                            currentHazard : hazard.value
                                                         })
                                                     }else{
-                                                        this.toggleClickHazard()
+                                                        this.props.setHazard(null)
                                                     }
 
                                                 }}
