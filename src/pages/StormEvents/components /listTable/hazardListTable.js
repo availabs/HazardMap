@@ -27,7 +27,6 @@ const hazards = [
     {value:'volcano', name:'Volcano'},
     {value:'coastal', name:'Coastal Hazards'}
 ]
-let activeHazard = 'riverine'
 
 class HazardListTable extends React.Component{
     constructor(props) {
@@ -44,11 +43,7 @@ class HazardListTable extends React.Component{
     }
 
 
-    componentDidUpdate(oldProps,oldState){
-        if(oldProps.activeHazard !== this.props.activeHazard){
-            activeHazard = this.props.activeHazard
-        }
-    }
+    
 
     fetchFalcorDeps(){
         return this.props.falcor.get(['severeWeather',"",this.state.hazards,this.props.year,['total_damage', 'num_episodes','annualized_damage']]) // "" is for the whole country
@@ -103,7 +98,9 @@ class HazardListTable extends React.Component{
                         </thead>
                         <tbody>
                         {   listTableData.length > 0 ?
-                            listTableData.map((hazard,i) =>{
+                            listTableData
+                            .sort((a,b) => b.annualized_damage - a.annualized_damage)
+                            .map((hazard,i) =>{
                                 let className = ""
                                 if(i % 2 !==0){
                                     className="bg-white"
@@ -111,24 +108,21 @@ class HazardListTable extends React.Component{
                                     className = "bg-gray-50"
                                 }
                                 return(
-                                    <tr className={`${className} ${activeHazard === hazard.value ? 'border-4' : '' }` }
+                                    <tr className={`${className} ${this.props.activeHazard === hazard.value ? 'border-4 border-blue-300' : '' }` }
                                         key={i} id={hazard.value}>
                                         <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
-                                            <a
-                                                href={"#"}
-                                                className="text-indigo-600 hover:text-indigo-900"
+                                            <div
+                                                className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
                                                 onClick={(e) =>{
                                                     e.persist()
-                                                    if(this.props.initialLoad){
-                                                        this.props.setHazard(hazard.value)
-                                                        this.setState({
-                                                            currentHazard : hazard.value
-                                                        })
-                                                    }
+                                                    
+                                                    this.props.setHazard(hazard.value)
+                                                    
+                                                    
                                                 }}
                                                 >
                                                 {hazard.name}
-                                            </a>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
                                             {fnum(hazard.total_damage)}
