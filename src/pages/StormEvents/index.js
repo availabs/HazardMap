@@ -125,7 +125,7 @@ class NationalLanding extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className='h-56 lg:h-auto lg:w-1/3 p-2 lg:min-w-64 overflow-auto'>
+                <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
                     <div className='bg-white rounded h-full w-full shadow'>
                         <div className='text-3xl'>
                             <Select
