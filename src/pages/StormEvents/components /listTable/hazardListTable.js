@@ -108,7 +108,7 @@ class HazardListTable extends React.Component{
                                     className = "bg-gray-50"
                                 }
                                 return(
-                                    <tr className={`${className} ${this.props.activeHazard === hazard.value ? 'border-b-4 border-blue-600' : '' }` }
+                                    <tr className={`${className} ${this.props.activeHazard === hazard.value ? 'border-b-4 border-blue-300' : '' }` }
                                         key={i} id={hazard.value}>
                                         <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
                                             <div
