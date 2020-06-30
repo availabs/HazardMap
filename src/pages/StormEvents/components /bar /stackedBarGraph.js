@@ -35,23 +35,25 @@ const end_year = 2019
 for(let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
-let hazard = "riverine"
+
 class StackedBarGraph extends React.Component{
     constructor(props) {
         super(props);
         this.state={
-
+            isLoading : true
         }
     }
 
-    componentDidUpdate(oldProps,oldState){
-        if(this.props.hazard !== oldProps.hazard){
-            hazard = this.props.hazard
+    componentDidUpdate(oldProps){
+        if(oldProps.hazard !== this.props.hazard){
             this.fetchFalcorDeps()
         }
     }
 
     fetchFalcorDeps(){
+        this.setState({
+            isLoading : true
+        });
         return this.props.falcor.get(
             ['geo', fips, 'counties', 'geoid'])
             .then(response =>{
@@ -62,8 +64,8 @@ class StackedBarGraph extends React.Component{
                         }
                         return out
                     },[])
-                if(hazard){
-                    this.hazards = [hazard]
+                if(this.props.hazard !== null){
+                    this.hazards = [this.props.hazard]
                 }else{
                     this.hazards = hazards.reduce((a,c) =>{
                         a.push(c.value)
@@ -72,7 +74,11 @@ class StackedBarGraph extends React.Component{
                 }
                 this.props.falcor.get(['severeWeather',"",this.hazards,years,['total_damage', 'num_episodes']]) // "" is for the whole country
                     .then(response =>{
+                        this.setState({
+                            isLoading : false
+                        })
                         return response
+
                     })
 
             })
@@ -99,18 +105,18 @@ class StackedBarGraph extends React.Component{
 
     render(){
         let data = this.transformData()
-        //style={ { width: "100%", height: "100%" } }
         let hazard_list = []
-        if(hazard){
-           hazard_list = [hazard]
+        if(this.props.hazard !== null){
+           hazard_list = [this.props.hazard]
         }else{
             hazard_list = hazards.reduce((a,c) =>{
                 a.push(c.value)
                 return a
             },[])
         }
-        return(
-            <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
+        if(!this.state.isLoading){
+            return(
+                <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
                     <ResponsiveBar
                         data={data}
                         keys={hazard_list}
@@ -179,11 +185,20 @@ class StackedBarGraph extends React.Component{
                         tooltipFormat={value => `${fnum(value)}`}
                         onClick={(e) => {
                             this.props.setYear(e.data.year)
-                            }
+                        }
                         }
                     />
-            </div>
-        )
+                </div>
+            )
+        }else{
+            return(
+                <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
+                Loading ...
+                </div>
+            )
+        }
+
+
     }
 }
 

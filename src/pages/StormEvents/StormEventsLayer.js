@@ -57,7 +57,7 @@ class StormEventsLayer extends MapLayer {
         }
         if(oldProps.hazard !== newProps.hazard){
             hazard =  newProps.hazard
-            this.filters.hazard.value = newProps.hazard
+            this.filters.hazard.value = newProps.hazard || 'riverine'
             this.doAction(["fetchLayerData"]);
         }
     }

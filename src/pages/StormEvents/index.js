@@ -79,10 +79,8 @@ class NationalLanding extends React.Component {
 
     handleChange(e) {
         console.log('---', e);
-        let newSelect = this.state.update
-        newSelect.year = e
         this.setState({
-            update: newSelect
+            year : e
         })
 
     }
