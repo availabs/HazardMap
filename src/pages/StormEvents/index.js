@@ -5,7 +5,8 @@ import get from 'lodash.get';
 import AvlMap from "components/AvlMap";
 import StoemEventsLayerFactory from "./StormEventsLayer"
 import StackedBarGraph from "./components /bar /stackedBarGraph";
-import HazardStatBox from "./components /statbox/hazardStatBox";
+//import HazardStatBox from "./components /statbox/hazardStatBox";
+import HazardListTable from "./components /listTable/hazardListTable";
 import Select from "../../components/avl-components/components/Inputs/select";
 
 let years = []
@@ -47,7 +48,7 @@ class NationalLanding extends React.Component {
             update: {
                 layer: 'Tracts Layer',
                 year: 'allTime',
-                filter: 'hazard',
+                hazard: 'riverine',
                 initialLoad: true,
             },
             select: {
@@ -72,9 +73,17 @@ class NationalLanding extends React.Component {
         }
     }
 
+    setHazard = (hazard) =>{
+        if (this.state.update.hazard !== hazard) {
+            let update = Object.assign({}, this.state.update);    //creating copy of object
+            update.hazard = hazard;  //updating value
+            update.initialLoad = false;
+            this.setState({update})
+        }
+    }
+
     fetchFalcorDeps() {
         return this.props.falcor.get(['riskIndex', 'hazards'])
-
     }
 
     handleChange(e) {
@@ -90,13 +99,13 @@ class NationalLanding extends React.Component {
     render() {
         return (
             <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
-                <div className='flex-1 h-full order-last lg:order-none overflow-hidden'>
+                <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
                     <div className='h-full'>
                         <AvlMap
                             layers={[
                                 this.StormEventsLayer
                             ]}
-                            height={'100%'}
+                            height={'96%'}
                             center={[0, 0]}
                             zoom={4}
                             year={2018}
@@ -109,20 +118,24 @@ class NationalLanding extends React.Component {
                             attributes={false}
                             layerProps={{
                                 [this.StormEventsLayer.name]: {
-                                    year: this.state.update.year
+                                    year: this.state.update.year,
+                                    hazard : this.state.update.hazard,
+                                    initialLoad : this.state.update.initialLoad
+
                                 }
                             }}
                         />
-                        <div className='relative bottom-56 h-64 z-90 w-full'>
+                        <div className='relative bottom-64 h-64 z-90 w-full'>
                             <StackedBarGraph
                                 height={300}
                                 setYear={this.setYear.bind(this)}
                                 initialLoad={this.state.update.initialLoad}
+                                hazard={this.state.update.hazard}
                             />
                         </div>
                     </div>
                 </div>
-                <div className='h-56 lg:h-auto lg:w-1/6 p-2 lg:min-w-64 overflow-auto'>
+                <div className='h-56 lg:h-auto lg:w-1/3 p-2 lg:min-w-64 overflow-auto'>
                     <div className='bg-white rounded h-full w-full shadow'>
                         <div className='text-3xl'>
                             <Select
@@ -133,10 +146,18 @@ class NationalLanding extends React.Component {
                                 onChange={this.handleChange}
                             />
                         </div>
-                            <HazardStatBox
+                            {/*<HazardStatBox
                                 geoid={[""]}
                                 year={this.state.update.year}
-                            />
+                            />*/}
+                        <HazardListTable
+                            geoid={[""]}
+                            year={this.state.update.year}
+                            setHazard={this.setHazard.bind(this)}
+                            activeHazard={this.state.update.hazard}
+                            initialLoad={this.state.update.initialLoad}
+
+                        />
                     </div>
                 </div>
             </div>
@@ -164,7 +185,6 @@ export default [{
         headerBar: false,
         nav: 'top',
         theme: 'flat',
-
     },
     component: {
         type: 'div',

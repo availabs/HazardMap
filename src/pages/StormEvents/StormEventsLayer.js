@@ -36,21 +36,31 @@ let years = []
 for (let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
-
-
+let hazard = null
 class StormEventsLayer extends MapLayer {
     receiveProps(oldProps, newProps) {
-        if ((newProps.year) && this.filters.year.value !== newProps.year) {
+        if (this.filters.year.value !== newProps.year) {
             this.filters.year.value = newProps.year ?
                 [newProps.year] : newProps.year ? newProps.year : null;
+        }
+        if(oldProps.hazard !== newProps.hazard){
+            hazard = newProps.hazard
+            /*this.filters.hazard.value = newProps.hazard ?
+                [newProps.hazard] : newProps.hazard ? newProps.hazard : null;*/
         }
     }
 
     onPropsChange(oldProps, newProps) {
-        if ((newProps.year) && this.filters.year.value !== newProps.year) {
+        if (this.filters.year.value !== newProps.year) {
             this.filters.year.value = newProps.year ?
-                [newProps.year] : newProps.year ? newProps.year : null;
+                [newProps.year] : newProps.year ? newProps.year : null
             this.doAction(["fetchLayerData"]);
+        }
+        if(oldProps.hazard !== newProps.hazard){
+            hazard =  newProps.hazard
+            /*this.filters.hazard.value = newProps.hazard ?
+                [newProps.hazard] : newProps.hazard ? newProps.hazard : null;
+            this.doAction(["fetchLayerData"]);*/
         }
     }
 
@@ -77,10 +87,12 @@ class StormEventsLayer extends MapLayer {
         if (this.counties.length === 0) {
             return Promise.resolve()
         }
-        console.log('in fetch', this.filters.year.value, this.filters.hazard.value)
-        //console.time('get severeWeather',)
+        if(hazard){
+            this.filters.hazard.value = hazard
+        }
+        console.log('in fetch',this.filters.year.value,this.filters.hazard.value)
         return falcorGraph.get(
-            ['severeWeather', this.counties, [this.filters.hazard.value], this.filters.year.value, ['total_damage', 'num_episodes']]
+            ['severeWeather', this.counties,this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes']]
         ).then(d => {
             //console.timeEnd('get severeWeather')
             this.render(this.map)

@@ -76,7 +76,11 @@ class HazardStatBox extends React.Component{
                 {statBoxData.length > 0 ?
                     statBoxData.map((hazard,i) =>{
                         return(
-                            <div className="mt-5 grid-cols-6 rounded-lg bg-white overflow-hidden shadow" key={i}>
+                            <div className="mt-5 grid-cols-6 rounded-lg bg-white overflow-hidden shadow cursor-pointer"
+                                 key={i}
+                                    onClick={(e) => {
+                                        console.log('e',e)
+                                    }}>
                                 <div className="px-4 py-5 sm:p-6" key={i}>
                                     <dl>
                                         <dt className="text-2xl leading-6 font-Georgia text-gray-900" key={i}>

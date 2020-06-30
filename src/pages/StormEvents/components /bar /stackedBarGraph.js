@@ -35,11 +35,19 @@ const end_year = 2019
 for(let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
+let hazard = null
 class StackedBarGraph extends React.Component{
     constructor(props) {
         super(props);
         this.state={
 
+        }
+    }
+
+    componentDidUpdate(oldProps,oldState){
+        if(this.props.hazard !== oldProps.hazard){
+            hazard = this.props.hazard
+            this.fetchFalcorDeps()
         }
     }
 
@@ -54,10 +62,14 @@ class StackedBarGraph extends React.Component{
                         }
                         return out
                     },[])
-                this.hazards = hazards.reduce((a,c) =>{
-                    a.push(c.value)
-                    return a
-                },[])
+                if(hazard){
+                    this.hazards = [hazard]
+                }else{
+                    this.hazards = hazards.reduce((a,c) =>{
+                        a.push(c.value)
+                        return a
+                    },[])
+                }
                 this.props.falcor.get(['severeWeather',"",this.hazards,years,['total_damage', 'num_episodes']]) // "" is for the whole country
                     .then(response =>{
                         return response
@@ -88,20 +100,24 @@ class StackedBarGraph extends React.Component{
     render(){
         let data = this.transformData()
         //style={ { width: "100%", height: "100%" } }
-        let hazard_list = hazards.reduce((a,c) =>{
-            a.push(c.value)
-            return a
-        },[])
+        let hazard_list = []
+        if(hazard){
+           hazard_list = [hazard]
+        }else{
+            hazard_list = hazards.reduce((a,c) =>{
+                a.push(c.value)
+                return a
+            },[])
+        }
         return(
             <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
-                
                     <ResponsiveBar
                         data={data}
                         keys={hazard_list}
                         indexBy="year"
                         margin={{ top: 50, right: 50, bottom: 100, left: 90 }}
                         padding={0.1}
-                        colors={{ scheme: 'spectral' }}
+                        colors={hazard_list.length === 1 ? {scheme:'nivo'}:{ scheme: 'spectral' }}
                         enableLabel={false}
                         enableGridX={false}
                         enableGridY= {false}
@@ -166,8 +182,6 @@ class StackedBarGraph extends React.Component{
                             }
                         }
                     />
-                   
-                }
             </div>
         )
     }
