@@ -28,7 +28,7 @@ const hazards = [
     {value:'coastal', name:'Coastal Hazards'}
 ]
 let activeHazard = 'riverine'
-let intialLoad = true
+let intialLoad = false
 
 class HazardListTable extends React.Component{
     constructor(props) {
@@ -127,7 +127,7 @@ class HazardListTable extends React.Component{
                                                     if(intialLoad){
                                                         this.props.setHazard(hazard.value)
                                                         this.setState({
-                                                            currentHazard : false
+                                                            currentHazard : true
                                                         })
                                                     }else{
                                                         this.props.setHazard(null)
