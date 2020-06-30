@@ -110,7 +110,7 @@ class HazardListTable extends React.Component{
                                 return(
                                     <tr className={`${className} ${this.props.activeHazard === hazard.value ? 'border-4 border-blue-300' : '' }` }
                                         key={i} id={hazard.value}>
-                                        <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                        <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
                                             <div
                                                 className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
                                                 onClick={(e) =>{
@@ -124,13 +124,13 @@ class HazardListTable extends React.Component{
                                                 {hazard.name}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                        <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right">
                                             {fnum(hazard.total_damage)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                        <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right">
                                             {fnum(hazard.annualized_damage)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                        <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right">
                                             {fmt(hazard.num_episodes)}
                                         </td>
                                     </tr>
