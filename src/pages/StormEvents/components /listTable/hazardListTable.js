@@ -5,6 +5,7 @@ import get from 'lodash.get';
 import {falcorGraph} from "../../../../store/falcorGraphNew";
 import { fnum } from "utils/sheldusUtils"
 import * as d3 from "d3";
+import hazardcolors from "../../../../constants/hazardColors";
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
 const hazards = [
@@ -49,7 +50,7 @@ class HazardListTable extends React.Component{
     }
 
     toggleClickHazard(){
-        if(this.state.currentHazard === false){
+        if(this.state.currentHazard === true){
             this.props.setHazard(null)
             this.setState({
                 currentHazard : false
@@ -111,7 +112,8 @@ class HazardListTable extends React.Component{
                                         key={i} id={hazard.value}>
                                         <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
                                             <div
-                                                className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
+                                                className="hover:text-red-600 cursor-pointer"
+                                                style ={{color:hazardcolors[hazard.value]}}
                                                 onClick={(e) =>{
                                                     e.persist()
                                                     if(this.state.currentHazard === false){
@@ -119,8 +121,10 @@ class HazardListTable extends React.Component{
                                                         this.setState({
                                                             currentHazard : true
                                                         })
+                                                    }else{
+                                                        this.toggleClickHazard()
                                                     }
-                                                    this.toggleClickHazard()
+
                                                 }}
                                                 >
                                                 {hazard.name}

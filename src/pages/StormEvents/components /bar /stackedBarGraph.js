@@ -4,6 +4,7 @@ import { reduxFalcor} from "utils/redux-falcor-new";
 import { falcorGraph } from "store/falcorGraphNew"
 import {ResponsiveBar} from '@nivo/bar'
 import { fnum } from "utils/sheldusUtils"
+import hazardcolors from "../../../../constants/hazardColors";
 const get = require("lodash.get");
 
 const fips = ["01","02","04","05","06","08","09","10","11","12","13","15","16","17","18","19","20",
@@ -123,7 +124,7 @@ class StackedBarGraph extends React.Component{
                         indexBy="year"
                         margin={{ top: 50, right: 50, bottom: 100, left: 90 }}
                         padding={0.1}
-                        colors={hazard_list.length === 1 ? {scheme:'nivo'}:{ scheme: 'spectral' }}
+                        colors={(d) => hazardcolors[d.id]}
                         enableLabel={false}
                         enableGridX={false}
                         enableGridY= {false}
