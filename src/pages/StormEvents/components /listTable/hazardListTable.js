@@ -2,10 +2,10 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
-import {falcorGraph} from "../../../../store/falcorGraphNew";
+import { falcorGraph } from "store/falcorGraphNew"
 import { fnum } from "utils/sheldusUtils"
 import * as d3 from "d3";
-import hazardcolors from "../../../../constants/hazardColors";
+import hazardcolors from "constants/hazardColors";
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
 const hazards = [
@@ -61,7 +61,7 @@ class HazardListTable extends React.Component{
                             value: item.value,
                             total_damage : get(graph,[hazard,this.props.year,"total_damage"],0),
                             num_episodes: get(graph,[hazard,this.props.year,"num_episodes"],0),
-                            annualized_damage : get(graph,[hazard,this.props.year,'annualized_damage'],0)
+                            annualized_damage : get(graph,[hazard,'allTime','annualized_damage'],0) // fixed as 'allTime'
                         })
                     }
                 })
@@ -107,7 +107,6 @@ class HazardListTable extends React.Component{
                                                 style ={{color:hazardcolors[hazard.value]}}
                                                 onClick={(e) =>{
                                                     e.persist()
-                                                    console.log('in on click',this.state.currentHazard)
                                                     if(this.state.currentHazard !== hazard.value){
                                                         this.props.setHazard(hazard.value)
                                                         this.setState({
