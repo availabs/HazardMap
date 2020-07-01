@@ -1,12 +1,13 @@
 import React from "react"
-
 import MapLayer from "components/AvlMap/MapLayer"
-
 import {falcorGraph} from "store/falcorGraphNew"
-
 import get from "lodash.get"
 import hazardcolors from "../../constants/hazardColors";
 import * as d3scale from 'd3-scale'
+import * as d3 from 'd3'
+import { fnum } from "utils/sheldusUtils"
+import { extent } from "d3-array"
+var _ = require('lodash')
 
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 const hazards = [
@@ -96,6 +97,28 @@ class StormEventsLayer extends MapLayer {
         })
     }
 
+    getColorScale(domain) {
+        this.legend.range = hazardcolors[this.filters.hazard.value+"_range"]
+        switch (this.legend.type) {
+            case "quantile":
+                return d3scale.scaleQuantile()
+                    .domain(domain)
+                    .range(this.legend.range);
+            case "quantize":
+                this.legend.domain = extent(domain)
+                return d3scale.scaleQuantize()
+                    .domain(domain)
+                    .range(this.legend.range);
+            case "threshold": {
+                this.legend.domain = domain
+                return d3scale.scaleThreshold()
+                    .domain(domain)
+                    .range(this.legend.range)
+            }
+        }
+        this.layer.forceUpdate()
+
+    }
 
     render(map) {
         let data = falcorGraph.getCache()
@@ -106,23 +129,31 @@ class StormEventsLayer extends MapLayer {
         let lossByCounty = Object.keys(sw)
             .reduce((a, c) => {
                 if (get(sw[c], `${hazard}.${year}.${measure}`, false)) {
-                    a[c] = get(sw[c], `${hazard}.${year}.${measure}`, false)
+                     a[c] = get(sw[c], `${hazard}.${year}.${measure}`, false)
                 }
                 return a
             }, {})
-        let lossDomain = Object.values(lossByCounty).sort((a, b) => a - b)
-        let colorScale = d3scale.scaleQuantile()
-            .domain(lossDomain)
-            .range(
-                //["#f2efe9", "#fadaa6", "#f7c475", "#f09a10", "#cf4010"]
-                hazardcolors[this.filters.hazard.value+"_range"]
-            )
+        let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
 
+        let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
+            d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
+
+        let range = ["#F1EFEF",...hazardcolors[this.filters.hazard.value + '_range']]
+
+        this.legend.domain = domain
+        this.legend.range = range
+
+        let colorScale = d3scale.scaleThreshold()
+            .domain(domain)
+            .range(
+                range //["#f2efe9", "#fadaa6", "#f7c475", "#f09a10", "#cf4010"]
+            )
         let colors = Object.keys(lossByCounty)
             .reduce((a, c) => {
                 a[c] = colorScale(lossByCounty[c])
                 return a
             }, {})
+
         map.setPaintProperty(
             'counties',
             'fill-color',
@@ -143,7 +174,12 @@ export default (props = {}) =>
         stationFeatures: [],
 
         onHover: {
-            layers: ["counties"]
+            layers: ["counties"],
+            dataFunc: function (features) {
+                let data = get(falcorGraph.getCache(), 'severeWeather', {})
+                console.log('county',features[0].properties.county_fips)
+                console.log('data',get(data[features[0].properties.county_fips],[this.filters.hazard.value,this.filters.year.value],{}))
+            }
         },
         popover: {
             layers: ["counties"],
@@ -153,6 +189,16 @@ export default (props = {}) =>
                     ["geoid", properties.county_fips]
                 ]
             }
+        },
+        legend: {
+            title: 'Total Damage',
+            type: "threshold",
+            types: ["threshold", "quantile", "quantize","linear"],
+            vertical: false,
+            range: [],
+            active: false,
+            domain: [],
+            format: fnum
         },
         sources: [
             {

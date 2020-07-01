@@ -3,22 +3,27 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import AvlMap from "components/AvlMap";
-import StoemEventsLayerFactory from "./StormEventsLayer"
+import StormEventsLayerFactory from "./StormEventsLayer"
 import StackedBarGraph from "./components /bar /stackedBarGraph";
 //import HazardStatBox from "./components /statbox/hazardStatBox";
+import Legend from "components/AvlMap/components/legend/Legend"
+import { fnum } from "utils/sheldusUtils"
 import HazardListTable from "./components /listTable/hazardListTable";
 import Select from "components/avl-components/components/Inputs/select";
+import hazardcolors from "constants/hazardColors";
+import * as d3 from "d3";
 
 let years = []
 const start_year = 1996
 const end_year = 2019
+const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 for (let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
 
 class NationalLanding extends React.Component {
 
-    StormEventsLayer = StoemEventsLayerFactory({active: true});
+    StormEventsLayer = StormEventsLayerFactory({active: true});
 
     constructor(props) {
         super(props);
@@ -53,7 +58,38 @@ class NationalLanding extends React.Component {
     }
 
     fetchFalcorDeps() {
-        return this.props.falcor.get(['riskIndex', 'hazards'])
+        return this.props.falcor.get(
+            ['geo', fips, 'counties', 'geoid'])
+            .then(response =>{
+                this.counties = Object.values(response.json.geo)
+                    .reduce((out,state) => {
+                        if(state.counties){
+                            out = [...out,...state.counties]
+                        }
+                        return out
+                    },[])
+                this.props.falcor.get(['severeWeather',this.counties,this.state.hazard,this.state.year,['total_damage', 'num_episodes']]) // "" is for the whole country
+                    .then(response =>{
+                        let sw = get(response, 'json.severeWeather', {})
+                        let lossByCounty = Object.keys(sw)
+                            .reduce((a, c) => {
+                                if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)) {
+                                    a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)
+                                }
+                                return a
+                            }, {})
+                        let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
+
+                        let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
+                            d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
+                        this.setState({
+                            domain : domain
+                        })
+                        return response
+
+                    })
+
+            })
     }
 
     handleChange(e) {
@@ -62,10 +98,21 @@ class NationalLanding extends React.Component {
     }
 
     render() {
+
         return (
             <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
                 <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
                     <div className='h-full'>
+                        <div className="relative top-0 right-auto h-8 w-2/6">
+                            <Legend
+                                title = {'Total Damage'}
+                                type = {"threshold"}
+                                vertical= {false}
+                                range= {["#F1EFEF",...hazardcolors[this.state.hazard + '_range']]}
+                                domain = {this.state.domain}
+                                format= {fnum}
+                            />
+                        </div>
                         <AvlMap
                             layers={[
                                 this.StormEventsLayer
@@ -74,7 +121,7 @@ class NationalLanding extends React.Component {
                             center={[0, 0]}
                             zoom={4}
                             year={2018}
-                            hazards={this.props.hazards}
+                            //hazards={this.props.hazards}
                             fips={''}
                             styles={[
                                 {name: 'Blank', style: 'mapbox://styles/am3081/ck80d5hds0r9y1ip3cs3aplld'}
@@ -120,6 +167,7 @@ class NationalLanding extends React.Component {
                             setHazard={this.setHazard.bind(this)}
                             activeHazard={this.state.hazard}
                         />
+
                     </div>
                 </div>
             </div>
