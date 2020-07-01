@@ -4,6 +4,7 @@ import { reduxFalcor} from "utils/redux-falcor-new";
 import { falcorGraph } from "store/falcorGraphNew"
 import {ResponsiveBar} from '@nivo/bar'
 import { fnum } from "utils/sheldusUtils"
+import hazardcolors from "../../../../constants/hazardColors";
 const get = require("lodash.get");
 
 const fips = ["01","02","04","05","06","08","09","10","11","12","13","15","16","17","18","19","20",
@@ -35,23 +36,25 @@ const end_year = 2019
 for(let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
-let hazard = null
+
 class StackedBarGraph extends React.Component{
     constructor(props) {
         super(props);
         this.state={
-
+            isLoading : true
         }
     }
 
-    componentDidUpdate(oldProps,oldState){
-        if(this.props.hazard !== oldProps.hazard){
-            hazard = this.props.hazard
+    componentDidUpdate(oldProps){
+        if(oldProps.hazard !== this.props.hazard){
             this.fetchFalcorDeps()
         }
     }
 
     fetchFalcorDeps(){
+        this.setState({
+            isLoading : true
+        });
         return this.props.falcor.get(
             ['geo', fips, 'counties', 'geoid'])
             .then(response =>{
@@ -62,8 +65,8 @@ class StackedBarGraph extends React.Component{
                         }
                         return out
                     },[])
-                if(hazard){
-                    this.hazards = [hazard]
+                if(this.props.hazard !== null){
+                    this.hazards = [this.props.hazard]
                 }else{
                     this.hazards = hazards.reduce((a,c) =>{
                         a.push(c.value)
@@ -72,7 +75,11 @@ class StackedBarGraph extends React.Component{
                 }
                 this.props.falcor.get(['severeWeather',"",this.hazards,years,['total_damage', 'num_episodes']]) // "" is for the whole country
                     .then(response =>{
+                        this.setState({
+                            isLoading : false
+                        })
                         return response
+
                     })
 
             })
@@ -99,25 +106,25 @@ class StackedBarGraph extends React.Component{
 
     render(){
         let data = this.transformData()
-        //style={ { width: "100%", height: "100%" } }
         let hazard_list = []
-        if(hazard){
-           hazard_list = [hazard]
+        if(this.props.hazard !== null){
+           hazard_list = [this.props.hazard]
         }else{
             hazard_list = hazards.reduce((a,c) =>{
                 a.push(c.value)
                 return a
             },[])
         }
-        return(
-            <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
+        if(!this.state.isLoading){
+            return(
+                <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
                     <ResponsiveBar
                         data={data}
                         keys={hazard_list}
                         indexBy="year"
                         margin={{ top: 50, right: 50, bottom: 100, left: 90 }}
                         padding={0.1}
-                        colors={hazard_list.length === 1 ? {scheme:'nivo'}:{ scheme: 'spectral' }}
+                        colors={(d) => hazardcolors[d.id]}
                         enableLabel={false}
                         enableGridX={false}
                         enableGridY= {false}
@@ -179,11 +186,20 @@ class StackedBarGraph extends React.Component{
                         tooltipFormat={value => `${fnum(value)}`}
                         onClick={(e) => {
                             this.props.setYear(e.data.year)
-                            }
+                        }
                         }
                     />
-            </div>
-        )
+                </div>
+            )
+        }else{
+            return(
+                <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
+                Loading ...
+                </div>
+            )
+        }
+
+
     }
 }
 

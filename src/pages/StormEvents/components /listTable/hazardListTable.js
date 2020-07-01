@@ -5,6 +5,7 @@ import get from 'lodash.get';
 import {falcorGraph} from "../../../../store/falcorGraphNew";
 import { fnum } from "utils/sheldusUtils"
 import * as d3 from "d3";
+import hazardcolors from "../../../../constants/hazardColors";
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
 const hazards = [
@@ -31,7 +32,6 @@ const hazards = [
 class HazardListTable extends React.Component{
     constructor(props) {
         super(props);
-
         this.state={
             hazards: hazards.reduce((a,c) =>{
                 a.push(c.value)
@@ -41,9 +41,6 @@ class HazardListTable extends React.Component{
         }
 
     }
-
-
-    
 
     fetchFalcorDeps(){
         return this.props.falcor.get(['severeWeather',"",this.state.hazards,this.props.year,['total_damage', 'num_episodes','annualized_damage']]) // "" is for the whole country
@@ -106,13 +103,20 @@ class HazardListTable extends React.Component{
                                         key={i} id={hazard.value}>
                                         <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
                                             <div
-                                                className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
+                                                className="hover:text-red-600 cursor-pointer"
+                                                style ={{color:hazardcolors[hazard.value]}}
                                                 onClick={(e) =>{
                                                     e.persist()
-                                                    
-                                                    this.props.setHazard(hazard.value)
-                                                    
-                                                    
+                                                    console.log('in on click',this.state.currentHazard)
+                                                    if(this.state.currentHazard !== hazard.value){
+                                                        this.props.setHazard(hazard.value)
+                                                        this.setState({
+                                                            currentHazard : hazard.value
+                                                        })
+                                                    }else{
+                                                        this.props.setHazard(null)
+                                                    }
+
                                                 }}
                                                 >
                                                 {hazard.name}

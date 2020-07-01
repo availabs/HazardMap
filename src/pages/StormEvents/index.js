@@ -78,7 +78,6 @@ class NationalLanding extends React.Component {
     }
 
     handleChange(e) {
-        console.log('---', e);
         this.setState({ year: e })
 
     }

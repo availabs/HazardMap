@@ -5,7 +5,7 @@ import MapLayer from "components/AvlMap/MapLayer"
 import {falcorGraph} from "store/falcorGraphNew"
 
 import get from "lodash.get"
-// import styled from "styled-components"
+import hazardcolors from "../../constants/hazardColors";
 import * as d3scale from 'd3-scale'
 
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
@@ -57,7 +57,7 @@ class StormEventsLayer extends MapLayer {
         }
         if(oldProps.hazard !== newProps.hazard){
             hazard =  newProps.hazard
-            this.filters.hazard.value = newProps.hazard
+            this.filters.hazard.value = newProps.hazard || 'riverine'
             this.doAction(["fetchLayerData"]);
         }
     }
@@ -113,7 +113,10 @@ class StormEventsLayer extends MapLayer {
         let lossDomain = Object.values(lossByCounty).sort((a, b) => a - b)
         let colorScale = d3scale.scaleQuantile()
             .domain(lossDomain)
-            .range(["#f2efe9", "#fadaa6", "#f7c475", "#f09a10", "#cf4010"])
+            .range(
+                //["#f2efe9", "#fadaa6", "#f7c475", "#f09a10", "#cf4010"]
+                hazardcolors[this.filters.hazard.value+"_range"]
+            )
 
         let colors = Object.keys(lossByCounty)
             .reduce((a, c) => {
