@@ -16,27 +16,6 @@ for (let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
 
-const hazards = [
-    {value:'wind', name:'Wind'},
-    {value:'wildfire', name:'Wildfire'},
-    {value:'tsunami', name:'Tsunami/Seiche'},
-    {value:'tornado', name:'Tornado'},
-    {value:'riverine', name:'Flooding'},
-    {value:'lightning', name:'Lightning'},
-    {value:'landslide', name:'Landslide'},
-    {value:'icestorm', name:'Ice Storm'},
-    {value:'hurricane', name:'Hurricane'},
-    {value:'heatwave', name:'Heat Wave'},
-    {value:'hail', name:'Hail'},
-    {value:'earthquake', name:'Earthquake'},
-    {value:'drought', name:'Drought'},
-    {value:'avalanche', name:'Avalanche'},
-    {value:'coldwave', name:'Coldwave'},
-    {value:'winterweat', name:'Snow Storm'},
-    {value:'volcano', name:'Volcano'},
-    {value:'coastal', name:'Coastal Hazards'}
-]
-
 class NationalLanding extends React.Component {
 
     StormEventsLayer = StoemEventsLayerFactory({active: true});

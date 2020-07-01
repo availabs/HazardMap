@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { reduxFalcor} from "utils/redux-falcor-new";
 import { falcorGraph } from "store/falcorGraphNew"
 import {ResponsiveBar} from '@nivo/bar'
 import { fnum } from "utils/sheldusUtils"
-import hazardcolors from "../../../../constants/hazardColors";
+import hazardcolors from "constants/hazardColors";
 const get = require("lodash.get");
 
 const fips = ["01","02","04","05","06","08","09","10","11","12","13","15","16","17","18","19","20",
@@ -95,8 +95,8 @@ class StackedBarGraph extends React.Component{
                 })
                 return a
             }, [])
-            Object.keys(graph).forEach(hazard => {
-                graph_data.map(item => {
+            Object.keys(graph).forEach(function (hazard) {
+                graph_data.forEach(item => {
                     item[hazard] = get(graph, [hazard,item.year, "total_damage"], 0)
                 })
             })

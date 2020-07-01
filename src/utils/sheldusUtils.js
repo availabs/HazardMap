@@ -7,10 +7,10 @@ const ss = require("simple-statistics");
 
 const { format } = require("d3-format");
 
-const LimitedAttributes = {
-    num_events: "Occurances",
-    property_damage: "Property Damage $"
-}
+// const LimitedAttributes = {
+//     num_events: "Occurances",
+//     property_damage: "Property Damage $"
+// }
 
 const sheldusAttributes = {
     num_events: "Occurances",
@@ -241,7 +241,7 @@ module.exports = {
         for (const geoid in rawData) {
             if (!geoids.includes(geoid)) continue;
             for (const hazardid in rawData[geoid]) {
-                if (hazard && (hazardid != hazard)) continue;
+                if (hazard && (hazardid !== hazard)) continue;
 
                 if (!(hazardid in keys)) {
                     keys[hazardid] = true;
@@ -284,16 +284,14 @@ module.exports = {
     sumData : (data, key, len) => {
         return Object.keys(data).reduce((total,year) => {
             let avgTotal = 0
-            let count = 0
             for(let i=(len-1); i >= 0; i-- ) {
                 if(data[year-i] && data[year-i][key]){
                     avgTotal += data[year-i][key]
                 }
-                count += 1
             }
-            let avg = !isNaN(avgTotal / count) && count > 0
-                ? (avgTotal / count)
-                : 0
+            // let avg = !isNaN(avgTotal / count) && count > 0
+            //     ? (avgTotal / count)
+            //     : 0
             total[year] = +(avgTotal.toFixed(2))
             return total
         }, {})

@@ -165,10 +165,10 @@ const D3_CATEGORY20_RANGE = [
 const hazardcolors = {
     'wind': D3_CATEGORY20[4],
     'wind_range': D3_CATEGORY20_RANGE[4],
-    'wildfire': D3_CATEGORY20[1],
-    'wildfire_range': D3_CATEGORY20_RANGE[1],
-    'tsunami': D3_CATEGORY20[2],
-    'tsunami_range': D3_CATEGORY20_RANGE[2],
+    'wildfire': D3_CATEGORY20[17],
+    'wildfire_range': D3_CATEGORY20_RANGE[17],
+    'tsunami': D3_CATEGORY20[9],
+    'tsunami_range': D3_CATEGORY20_RANGE[9],
     'tornado': D3_CATEGORY20[3],
     'tornado_range': D3_CATEGORY20_RANGE[3],
     'riverine': D3_CATEGORY20[19],
@@ -181,8 +181,8 @@ const hazardcolors = {
     'icestorm_range': D3_CATEGORY20_RANGE[7],
     'hurricane': D3_CATEGORY20[8],
     'hurricane_range': D3_CATEGORY20_RANGE[8],
-    'heatwave': D3_CATEGORY20[9],
-    'heatwave_range': D3_CATEGORY20_RANGE[9],
+    'heatwave': D3_CATEGORY20[2],
+    'heatwave_range': D3_CATEGORY20_RANGE[2],
     'hail': D3_CATEGORY20[0],
     'hail_range': D3_CATEGORY20_RANGE[0],
     'earthquake': D3_CATEGORY20[11],
@@ -197,8 +197,8 @@ const hazardcolors = {
     'winterweat_range': D3_CATEGORY20_RANGE[15],
     'volcano': D3_CATEGORY20[16],
     'volcano_range': D3_CATEGORY20_RANGE[16],
-    'coastal': D3_CATEGORY20[17],
-    'coastal_range': D3_CATEGORY20_RANGE[17]
+    'coastal': D3_CATEGORY20[1],
+    'coastal_range': D3_CATEGORY20_RANGE[1]
 };
 
 export default hazardcolors
