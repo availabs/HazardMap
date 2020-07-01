@@ -7,7 +7,7 @@ import StoemEventsLayerFactory from "./StormEventsLayer"
 import StackedBarGraph from "./components /bar /stackedBarGraph";
 //import HazardStatBox from "./components /statbox/hazardStatBox";
 import HazardListTable from "./components /listTable/hazardListTable";
-import Select from "../../components/avl-components/components/Inputs/select";
+import Select from "components/avl-components/components/Inputs/select";
 
 let years = []
 const start_year = 1996
