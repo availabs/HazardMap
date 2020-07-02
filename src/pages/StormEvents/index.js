@@ -117,7 +117,7 @@ class NationalLanding extends React.Component {
                             layers={[
                                 this.StormEventsLayer
                             ]}
-                            height={'96%'}
+                            height={'90%'}
                             center={[0, 0]}
                             zoom={4}
                             year={2018}
