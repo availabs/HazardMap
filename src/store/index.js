@@ -1,3 +1,4 @@
+
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 // import { reducer as graph } from 'utils/redux-falcor';
@@ -5,11 +6,13 @@ import thunk from 'redux-thunk'
 import falcorCache from "utils/redux-falcor-new/falcorCache"
 
 import user from './user';
+import stormEvents from "./stormEvents";
 import options from 'components/CensusCharts/options.store.js'
 import messages from './messages';
 
 const reducer = combineReducers({
   user,
+  stormEvents,
   options,
   messages,
   // graph

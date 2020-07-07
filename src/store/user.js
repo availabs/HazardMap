@@ -7,6 +7,7 @@ import { AUTH_HOST, AUTH_PROJECT_NAME } from 'config';
 const USER_LOGIN = 'USER::USER_LOGIN';
 const USER_LOGOUT = 'USER::USER_LOGOUT';
 const AUTH_FAILURE = 'USER::AUTH_FAILURE';
+
 // const RESET_PASSWORD = 'USER::RESET_PASSWORD';
 
 // ------------------------------------
@@ -40,6 +41,7 @@ const removeUserToken = () => {
     localStorage.removeItem('userToken');
   }
 };
+
 
 export const logout = () => dispatch =>
   Promise.resolve(dispatch({ type: USER_LOGOUT }));
@@ -166,7 +168,7 @@ export const resetPassword = email => dispatch => {
 
 export const actions = {
   login,
-  logout
+  logout,
 };
 
 // -------------------------------------

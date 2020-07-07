@@ -7,10 +7,14 @@ import * as d3scale from 'd3-scale'
 import * as d3 from 'd3'
 import { fnum } from "utils/sheldusUtils"
 import { extent } from "d3-array"
+import * as turf from '@turf/turf'
+import { connect } from 'react-redux';
+import {reduxFalcor} from "utils/redux-falcor-new";
+import {setActiveStateGeoid} from "store/stormEvents";
+
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
-var _ = require('lodash')
-
+const history = require('history').createBrowserHistory({forceRefresh:false});
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 const hazards = [
     {value: 'wind', name: 'Wind'},
@@ -46,10 +50,11 @@ class StormEventsLayer extends MapLayer {
             this.filters.year.value = newProps.year ?
                 [newProps.year] : newProps.year ? newProps.year : null;
         }
-        if(oldProps.hazard !== newProps.hazard){
+        if (oldProps.hazard !== newProps.hazard) {
             hazard = newProps.hazard
-            this.filters.hazard.value = newProps.hazard 
+            this.filters.hazard.value = newProps.hazard
         }
+
     }
 
     onPropsChange(oldProps, newProps) {
@@ -58,11 +63,12 @@ class StormEventsLayer extends MapLayer {
                 [newProps.year] : newProps.year ? newProps.year : null
             this.doAction(["fetchLayerData"]);
         }
-        if(oldProps.hazard !== newProps.hazard){
-            hazard =  newProps.hazard
+        if (oldProps.hazard !== newProps.hazard) {
+            hazard = newProps.hazard
             this.filters.hazard.value = newProps.hazard || 'riverine'
             this.doAction(["fetchLayerData"]);
         }
+
     }
 
     onAdd(map) {
@@ -78,6 +84,7 @@ class StormEventsLayer extends MapLayer {
                         }
                         return out
                     }, [])
+
                 this.fetchData()
             })
 
@@ -88,11 +95,11 @@ class StormEventsLayer extends MapLayer {
         if (this.counties.length === 0) {
             return Promise.resolve()
         }
-        if(hazard){
+        if (hazard) {
             this.filters.hazard.value = hazard
         }
         return falcorGraph.get(
-            ['severeWeather', this.counties,this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes']]
+            ['severeWeather', this.counties, this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes']]
         ).then(d => {
             //console.timeEnd('get severeWeather')
             this.render(this.map)
@@ -100,7 +107,7 @@ class StormEventsLayer extends MapLayer {
     }
 
     getColorScale(domain) {
-        this.legend.range = hazardcolors[this.filters.hazard.value+"_range"]
+        this.legend.range = hazardcolors[this.filters.hazard.value + "_range"]
         switch (this.legend.type) {
             case "quantile":
                 return d3scale.scaleQuantile()
@@ -122,6 +129,7 @@ class StormEventsLayer extends MapLayer {
 
     }
 
+
     render(map) {
         let data = falcorGraph.getCache()
         let hazard = this.filters.hazard.value
@@ -131,16 +139,16 @@ class StormEventsLayer extends MapLayer {
         let lossByCounty = Object.keys(sw)
             .reduce((a, c) => {
                 if (get(sw[c], `${hazard}.${year}.${measure}`, false)) {
-                     a[c] = get(sw[c], `${hazard}.${year}.${measure}`, false)
+                    a[c] = get(sw[c], `${hazard}.${year}.${measure}`, false)
                 }
                 return a
             }, {})
-        let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
+        let lossDomain = Object.values(lossByCounty).sort((a, b) => a - b)
 
-        let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
-            d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
+        let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
+            d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]
 
-        let range = ["#F1EFEF",...hazardcolors[this.filters.hazard.value + '_range']]
+        let range = ["#F1EFEF", ...hazardcolors[this.filters.hazard.value + '_range']]
 
         this.legend.domain = domain
         this.legend.range = range
@@ -156,6 +164,25 @@ class StormEventsLayer extends MapLayer {
                 return a
             }, {})
 
+        map.on('click',(e, layer)=> {
+            let relatedFeatures = map.queryRenderedFeatures(e.point, {
+                layers: ['states']
+            });
+            if(relatedFeatures[0]){
+                let state_fips = relatedFeatures.reduce((a, c) => {
+                    a = c.properties.state_fips
+                    return a
+                }, '')
+                this.state = state_fips
+                this.infoBoxes.overview.show = true
+
+                window.history.pushState({state: 1}, "info", `/state/:${state_fips}`);
+                map.setFilter('counties', ["all", ["match", ["get", "state_fips"], [state_fips], true, false]]);
+                map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
+                this.forceUpdate()
+            }
+
+        })
         map.setPaintProperty(
             'counties',
             'fill-color',
@@ -165,7 +192,6 @@ class StormEventsLayer extends MapLayer {
                 "hsl(0, 3%, 94%)"
             ]
         );
-        //console.log('lossDomain', colors)
     }
 }
 
@@ -174,47 +200,55 @@ export default (props = {}) =>
         ...props,
         selectedStations: new Map(),
         stationFeatures: [],
-
-        onHover: {
+        /*onHover: {
             layers: ["states"],
             dataFunc: function ({features,properties}) {
-                //console.log('features',features)
-                //console.log('properties',properties)
+                //this.infoBoxes.overview.show = true
             }
-        },
+        },*/
         popover: {
-            layers: ["states"],
+            layers: ["states","counties"],
+            pinned:false,
             dataFunc: function ({properties}) {
+                let fips = ''
+                let fips_name = ''
+                if(this.state){
+                    fips = properties.county_fips
+                    fips_name = properties.county_name
+                }else{
+                    fips = properties.state_fips
+                    fips_name = properties.state_name
+                }
                 falcorGraph.get(['severeWeather',properties.state_fips,this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes','property_damage','fatalities']])
                     .then(response =>{
                         return response
                     })
+
                 return [
                     [   (<div className='text-lg text-bold bg-white'>
-                        {properties.state_name} ({properties.state_abbrev}) - {this.filters.year.value}
+                        {fips_name} - {this.filters.year.value}
                         </div>)
                     ],
                     [   (<div className='text-sm bg-white'>
-                        Total Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',properties.state_fips,this.filters.hazard.value,this.filters.year.value,'total_damage'],0))}
+                        Total Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'total_damage'],0))}
                         </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                        Property Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',properties.state_fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],0))}
+                        Property Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],0))}
                         </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                            # Episodes : {fmt(get(falcorGraph.getCache(),['severeWeather',properties.state_fips,this.filters.hazard.value,this.filters.year.value,'num_episodes'],0))}
+                            # Episodes : {fmt(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'num_episodes'],0))}
                         </div>)
                     ],
                     [
                     (<div className='text-sm bg-white'>
-                        # Deaths : {fmt(get(falcorGraph.getCache(),['severeWeather',properties.state_fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],0))}
+                        # Deaths : {fmt(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],0))}
                     </div>)
                     ]
                 ]
-
             }
         },
         legend: {
@@ -284,7 +318,7 @@ export default (props = {}) =>
                 "type": "fill",
                 "source": "albersusa",
                 "source-layer": "albersusa",
-                "filter": ["match", ["get", "type"], ["state"], true, false],
+                    "filter": ["match", ["get", "type"], ["state"], true, false],
                 "layout": {
                 },
                 "paint": {
@@ -326,7 +360,7 @@ export default (props = {}) =>
                 "filter": ["match", ["get", "type"], ["state"], true, false],
                 "layout": {
                     "text-field": ["to-string", ["get", "state_abbrev"]],
-                    "text-font": ["Overpass Mono Bold", "Arial Unicode MS Regular"]
+                    "text-font": ["Overpass Mono Bold", "Arial Unicode MS Regular"],
                 },
                 "paint": {
                     "text-color": "hsl(0, 0%, 0%)",
@@ -336,6 +370,57 @@ export default (props = {}) =>
                 }
             }
         ],
+        infoBoxes:{
+            overview:{
+                title:"",
+                comp:(props)  =>{
+                    return (
+                        <ControlBase
+                            layer={props}
+                            state = {props.layer.state}
+                        />
+                    )
+                },
+                show:true
+            }
+        },
 
+        state: null
 
     })
+
+class NationalLandingControlBase extends React.Component{
+
+    constructor(props) {
+        super(props);
+        this.state={
+            stateGeoid : props.state
+        }
+    }
+
+    componentDidUpdate(prevProps){
+        if(this.props.state !== prevProps.state){
+            this.props.setActiveStateGeoid(this.props.state)
+        }
+    }
+
+    render(){
+        return(
+            <div>
+
+            </div>
+        )
+
+    }
+
+}
+
+const mapStateToProps = (state, { id }) =>
+    ({
+        activeStateGeoid : state.user.activeStateGeoid
+    });
+const mapDispatchToProps = {
+    setActiveStateGeoid
+};
+
+const ControlBase = connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLandingControlBase))

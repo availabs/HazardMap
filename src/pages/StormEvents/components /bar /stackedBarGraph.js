@@ -51,6 +51,12 @@ class StackedBarGraph extends React.Component{
         }
     }
 
+    componentWillUnmount(){
+        this.setState = (state,callback)=>{
+            return;
+        };
+    }
+
     fetchFalcorDeps(){
         this.setState({
             isLoading : true

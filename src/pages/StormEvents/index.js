@@ -21,12 +21,11 @@ for (let i = start_year; i <= end_year; i++) {
 }
 
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
-
+const history = require('history').createBrowserHistory({forceRefresh:false});
 
 class NationalLanding extends React.Component {
 
     StormEventsLayer = StormEventsLayerFactory({active: true});
-
     constructor(props) {
         super(props);
         // Don't call this.setState() here!
@@ -47,6 +46,13 @@ class NationalLanding extends React.Component {
         document.body.classList.add("overflow-y-hidden")
     }
 
+    componentWillUnmount(){
+        this.setState = (state,callback)=>{
+            return;
+        };
+    }
+
+
     setYear = (year) => {
         if (this.state.year !== year) {
             this.setState({year})
@@ -59,6 +65,7 @@ class NationalLanding extends React.Component {
         }
     }
 
+
     fetchFalcorDeps() {
         return this.props.falcor.get(
             ['geo', fips, 'counties', 'geoid'])
@@ -70,6 +77,9 @@ class NationalLanding extends React.Component {
                         }
                         return out
                     },[])
+                if(!this.props.activeStateGeoid){
+
+                }
                 this.props.falcor.get(['severeWeather',this.counties,this.state.hazard,this.state.year,['total_damage', 'num_episodes']]) // "" is for the whole country
                     .then(response =>{
                         let sw = get(response, 'json.severeWeather', {})
@@ -100,7 +110,6 @@ class NationalLanding extends React.Component {
     }
 
     render() {
-
         return (
             <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
                 <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
@@ -133,8 +142,7 @@ class NationalLanding extends React.Component {
                             layerProps={{
                                 [this.StormEventsLayer.name]: {
                                     year: this.state.year,
-                                    hazard : this.state.hazard
-
+                                    hazard : this.state.hazard,
                                 }
                             }}
                         />
@@ -164,7 +172,7 @@ class NationalLanding extends React.Component {
                                 year={this.state.update.year}
                             />*/}
                         <HazardListTable
-                            geoid={[""]}
+                            geoid={this.props.activeStateGeoid ? [this.props.activeStateGeoid] : [""]}
                             year={this.state.year}
                             setHazard={this.setHazard.bind(this)}
                             activeHazard={this.state.hazard}
@@ -179,12 +187,14 @@ class NationalLanding extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     return {
+        activeStateGeoid : state.stormEvents.activeStateGeoid,
         graph: state.graph,
         hazards: get(state.graph, 'riskIndex.hazards.value', [])
     };
 };
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+};
 
 export default [{
     path: '/',
