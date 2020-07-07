@@ -163,8 +163,8 @@ class StormEventsLayer extends MapLayer {
                 a[c] = colorScale(lossByCounty[c])
                 return a
             }, {})
-
         map.on('click',(e, layer)=> {
+
             let relatedFeatures = map.queryRenderedFeatures(e.point, {
                 layers: ['states']
             });
@@ -175,8 +175,7 @@ class StormEventsLayer extends MapLayer {
                 }, '')
                 this.state = state_fips
                 this.infoBoxes.overview.show = true
-
-                window.history.pushState({state: 1}, "info", `/state/:${state_fips}`);
+                window.history.pushState({state: '2'}, "state", `/state/:${state_fips}`);
                 map.setFilter('counties', ["all", ["match", ["get", "state_fips"], [state_fips], true, false]]);
                 map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
                 this.forceUpdate()
