@@ -54,8 +54,10 @@
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
-    "start": "npm run build:style && react-scripts start",
     "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "aws s3 sync build/ s3://hazardloss",
+    "start": "npm run build:style && react-scripts start",
     "test": "react-scripts test",
     "test:nowatch": "CI=true react-scripts test --env=jsdom",
     "lint": "eslint --fix src/**/*.js --max-warnings=20",

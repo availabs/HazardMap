@@ -6,8 +6,8 @@ import store from "store"
 import { update } from "utils/redux-falcor/components/duck"
 
 //export let host =
-// let host = 'https://graph.availabs.org/'
-let host = "http://localhost:4444/graph/"
+ let host = 'https://graph.availabs.org/'
+//let host = "http://localhost:4444/graph/"
 //let host = process.env.NODE_ENV === 'production' ? 'https://graph.availabs.org/' : '/';
 
 
@@ -21,20 +21,6 @@ class CustomSource extends HttpDataSource {
         config.headers['Authorization'] = userToken;
       }
     }
-    // // console.log('header', config.headers)
-    // config.url = config.url.replace(/%22/g, '%27')
-    // // config.url = config.url.replace(/"/g, "'")
-    // var splitUrl = config.url.split('?')
-    // if (splitUrl[1] && config.method === 'GET') {
-    //   // config.url = splitUrl[0] + '?' + encodeURI(splitUrl[1])
-    //   delete config.headers
-    // } else if (config.method === 'POST') {
-    //   config.method = 'GET'
-    //   delete config.headers
-    //   config.url = config.url + '?' + config.data.replace(/%22/g, '%27')
-    //   // console.log(config.url)
-    // }
-    // console.log('FR:', config)
   }
 }
 
