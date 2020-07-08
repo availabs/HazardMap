@@ -128,14 +128,22 @@ class StackedBarGraph extends React.Component{
                         data={data}
                         keys={hazard_list}
                         indexBy="year"
-                        margin={{ top: 50, right: 50, bottom: 100, left: 90 }}
+                        margin={{ top: 50, right: 70, bottom: 20, left: 10 }}
                         padding={0.1}
                         colors={(d) => hazardcolors[d.id]}
                         enableLabel={false}
                         enableGridX={false}
                         enableGridY= {false}
                         axisTop={null}
-                        axisRight={null}
+                        axisRight={{
+                            tickSize: 5,
+                            tickPadding: 5,
+                            tickRotation: 0,
+                            legend: 'Total Damage $',
+                            legendPosition: 'middle',
+                            legendOffset: 60,
+                            format: v => `${fnum(v)}`
+                        }}
                         axisBottom={{
                             tickSize: 5,
                             tickPadding: 5,
@@ -144,15 +152,7 @@ class StackedBarGraph extends React.Component{
                             legendPosition: 'middle',
                             legendOffset: 32
                         }}
-                        axisLeft={{
-                            tickSize: 5,
-                            tickPadding: 5,
-                            tickRotation: 0,
-                            legend: 'Total damage',
-                            legendPosition: 'middle',
-                            legendOffset: -50,
-                            format: v => `${fnum(v)}`
-                        }}
+                        axisLeft={null}
                         labelSkipWidth={12}
                         labelSkipHeight={12}
                         /*labelFormat={d=> `${fnum(d)}`}*/
