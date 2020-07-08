@@ -43,14 +43,14 @@ class HazardListTable extends React.Component{
     }
 
     fetchFalcorDeps(){
-        return this.props.falcor.get(['severeWeather',"",this.state.hazards,this.props.year,['total_damage', 'num_episodes','annualized_damage']]) // "" is for the whole country
+        return this.props.falcor.get(['severeWeather',this.props.geoid,this.state.hazards,this.props.year,['total_damage', 'num_episodes','annualized_damage']]) // "" is for the whole country
             .then(response =>{
                 return response
             })
     }
 
     processData(){
-        let graph = get(falcorGraph.getCache(),['severeWeather',""],null)
+        let graph = get(falcorGraph.getCache(),['severeWeather',this.props.geoid],null)
         let data = []
         if(graph){
             Object.keys(graph).forEach(hazard =>{
@@ -73,6 +73,7 @@ class HazardListTable extends React.Component{
 
     render(){
         let listTableData = this.processData()
+       // console.log('props',this.props)
         return(
                 <div className="align-middle inline-block min-w-full overflow-hidden"
                     key={0}>
@@ -147,6 +148,7 @@ const mapDispatchToProps = { };
 
 const mapStateToProps = (state,ownProps) => {
     return {
+        activeStateGeoid : state.user.activeStateGeoid,
         geoid:ownProps.geoid,
         censusKey:ownProps.censusKey,
         graph: state.graph,

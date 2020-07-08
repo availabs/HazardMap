@@ -12,19 +12,16 @@ import HazardListTable from "./components /listTable/hazardListTable";
 import Select from "components/avl-components/components/Inputs/select";
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
-
 let years = []
 const start_year = 1996
 const end_year = 2019
-const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 for (let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
-
+const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
+const history = require('history').createBrowserHistory({forceRefresh:false});
 class NationalLanding extends React.Component {
-
     StormEventsLayer = StormEventsLayerFactory({active: true});
-
     constructor(props) {
         super(props);
         // Don't call this.setState() here!
@@ -36,27 +33,27 @@ class NationalLanding extends React.Component {
                 domain: [...years, 'allTime'],
                 value: []
             },
-
         };
         this.handleChange = this.handleChange.bind(this)
     }
-
     componentDidMount(){
         document.body.classList.add("overflow-y-hidden")
     }
-
+    componentWillUnmount(){
+        this.setState = (state,callback)=>{
+            return;
+        };
+    }
     setYear = (year) => {
         if (this.state.year !== year) {
             this.setState({year})
         }
     }
-
     setHazard = (hazard) =>{
         if (this.state.hazard !== hazard) {
             this.setState({hazard})
         }
     }
-
     fetchFalcorDeps() {
         return this.props.falcor.get(
             ['geo', fips, 'counties', 'geoid'])
@@ -79,26 +76,22 @@ class NationalLanding extends React.Component {
                                 return a
                             }, {})
                         let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
-
                         let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
                             d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
                         this.setState({
                             domain : domain
                         })
                         return response
-
                     })
-
             })
     }
-
     handleChange(e) {
         this.setState({ year: e })
-
     }
-
     render() {
-
+        window.addEventListener('popstate', (event) => {
+            window.history.replaceState({state : '1'},"whole","/")
+        });
         return (
             <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
                 <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
@@ -131,8 +124,7 @@ class NationalLanding extends React.Component {
                             layerProps={{
                                 [this.StormEventsLayer.name]: {
                                     year: this.state.year,
-                                    hazard : this.state.hazard
-
+                                    hazard : this.state.hazard,
                                 }
                             }}
                         />
@@ -157,33 +149,31 @@ class NationalLanding extends React.Component {
                                 onChange={this.handleChange}
                             />
                         </div>
-                            {/*<HazardStatBox
+                        {/*<HazardStatBox
                                 geoid={[""]}
                                 year={this.state.update.year}
                             />*/}
                         <HazardListTable
-                            geoid={[""]}
+                            geoid={this.props.activeStateGeoid ? [this.props.activeStateGeoid] : [""]}
                             year={this.state.year}
                             setHazard={this.setHazard.bind(this)}
                             activeHazard={this.state.hazard}
                         />
-
                     </div>
                 </div>
             </div>
         )
     }
 }
-
 const mapStateToProps = (state, ownProps) => {
     return {
+        activeStateGeoid : state.stormEvents.activeStateGeoid,
         graph: state.graph,
         hazards: get(state.graph, 'riskIndex.hazards.value', [])
     };
 };
-
-const mapDispatchToProps = {};
-
+const mapDispatchToProps = {
+};
 export default [{
     path: '/',
     mainNav: true,
@@ -205,6 +195,28 @@ export default [{
         children: [
             connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
         ]
-
     }
-}]
+},
+    {
+        path: '/state/:stateId',
+        mainNav: true,
+        exact: true,
+        name: 'Storm Events',
+        layoutSettings: {
+            fixed: true,
+            maxWidth: '',//'max-w-7xl',
+            headerBar: false,
+            nav: 'top',
+            theme: 'flat',
+        },
+        component: {
+            type: 'div',
+            props: {
+                className: 'w-full overflow-hidden pt-16 focus:outline-none',
+                style: {height: 'calc(100vh - 1rem)'}
+            },
+            children: [
+                connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
+            ]
+        }
+    }]
