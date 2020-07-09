@@ -198,10 +198,11 @@ export default [{
     }
 },
     {
-        path: '/state/:stateId',
-        mainNav: true,
-        exact: true,
+        path: '/state/stateId',
+        mainNav: false,
+        exact: false,
         name: 'Storm Events',
+        authed:false,
         layoutSettings: {
             fixed: true,
             maxWidth: '',//'max-w-7xl',
@@ -219,4 +220,5 @@ export default [{
                 connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
             ]
         }
-    }]
+    }
+]

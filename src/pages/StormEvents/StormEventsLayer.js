@@ -84,7 +84,6 @@ class StormEventsLayer extends MapLayer {
                         }
                         return out
                     }, [])
-
                 this.fetchData()
             })
 
@@ -165,6 +164,11 @@ class StormEventsLayer extends MapLayer {
             }, {})
         map.on('click',(e, layer)=> {
 
+            var test = map.querySourceFeatures('albersusa', {
+                sourceLayer: 'states',
+                //filter: ['in', 'COUNTY', feature.properties.COUNTY]
+            });
+            console.log('test',test)
             let relatedFeatures = map.queryRenderedFeatures(e.point, {
                 layers: ['states']
             });
@@ -175,7 +179,7 @@ class StormEventsLayer extends MapLayer {
                 }, '')
                 this.state = state_fips
                 this.infoBoxes.overview.show = true
-                window.history.pushState({state: '2'}, "state", `/state/:${state_fips}`);
+                window.history.pushState({state: '2'}, "state", `/state/${state_fips}`);
                 map.setFilter('counties', ["all", ["match", ["get", "state_fips"], [state_fips], true, false]]);
                 map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
                 this.forceUpdate()
