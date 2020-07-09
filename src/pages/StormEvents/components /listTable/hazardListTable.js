@@ -100,12 +100,12 @@ class HazardListTable extends React.Component{
                             .sort((a,b) => b.annualized_damage - a.annualized_damage)
                             .map((hazard,i) =>{
                                 return(
-                                    <tr className={`bg-white even:bg-blue-50 ${this.props.activeHazard === hazard.value ? 'border-b-4 border-blue-300' : '' }` }
+                                    <tr className={`bg-white  ${this.props.activeHazard === hazard.value ? 'border-b-4 border-blue-300' : 'border-b border-gray-200' }` }
                                         key={i} id={hazard.value}>
-                                        <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                        <td style={{backgroundColor:hazardcolors[hazard.value]}} className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-100">
                                             <div
-                                                className="hover:text-red-600 cursor-pointer"
-                                                style ={{color:hazardcolors[hazard.value]}}
+                                                className="hover:text-blue-100 cursor-pointer"
+                                                
                                                 onClick={(e) =>{
                                                     e.persist()
                                                     if(this.state.currentHazard !== hazard.value){

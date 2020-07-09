@@ -190,7 +190,7 @@ export default [{
         type: 'div',
         props: {
             className: 'w-full overflow-hidden pt-16 focus:outline-none',
-            style: {height: 'calc(100vh - 1rem)'}
+            style: {height: 'calc(100vh)'}
         },
         children: [
             connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
