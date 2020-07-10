@@ -10,8 +10,11 @@ import Legend from "components/AvlMap/components/legend/Legend"
 import { fnum } from "utils/sheldusUtils"
 import HazardListTable from "./components /listTable/hazardListTable";
 import Select from "components/avl-components/components/Inputs/select";
+import Modal from "components/avl-components/components/Modal/avl-modal"
+import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
+import {setActiveStateGeoid} from "store/stormEvents";
 let years = []
 const start_year = 1996
 const end_year = 2019
@@ -19,7 +22,43 @@ for (let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
-const history = require('history').createBrowserHistory({forceRefresh:false});
+const tableCols = [
+    {
+        Header: 'County',
+        accessor: 'county_fips'
+    },
+    {
+        Header: 'Year',
+        accessor: 'year'
+    },
+    {
+        Header: 'Hazard',
+        accessor: 'hazard'
+    },
+    {
+        Header: 'Total Damage',
+        accessor: 'total_damage'
+    },
+    {
+        Header: 'Property Damage',
+        accessor: 'property_damage'
+    },
+    {
+        Header: 'Crop Damage',
+        accessor: 'crop_damage'
+    },
+    {
+        Header: '# Events',
+        accessor: 'num_events'
+    },
+    {
+        Header: '# Episodes',
+        accessor: 'num_episodes'
+    },
+
+
+];
+
 class NationalLanding extends React.Component {
     StormEventsLayer = StormEventsLayerFactory({active: true});
     constructor(props) {
@@ -33,6 +72,7 @@ class NationalLanding extends React.Component {
                 domain: [...years, 'allTime'],
                 value: []
             },
+            showModal : false
         };
         this.handleChange = this.handleChange.bind(this)
     }
@@ -88,6 +128,8 @@ class NationalLanding extends React.Component {
     handleChange(e) {
         this.setState({ year: e })
     }
+
+
     render() {
         window.addEventListener('popstate', (event) => {
             window.history.replaceState({state : '1'},"whole","/")
@@ -125,6 +167,7 @@ class NationalLanding extends React.Component {
                                 [this.StormEventsLayer.name]: {
                                     year: this.state.year,
                                     hazard : this.state.hazard,
+                                    fips : this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : null
                                 }
                             }}
                         />
@@ -139,6 +182,24 @@ class NationalLanding extends React.Component {
                     </div>
                 </div>
                 <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
+                        {this.props.activeStateGeoid && !this.props.activeStateGeoid.map(d => d.state_fips).includes("")?
+                        <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">
+                        <span className="block sm:inline">{this.props.activeStateGeoid.map(d => d.state_fips)}-{this.props.activeStateGeoid.map(d => d.state_name)}</span>
+                        <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <svg className="fill-current h-6 w-6 text-blue-500"
+                             role="button"
+                             xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 20 20"
+                             onClick={(e) =>{
+                                 e.target.closest(`#closeMe`).style.display = 'none'
+                                 this.props.setActiveStateGeoid([{state_fips:"",state_name:""}])
+                             }}>
+                            <title>Close</title>
+                            <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+                        </svg>
+                        </span>
+                    </div>
+                        :null}
                     <div className='bg-white rounded h-full w-full shadow'>
                         <div className='text-3xl'>
                             <Select
@@ -149,12 +210,43 @@ class NationalLanding extends React.Component {
                                 onChange={this.handleChange}
                             />
                         </div>
+                        {/*<button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            onClick ={(e) =>{
+                                this.setState({
+                                    showModal : true
+                                })
+                            }}>
+                            Export Data
+                        </button>
+                        {this.state.showModal ?
+                            <div className="h-32 w-32">
+                            <Modal
+                                show={true}
+                                onHide = {(e) =>{
+                                    this.setState({
+                                        showModal:false
+                                    })
+                                }}
+                                children={
+                                    <Table
+                                    columns={tableCols}
+                                    data={["a","b","c"]}
+                                    initialPageSize={10}
+                                />
+                                }
+                            />
+                            </div>
+                            :
+                            null
+                        }*/}
+
                         {/*<HazardStatBox
                                 geoid={[""]}
                                 year={this.state.update.year}
                             />*/}
                         <HazardListTable
-                            geoid={this.props.activeStateGeoid ? [this.props.activeStateGeoid] : [""]}
+                            geoid={this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
                             year={this.state.year}
                             setHazard={this.setHazard.bind(this)}
                             activeHazard={this.state.hazard}
@@ -168,11 +260,13 @@ class NationalLanding extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     return {
         activeStateGeoid : state.stormEvents.activeStateGeoid,
+        activeStateAbbrev : state.stormEvents.activeStateAbbrev,
         graph: state.graph,
         hazards: get(state.graph, 'riskIndex.hazards.value', [])
     };
 };
 const mapDispatchToProps = {
+    setActiveStateGeoid
 };
 export default [{
     path: '/',
@@ -198,7 +292,7 @@ export default [{
     }
 },
     {
-        path: '/state/stateId',
+        path: '/state/:stateId',
         mainNav: false,
         exact: false,
         name: 'Storm Events',

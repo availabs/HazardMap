@@ -5,15 +5,12 @@ import { AUTH_HOST, AUTH_PROJECT_NAME } from 'config'
 
 const SET_STATE_GEOID = 'USER::SET_STATE_GEOID';
 
-
 function setStateGeoid(id) {
     return {
         type:SET_STATE_GEOID,
         id
     }
 }
-
-
 
 export const setActiveStateGeoid = (id) =>{
     return (dispatch) => {
@@ -22,15 +19,14 @@ export const setActiveStateGeoid = (id) =>{
 };
 
 
-export const actions = {
 
-    setActiveStateGeoid
+export const actions = {
+    setActiveStateGeoid,
 
 };
 
 let initialState = {
-
-    activeStateGeoid: null
+    activeStateGeoid: null,
 };
 
 const ACTION_HANDLERS = {
@@ -42,7 +38,8 @@ const ACTION_HANDLERS = {
             localStorage.setItem('stateGeoid', newState.activeStateGeoid);
         }
         return newState
-    }
+    },
+
 };
 
 export default function scenarioReducer(state = initialState, action) {
