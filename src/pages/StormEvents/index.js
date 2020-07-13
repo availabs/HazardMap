@@ -199,7 +199,7 @@ export default [{
 },
     {
         path: '/state/:stateId',
-        mainNav: true,
+        mainNav: false,
         exact: true,
         name: 'Storm Events',
         layoutSettings: {

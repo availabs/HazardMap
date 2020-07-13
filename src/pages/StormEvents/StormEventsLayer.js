@@ -131,6 +131,11 @@ class StormEventsLayer extends MapLayer {
 
 
     render(map) {
+        if(this.state) {
+            this.popover.layers =['counties']
+        } else {
+            this.popover.layers = ['states']
+        }
         let data = falcorGraph.getCache()
         let hazard = this.filters.hazard.value
         let year = this.filters.year.value
@@ -175,7 +180,7 @@ class StormEventsLayer extends MapLayer {
                 }, '')
                 this.state = state_fips
                 this.infoBoxes.overview.show = true
-                window.history.pushState({state: '2'}, "state", `/state/:${state_fips}`);
+                window.history.pushState({state: '2'}, "state", `/state/${state_fips}`);
                 map.setFilter('counties', ["all", ["match", ["get", "state_fips"], [state_fips], true, false]]);
                 map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
                 this.forceUpdate()
@@ -208,7 +213,9 @@ export default (props = {}) =>
         popover: {
             layers: ["states","counties"],
             pinned:false,
-            dataFunc: function ({properties}) {
+            dataFunc: function (d) {
+                console.log(d)
+                const {properties} = d
                 let fips = ''
                 let fips_name = ''
                 if(this.state){
