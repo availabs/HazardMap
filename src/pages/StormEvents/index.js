@@ -17,6 +17,9 @@ import * as d3 from "d3";
 import styled from 'styled-components'
 import {setActiveStateGeoid} from "store/stormEvents";
 import {CSVLink, CSVDownload} from 'react-csv';
+
+var format =  d3.format("~s")
+const fmt = (d) => d < 1000 ? d : format(d)
 let years = []
 const start_year = 1996
 const end_year = 2019
@@ -140,8 +143,8 @@ class NationalLanding extends React.Component {
                                 total_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_damage'}`, 0)),
                                 property_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'property_damage'}`, 0)),
                                 crop_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'crop_damage'}`, 0)),
-                                num_events : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_events'}`, 0)),
-                                num_episodes : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_episodes'}`, 0))
+                                num_events : fmt(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_events'}`, 0)),
+                                num_episodes : fmt(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_episodes'}`, 0))
                             })
                         })
                         let lossByCounty = Object.keys(sw)
@@ -265,7 +268,7 @@ class NationalLanding extends React.Component {
                                     })
                                 }}
                                 usePositioned={true}>
-                                <div className="w-1/2 overflow-auto">
+                                <div className="w-full overflow-auto">
                                     <button
                                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
                                         <svg className="fill-current w-4 h-4 mr-2"
