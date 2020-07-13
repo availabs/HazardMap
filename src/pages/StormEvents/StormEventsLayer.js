@@ -2,6 +2,7 @@ import React from "react"
 import MapLayer from "components/AvlMap/MapLayer"
 import {falcorGraph} from "store/falcorGraphNew"
 import get from "lodash.get"
+import store from "store"
 import hazardcolors from "../../constants/hazardColors";
 import * as d3scale from 'd3-scale'
 import * as d3 from 'd3'
@@ -44,6 +45,8 @@ for (let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
 let hazard = null
+let state_fips = null
+let onLoadBounds = {}
 class StormEventsLayer extends MapLayer {
     receiveProps(oldProps, newProps) {
         if (this.filters.year.value !== newProps.year) {
@@ -54,7 +57,9 @@ class StormEventsLayer extends MapLayer {
             hazard = newProps.hazard
             this.filters.hazard.value = newProps.hazard
         }
-
+        if(oldProps.fips !== newProps.fips){
+            state_fips = newProps.fips
+        }
     }
 
     onPropsChange(oldProps, newProps) {
@@ -66,6 +71,10 @@ class StormEventsLayer extends MapLayer {
         if (oldProps.hazard !== newProps.hazard) {
             hazard = newProps.hazard
             this.filters.hazard.value = newProps.hazard || 'riverine'
+            this.doAction(["fetchLayerData"]);
+        }
+        if(oldProps.fips !== newProps.fips){
+            state_fips = newProps.fips
             this.doAction(["fetchLayerData"]);
         }
 
@@ -84,7 +93,7 @@ class StormEventsLayer extends MapLayer {
                         }
                         return out
                     }, [])
-
+                onLoadBounds = map.getBounds()
                 this.fetchData()
             })
 
@@ -98,12 +107,15 @@ class StormEventsLayer extends MapLayer {
         if (hazard) {
             this.filters.hazard.value = hazard
         }
-        return falcorGraph.get(
-            ['severeWeather', this.counties, this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes']]
-        ).then(d => {
-            //console.timeEnd('get severeWeather')
-            this.render(this.map)
-        })
+        if(this.counties){
+            return falcorGraph.get(
+                ['severeWeather', this.counties, this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes']]
+            ).then(d => {
+                //console.timeEnd('get severeWeather')
+                this.render(this.map)
+            })
+        }
+
     }
 
     getColorScale(domain) {
@@ -136,6 +148,7 @@ class StormEventsLayer extends MapLayer {
         } else {
             this.popover.layers = ['states']
         }
+
         let data = falcorGraph.getCache()
         let hazard = this.filters.hazard.value
         let year = this.filters.year.value
@@ -169,7 +182,6 @@ class StormEventsLayer extends MapLayer {
                 return a
             }, {})
         map.on('click',(e, layer)=> {
-
             let relatedFeatures = map.queryRenderedFeatures(e.point, {
                 layers: ['states']
             });
@@ -178,15 +190,35 @@ class StormEventsLayer extends MapLayer {
                     a = c.properties.state_fips
                     return a
                 }, '')
+                let state_name = relatedFeatures.reduce((a, c) => {
+                    a = c.properties.state_name
+                    return a
+                }, '')
                 this.state = state_fips
+                this.state_name = state_name
                 this.infoBoxes.overview.show = true
                 window.history.pushState({state: '2'}, "state", `/state/${state_fips}`);
                 map.setFilter('counties', ["all", ["match", ["get", "state_fips"], [state_fips], true, false]]);
                 map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
                 this.forceUpdate()
             }
-
         })
+        if(state_fips){
+            if(state_fips.includes("")){
+                map.setFilter('counties',undefined)
+                map.setPaintProperty(
+                    'counties',
+                    'fill-color',
+                    ['case',
+                        ["has", ["to-string", ["get", 'county_fips']], ["literal", colors]],
+                        ["get", ["to-string", ["get", 'county_fips']], ["literal", colors]],
+                        "hsl(0, 3%, 94%)"
+                    ]
+                );
+                map.fitBounds(onLoadBounds)
+                this.forceUpdate()
+            }
+        }
         map.setPaintProperty(
             'counties',
             'fill-color',
@@ -218,9 +250,15 @@ export default (props = {}) =>
                 const {properties} = d
                 let fips = ''
                 let fips_name = ''
-                if(this.state){
-                    fips = properties.county_fips
-                    fips_name = properties.county_name
+                if(store.getState().stormEvents.activeStateGeoid){
+                    let state = store.getState().stormEvents.activeStateGeoid.map(d => d.state_fips)
+                    if(!state.includes("")){
+                        fips = properties.county_fips
+                        fips_name = properties.county_name
+                    }else{
+                        fips = properties.state_fips
+                        fips_name = properties.state_name
+                    }
                 }else{
                     fips = properties.state_fips
                     fips_name = properties.state_name
@@ -384,14 +422,15 @@ export default (props = {}) =>
                         <ControlBase
                             layer={props}
                             state = {props.layer.state}
+                            state_name = {props.layer.state_name}
                         />
                     )
                 },
                 show:true
             }
         },
-
-        state: null
+        state: null,
+        state_name : null
 
     })
 
@@ -400,13 +439,14 @@ class NationalLandingControlBase extends React.Component{
     constructor(props) {
         super(props);
         this.state={
-            stateGeoid : props.state
+            stateGeoid : props.state,
+            stateName : props.state_name
         }
     }
 
     componentDidUpdate(prevProps){
         if(this.props.state !== prevProps.state){
-            this.props.setActiveStateGeoid(this.props.state)
+            this.props.setActiveStateGeoid([{state_fips: this.props.state,state_name:this.props.state_name}])
         }
     }
 
@@ -426,7 +466,7 @@ const mapStateToProps = (state, { id }) =>
         activeStateGeoid : state.user.activeStateGeoid
     });
 const mapDispatchToProps = {
-    setActiveStateGeoid
+    setActiveStateGeoid,
 };
 
 const ControlBase = connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLandingControlBase))
