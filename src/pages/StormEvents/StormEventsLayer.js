@@ -143,6 +143,11 @@ class StormEventsLayer extends MapLayer {
 
 
     render(map) {
+        if(this.state) {
+            this.popover.layers =['counties']
+        } else {
+            this.popover.layers = ['states']
+        }
 
         let data = falcorGraph.getCache()
         let hazard = this.filters.hazard.value
@@ -240,7 +245,9 @@ export default (props = {}) =>
         popover: {
             layers: ["states","counties"],
             pinned:false,
-            dataFunc: function ({properties}) {
+            dataFunc: function (d) {
+                console.log(d)
+                const {properties} = d
                 let fips = ''
                 let fips_name = ''
                 if(store.getState().stormEvents.activeStateGeoid){
