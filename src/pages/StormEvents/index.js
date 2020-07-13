@@ -258,17 +258,14 @@ class NationalLanding extends React.Component {
                         </button>
                         {this.state.showModal ?
                             <Modal
-                                className="w-1/3"
                                 show={true}
                                 onHide = {(e) =>{
                                     this.setState({
                                         showModal:false
                                     })
                                 }}
-                                usePositioned={true}
-
-                            >
-                                <div>
+                                usePositioned={true}>
+                                <div className="w-1/2 overflow-auto">
                                     <button
                                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
                                         <svg className="fill-current w-4 h-4 mr-2"
@@ -280,9 +277,6 @@ class NationalLanding extends React.Component {
                                                  data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_counties.csv`}>Download CSV</CSVLink>
                                     </button>
                                     <Table
-                                        style={{
-                                            overflow: 'auto'
-                                        }}
                                         defaultPageSize={10}
                                         showPagination={false}
                                         columns={tableCols}
