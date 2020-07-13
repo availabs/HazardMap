@@ -34,6 +34,7 @@
     "moment": "^2.27.0",
     "papaparse": "^5.2.0",
     "react": "^16.13.1",
+    "react-csv": "^2.0.3",
     "react-dom": "^16.13.1",
     "react-on-screen": "^2.1.1",
     "react-onclickoutside": "^6.9.0",

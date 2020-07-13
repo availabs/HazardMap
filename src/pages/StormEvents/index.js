@@ -14,7 +14,9 @@ import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
+import styled from 'styled-components'
 import {setActiveStateGeoid} from "store/stormEvents";
+import {CSVLink, CSVDownload} from 'react-csv';
 let years = []
 const start_year = 1996
 const end_year = 2019
@@ -25,7 +27,7 @@ const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", 
 const tableCols = [
     {
         Header: 'County',
-        accessor: 'county_fips'
+        accessor: 'county_fips_name'
     },
     {
         Header: 'Year',
@@ -58,7 +60,12 @@ const tableCols = [
 
 
 ];
-
+const DIV = styled.div`
+${props => props.theme.panelDropdownScrollBar};
+.expandable {
+        cursor: pointer;
+    }
+`;
 class NationalLanding extends React.Component {
     StormEventsLayer = StormEventsLayerFactory({active: true});
     constructor(props) {
@@ -72,6 +79,9 @@ class NationalLanding extends React.Component {
                 domain: [...years, 'allTime'],
                 value: []
             },
+            data : [],
+            current_fips : [],
+            current_fips_name : "us",
             showModal : false
         };
         this.handleChange = this.handleChange.bind(this)
@@ -84,6 +94,14 @@ class NationalLanding extends React.Component {
             return;
         };
     }
+
+    componentDidUpdate(prevProps){
+        if(this.props.activeStateGeoid !== prevProps.activeStateGeoid){
+            this.setState({
+                current_fips_name : this.props.activeStateGeoid[0].state_name === "" ? "us" : this.props.activeStateGeoid[0].state_name
+            })
+        }
+    }
     setYear = (year) => {
         if (this.state.year !== year) {
             this.setState({year})
@@ -94,20 +112,38 @@ class NationalLanding extends React.Component {
             this.setState({hazard})
         }
     }
+
     fetchFalcorDeps() {
         return this.props.falcor.get(
-            ['geo', fips, 'counties', 'geoid'])
+            ['geo',fips, 'counties', 'geoid'])
             .then(response =>{
-                this.counties = Object.values(response.json.geo)
-                    .reduce((out,state) => {
-                        if(state.counties){
-                            out = [...out,...state.counties]
+                this.counties = Object.keys(response.json.geo).filter(d => d!== '$__path')
+                    .reduce((out,state) =>{
+                        if(this.props.activeStateGeoid && this.props.activeStateGeoid[0].state_fips !== ""){
+                            out = [...response.json.geo[this.props.activeStateGeoid[0].state_fips].counties]
+                        }else{
+                            out = [...out,...response.json.geo[state].counties]
                         }
                         return out
                     },[])
-                this.props.falcor.get(['severeWeather',this.counties,this.state.hazard,this.state.year,['total_damage', 'num_episodes']]) // "" is for the whole country
+                this.props.falcor.get(['severeWeather',this.counties,this.state.hazard,this.state.year,['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events']],
+                    ['geo',this.counties,['name']])
                     .then(response =>{
+                        let geo_names = get(response,'json.geo',{})
                         let sw = get(response, 'json.severeWeather', {})
+                        let data = []
+                        Object.keys(sw).filter(d => d !== '$__path').forEach(item =>{
+                            data.push({
+                                county_fips_name : get(geo_names,`${item}.name`,''),
+                                year: this.state.year,
+                                hazard : this.state.hazard,
+                                total_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_damage'}`, 0)),
+                                property_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'property_damage'}`, 0)),
+                                crop_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'crop_damage'}`, 0)),
+                                num_events : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_events'}`, 0)),
+                                num_episodes : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_episodes'}`, 0))
+                            })
+                        })
                         let lossByCounty = Object.keys(sw)
                             .reduce((a, c) => {
                                 if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)) {
@@ -119,7 +155,8 @@ class NationalLanding extends React.Component {
                         let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
                             d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
                         this.setState({
-                            domain : domain
+                            domain : domain,
+                            data : data
                         })
                         return response
                     })
@@ -210,7 +247,7 @@ class NationalLanding extends React.Component {
                                 onChange={this.handleChange}
                             />
                         </div>
-                        {/*<button
+                        <button
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                             onClick ={(e) =>{
                                 this.setState({
@@ -220,27 +257,44 @@ class NationalLanding extends React.Component {
                             Export Data
                         </button>
                         {this.state.showModal ?
-                            <div className="h-32 w-32">
                             <Modal
+                                className="w-1/3"
                                 show={true}
                                 onHide = {(e) =>{
                                     this.setState({
                                         showModal:false
                                     })
                                 }}
-                                children={
+                                usePositioned={true}
+
+                            >
+                                <div>
+                                    <button
+                                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+                                        <svg className="fill-current w-4 h-4 mr-2"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
+                                        </svg>
+                                        <CSVLink className='btn btn-secondary btn-sm'
+                                                 style={{width:'100%'}}
+                                                 data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_counties.csv`}>Download CSV</CSVLink>
+                                    </button>
                                     <Table
-                                    columns={tableCols}
-                                    data={["a","b","c"]}
-                                    initialPageSize={10}
-                                />
-                                }
-                            />
-                            </div>
+                                        style={{
+                                            overflow: 'auto'
+                                        }}
+                                        defaultPageSize={10}
+                                        showPagination={false}
+                                        columns={tableCols}
+                                        data={this.state.data}
+                                        initialPageSize={10}
+                                        minRows={this.state.data.length}
+                                    />
+                                </div>
+                            </Modal>
                             :
                             null
-                        }*/}
-
+                        }
                         {/*<HazardStatBox
                                 geoid={[""]}
                                 year={this.state.update.year}
