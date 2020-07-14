@@ -155,7 +155,7 @@ class NationalLanding extends React.Component {
                         let data = []
                         Object.keys(sw).filter(d => d !== '$__path').forEach(item =>{
                             data.push({
-                                county_fips_name : get(geo_names,`${item}.name`,'') + " " + "("+get(sw,`${item}.${this.state.hazard}.${this.state.year}.${'state'}`,'') +")",
+                                county_fips_name : `${get(geo_names,`${item}.name`,'')},${get(sw,`${item}.${this.state.hazard}.${this.state.year}.${'state'}`,'')}`,
                                 year: this.state.year,
                                 hazard : hazards.map(d => d.value === this.state.hazard ? d.name : ''),
                                 total_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_damage'}`, 0)),
