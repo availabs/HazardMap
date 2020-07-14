@@ -1,6 +1,6 @@
-import { sendSystemMessage } from './messages';
+// import { sendSystemMessage } from './messages';
 
-import { AUTH_HOST, AUTH_PROJECT_NAME } from 'config'
+// import { AUTH_HOST, AUTH_PROJECT_NAME } from 'config'
 
 
 const SET_STATE_GEOID = 'USER::SET_STATE_GEOID';

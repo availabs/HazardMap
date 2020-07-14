@@ -14,9 +14,8 @@ import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
-import styled from 'styled-components'
 import {setActiveStateGeoid} from "store/stormEvents";
-import {CSVLink, CSVDownload} from 'react-csv';
+import {CSVLink,/* CSVDownload*/} from 'react-csv';
 
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -30,11 +29,13 @@ const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", 
 const tableCols = [
     {
         Header: 'County',
-        accessor: 'county_fips_name'
+        accessor: 'county_fips_name',
+        canFilter: false
     },
     {
         Header: 'Year',
-        accessor: 'year'
+        accessor: 'year',
+        canFilter: false
     },
     {
         Header: 'Hazard',
@@ -63,12 +64,12 @@ const tableCols = [
 
 
 ];
-const DIV = styled.div`
-${props => props.theme.panelDropdownScrollBar};
-.expandable {
-        cursor: pointer;
-    }
-`;
+// const DIV = styled.div`
+// ${props => props.theme.panelDropdownScrollBar};
+// .expandable {
+//         cursor: pointer;
+//     }
+// `;
 class NationalLanding extends React.Component {
     StormEventsLayer = StormEventsLayerFactory({active: true});
     constructor(props) {
