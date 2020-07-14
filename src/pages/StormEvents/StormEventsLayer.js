@@ -109,7 +109,7 @@ class StormEventsLayer extends MapLayer {
         }
         if(this.counties){
             return falcorGraph.get(
-                ['severeWeather', this.counties, this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes']]
+                ['severeWeather', this.counties, this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips']]
             ).then(d => {
                 //console.timeEnd('get severeWeather')
                 this.render(this.map)

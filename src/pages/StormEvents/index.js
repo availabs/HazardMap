@@ -30,46 +30,63 @@ const tableCols = [
     {
         Header: 'County',
         accessor: 'county_fips_name',
-        canFilter: false
     },
     {
         Header: 'Year',
         accessor: 'year',
-        canFilter: false
+        disableFilters: true
     },
     {
         Header: 'Hazard',
-        accessor: 'hazard'
+        accessor: 'hazard',
+        disableFilters: true
     },
     {
         Header: 'Total Damage',
-        accessor: 'total_damage'
+        accessor: 'total_damage',
+        disableFilters: true
     },
     {
         Header: 'Property Damage',
-        accessor: 'property_damage'
+        accessor: 'property_damage',
+        disableFilters: true
     },
     {
         Header: 'Crop Damage',
-        accessor: 'crop_damage'
+        accessor: 'crop_damage',
+        disableFilters: true
     },
     {
         Header: '# Events',
-        accessor: 'num_events'
+        accessor: 'num_events',
+        disableFilters: true
     },
     {
         Header: '# Episodes',
-        accessor: 'num_episodes'
+        accessor: 'num_episodes',
+        disableFilters: true
     },
-
-
 ];
-// const DIV = styled.div`
-// ${props => props.theme.panelDropdownScrollBar};
-// .expandable {
-//         cursor: pointer;
-//     }
-// `;
+const hazards = [
+    {value:'wind', name:'Wind'},
+    {value:'wildfire', name:'Wildfire'},
+    {value:'tsunami', name:'Tsunami/Seiche'},
+    {value:'tornado', name:'Tornado'},
+    {value:'riverine', name:'Flooding'},
+    {value:'lightning', name:'Lightning'},
+    {value:'landslide', name:'Landslide'},
+    {value:'icestorm', name:'Ice Storm'},
+    {value:'hurricane', name:'Hurricane'},
+    {value:'heatwave', name:'Heat Wave'},
+    {value:'hail', name:'Hail'},
+    {value:'earthquake', name:'Earthquake'},
+    {value:'drought', name:'Drought'},
+    {value:'avalanche', name:'Avalanche'},
+    {value:'coldwave', name:'Coldwave'},
+    {value:'winterweat', name:'Snow Storm'},
+    {value:'volcano', name:'Volcano'},
+    {value:'coastal', name:'Coastal Hazards'}
+]
 class NationalLanding extends React.Component {
     StormEventsLayer = StormEventsLayerFactory({active: true});
     constructor(props) {
@@ -130,7 +147,7 @@ class NationalLanding extends React.Component {
                         }
                         return out
                     },[])
-                this.props.falcor.get(['severeWeather',this.counties,this.state.hazard,this.state.year,['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events']],
+                this.props.falcor.get(['severeWeather',this.counties,this.state.hazard,this.state.year,['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips']],
                     ['geo',this.counties,['name']])
                     .then(response =>{
                         let geo_names = get(response,'json.geo',{})
@@ -138,9 +155,9 @@ class NationalLanding extends React.Component {
                         let data = []
                         Object.keys(sw).filter(d => d !== '$__path').forEach(item =>{
                             data.push({
-                                county_fips_name : get(geo_names,`${item}.name`,''),
+                                county_fips_name : get(geo_names,`${item}.name`,'') + " " + "("+get(sw,`${item}.${this.state.hazard}.${this.state.year}.${'state'}`,'') +")",
                                 year: this.state.year,
-                                hazard : this.state.hazard,
+                                hazard : hazards.map(d => d.value === this.state.hazard ? d.name : ''),
                                 total_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_damage'}`, 0)),
                                 property_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'property_damage'}`, 0)),
                                 crop_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'crop_damage'}`, 0)),
@@ -268,18 +285,31 @@ class NationalLanding extends React.Component {
                                         showModal:false
                                     })
                                 }}
+                                showCloseButton = {false}
                                 usePositioned={true}>
                                 <div className="w-full overflow-auto">
-                                    <button
-                                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
-                                        <svg className="fill-current w-4 h-4 mr-2"
-                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                            <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
-                                        </svg>
-                                        <CSVLink className='btn btn-secondary btn-sm'
-                                                 style={{width:'100%'}}
-                                                 data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_counties.csv`}>Download CSV</CSVLink>
-                                    </button>
+                                    <div className="flex justify-between">
+                                        <button
+                                            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+                                            <svg className="fill-current w-4 h-4 mr-2"
+                                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
+                                            </svg>
+                                            <CSVLink className='btn btn-secondary btn-sm'
+                                                     style={{width:'100%'}}
+                                                     data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_counties.csv`}>Download CSV</CSVLink>
+                                        </button>
+                                        <button
+                                            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+                                            onClick = {(e) =>{
+                                                this.setState({
+                                                    showModal:false
+                                                })
+                                            }}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
                                     <Table
                                         defaultPageSize={10}
                                         showPagination={false}
