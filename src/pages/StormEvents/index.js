@@ -229,9 +229,9 @@ class NationalLanding extends React.Component {
                                 }
                             }}
                         />
-                        <div className='relative bottom-64 h-64 z-90 w-full'>
+                        <div className='relative bottom-40 h-40 z-90 w-full'>
                             <StackedBarGraph
-                                height={300}
+                                height={200}
                                 setYear={this.setYear.bind(this)}
                                 initialLoad={this.state.initialLoad}
                                 hazard={this.state.hazard}
@@ -350,11 +350,14 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = {
     setActiveStateGeoid
 };
-export default [{
-    path: '/',
+export default [
+
+
+{
+    path: '/stormevents/',
     mainNav: true,
     exact: true,
-    name: 'Storm Events',
+    name: 'NCDC Storm Events',
     layoutSettings: {
         fixed: true,
         maxWidth: '',//'max-w-7xl',
@@ -374,7 +377,7 @@ export default [{
     }
 },
     {
-        path: '/state/:stateId',
+        path: 'stormevents/state/:stateId',
         mainNav: false,
         exact: true,
         name: 'Storm Events',
@@ -396,5 +399,54 @@ export default [{
                 connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
             ]
         }
+    },
+
+    
+    {
+    path: '/sba/',
+    mainNav: true,
+    exact: true,
+    name: 'SBA Hazard Loans',
+    layoutSettings: {
+        fixed: true,
+        maxWidth: '',//'max-w-7xl',
+        headerBar: false,
+        nav: 'top',
+        theme: 'flat',
+    },
+    component: {
+        type: 'div',
+        props: {
+            className: 'w-full overflow-hidden pt-16 focus:outline-none',
+            style: {height: 'calc(100vh)'}
+        },
+        children: [
+            connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
+        ]
     }
+},
+{
+    path: '/fema/',
+    mainNav: true,
+    exact: true,
+    name: 'FEMA Distaster Declarations',
+    layoutSettings: {
+        fixed: true,
+        maxWidth: '',//'max-w-7xl',
+        headerBar: false,
+        nav: 'top',
+        theme: 'flat',
+    },
+    component: {
+        type: 'div',
+        props: {
+            className: 'w-full overflow-hidden pt-16 focus:outline-none',
+            style: {height: 'calc(100vh)'}
+        },
+        children: [
+            connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
+        ]
+    }
+},
+
 ]

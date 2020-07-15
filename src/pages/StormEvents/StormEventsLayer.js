@@ -202,7 +202,7 @@ class StormEventsLayer extends MapLayer {
                 this.state = state_fips
                 this.state_name = state_name
                 this.infoBoxes.overview.show = true
-                window.history.pushState({state: '2'}, "state", `/state/${state_fips}`);
+                window.history.pushState({state: '2'}, "state", `/stormevents/state/${state_fips}`);
                 map.setFilter('counties', ["all", ["match", ["get", "state_fips"], [state_fips], true, false]]);
                 map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
                 this.forceUpdate()
@@ -300,6 +300,7 @@ export default (props = {}) =>
                 ]
             }
         },
+        showAttributesModal: false,
         legend: {
             title: 'Total Damage',
             type: "threshold",

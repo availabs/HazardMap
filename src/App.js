@@ -29,7 +29,9 @@ class App extends Component {
         <Switch>
           {Routes.map((route, i) => {
             return (
-              <Layout key={ i }
+              <Layout 
+                logo={(<div className='px-12'>HHD</div>)}
+                key={ i }
                 { ...route }
                 authed={ this.props.user.authed }
                 isAuthenticating={ this.state.isAuthenticating }

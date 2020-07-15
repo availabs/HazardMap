@@ -5,7 +5,8 @@ import StormEvents from 'pages/StormEvents'
 import NoMatch from 'pages/404';
 import Login from "pages/Login"
 import Logout from "pages/Logout"
-// import Home from "pages/home"
+import Home from "pages/home"
+import DataDownload from "pages/DataDownload"
 
 
 export default [
@@ -13,7 +14,8 @@ export default [
 	...StormEvents,
 	Login,
 	Logout,
-	//Home,
+	Home,
+	DataDownload,
 	// -- util
 	NoMatch
 ];

@@ -5,8 +5,8 @@ import HttpDataSource from 'falcor-http-datasource'
 
 import throttle from "lodash.throttle"
 
-let host = "http://localhost:4444/graph/"
-//let host = 'https://graph.availabs.org/'
+//let host = "http://localhost:4444/graph/"
+let host = 'https://graph.availabs.org/'
 
 
 class CustomSource extends HttpDataSource {
@@ -22,13 +22,13 @@ class CustomSource extends HttpDataSource {
 
 function cacheFromStorage () {
  let falcorCache = {}
- // if (localStorage && localStorage.getItem('falcorCache')) {
- //   let token = localStorage.getItem('token')
- //   let user = localStorage.getItem('currentUser')
- //   if (token && user) {
- //     falcorCache = JSON.parse(localStorage.getItem('falcorCache'))
- //   }
- // }
+ if (localStorage && localStorage.getItem('falcorCache')) {
+   //let token = localStorage.getItem('token')
+   //let user = localStorage.getItem('currentUser')
+   //if (token && user) {
+     falcorCache = JSON.parse(localStorage.getItem('falcorCache'))
+   //}
+ }
  return falcorCache;
 }
 
@@ -150,3 +150,10 @@ export const falcorChunkerNice = (...args) => {
     cache: cacheFromStorage()
   }).batch()
  )()
+
+
+window.addEventListener('beforeunload', function (e) {
+  var falcorCache = falcorGraph.getCache();
+  console.log('windowUnload', falcorCache);
+  localStorage.setItem('falcorCache', JSON.stringify(falcorCache));
+})
