@@ -191,7 +191,7 @@ class NationalLanding extends React.Component {
 
     render() {
         window.addEventListener('popstate', (event) => {
-            window.history.replaceState({state : '1'},"whole","/")
+            window.history.replaceState({state : '1'},"whole","/stormevents/")
         });
         return (
             <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>

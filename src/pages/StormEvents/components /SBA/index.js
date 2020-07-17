@@ -98,28 +98,24 @@ class SBAHazardLoans extends React.Component {
                         }
                         return out
                     },[])
-                this.props.falcor.get(['severeWeather',this.counties,this.state.hazard,this.state.year,['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips']],
+                this.props.falcor.get(['sba','all',this.counties,this.state.hazard,this.state.year,['total_loss','loan_total','num_loans']],
                     ['geo',this.counties,['name']])
                     .then(response =>{
                         let geo_names = get(response,'json.geo',{})
-                        let sw = get(response, 'json.severeWeather', {})
+                        let sw = get(response, 'json.sba.all', {})
                         let data = []
                         Object.keys(sw).filter(d => d !== '$__path').forEach(item =>{
                             data.push({
                                 county_fips_name : `${get(geo_names,`${item}.name`,'')},${get(sw,`${item}.${this.state.hazard}.${this.state.year}.${'state'}`,'')}`,
                                 year: this.state.year,
                                 hazard : hazards.map(d => d.value === this.state.hazard ? d.name : ''),
-                                total_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_damage'}`, 0)),
-                                property_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'property_damage'}`, 0)),
-                                crop_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'crop_damage'}`, 0)),
-                                num_events : fmt(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_events'}`, 0)),
-                                num_episodes : fmt(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_episodes'}`, 0))
+                                //total_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_damage'}`, 0)),
                             })
                         })
                         let lossByCounty = Object.keys(sw)
                             .reduce((a, c) => {
-                                if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)) {
-                                    a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)
+                                if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)) {
+                                    a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)
                                 }
                                 return a
                             }, {})
@@ -146,7 +142,7 @@ class SBAHazardLoans extends React.Component {
                     <div className='h-full'>
                         <div className="relative top-0 right-auto h-8 w-2/6">
                             <Legend
-                                title = {'Total Damage'}
+                                title = {'Total Loss'}
                                 type = {"threshold"}
                                 vertical= {false}
                                 range= {["#F1EFEF",...hazardcolors[this.state.hazard + '_range']]}

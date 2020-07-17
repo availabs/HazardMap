@@ -268,7 +268,7 @@ export default (props = {}) =>
                     fips = properties.state_fips
                     fips_name = properties.state_name
                 }
-                falcorGraph.get(['severeWeather',properties.state_fips,this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes','property_damage','fatalities']])
+                falcorGraph.get(['sba',['all'],properties.state_fips,this.filters.hazard.value, this.filters.year.value, ['total_loss', 'loan_total', 'num_loans']])
                     .then(response =>{
                         return response
                     })
@@ -279,22 +279,17 @@ export default (props = {}) =>
                     </div>)
                     ],
                     [   (<div className='text-sm bg-white'>
-                        Total Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'total_damage'],0))}
+                        Total Loss : {fnum(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'total_loss'],0))}
                     </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                            Property Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],0))}
+                            Total Loan : {fnum(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'loan_total'],0))}
                         </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                            # Episodes : {fmt(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'num_episodes'],0))}
-                        </div>)
-                    ],
-                    [
-                        (<div className='text-sm bg-white'>
-                            # Deaths : {fmt(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],0))}
+                            # Loans : {fmt(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'num_loans'],0))}
                         </div>)
                     ]
                 ]
