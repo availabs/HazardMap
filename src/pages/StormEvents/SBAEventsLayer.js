@@ -47,7 +47,7 @@ for (let i = start_year; i <= end_year; i++) {
 let hazard = null
 let state_fips = null
 let onLoadBounds = {}
-class StormEventsLayer extends MapLayer {
+class SBAEventsLayer extends MapLayer {
     receiveProps(oldProps, newProps) {
         if (this.filters.year.value !== newProps.year) {
             this.filters.year.value = newProps.year ?
@@ -111,7 +111,7 @@ class StormEventsLayer extends MapLayer {
         }
         if(this.counties){
             return falcorGraph.get(
-                ['severeWeather', this.counties, this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips']]
+                ['sba',["all"],this.counties,this.filters.hazard.value,this.filters.year.value,['total_loss', 'loan_total', 'num_loans']],
             ).then(d => {
                 //console.timeEnd('get severeWeather')
                 this.render(this.map)
@@ -144,7 +144,7 @@ class StormEventsLayer extends MapLayer {
                     .domain(domain)
                     .range(this.legend.range);
         }
-        
+
 
     }
 
@@ -155,12 +155,11 @@ class StormEventsLayer extends MapLayer {
         } else {
             this.popover.layers = ['states']
         }
-
         let data = falcorGraph.getCache()
         let hazard = this.filters.hazard.value
         let year = this.filters.year.value
-        let measure = 'total_damage'
-        let sw = get(data, 'severeWeather', {})
+        let measure = 'total_loss'
+        let sw = get(data, 'sba.all', {})
         let lossByCounty = Object.keys(sw)
             .reduce((a, c) => {
                 if (get(sw[c], `${hazard}.${year}.${measure}`, false)) {
@@ -204,7 +203,6 @@ class StormEventsLayer extends MapLayer {
                 this.state = state_fips
                 this.state_name = state_name
                 this.infoBoxes.overview.show = true
-                window.history.pushState({state: '2'}, "state", `/stormevents/state/${state_fips}`);
                 map.setFilter('counties', ["all", ["match", ["get", "state_fips"], [state_fips], true, false]]);
                 map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
                 this.forceUpdate()
@@ -239,7 +237,7 @@ class StormEventsLayer extends MapLayer {
 }
 
 export default (props = {}) =>
-    new StormEventsLayer("Storm Events", {
+    new SBAEventsLayer("SBA Events", {
         ...props,
         selectedStations: new Map(),
         stationFeatures: [],
@@ -278,15 +276,15 @@ export default (props = {}) =>
                 return [
                     [   (<div className='text-lg text-bold bg-white'>
                         {fips_name} - {this.filters.year.value}
-                        </div>)
+                    </div>)
                     ],
                     [   (<div className='text-sm bg-white'>
                         Total Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'total_damage'],0))}
-                        </div>)
+                    </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                        Property Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],0))}
+                            Property Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],0))}
                         </div>)
                     ],
                     [
@@ -295,9 +293,9 @@ export default (props = {}) =>
                         </div>)
                     ],
                     [
-                    (<div className='text-sm bg-white'>
-                        # Deaths : {fmt(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],0))}
-                    </div>)
+                        (<div className='text-sm bg-white'>
+                            # Deaths : {fmt(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],0))}
+                        </div>)
                     ]
                 ]
             }
@@ -370,7 +368,7 @@ export default (props = {}) =>
                 "type": "fill",
                 "source": "albersusa",
                 "source-layer": "albersusa",
-                    "filter": ["match", ["get", "type"], ["state"], true, false],
+                "filter": ["match", ["get", "type"], ["state"], true, false],
                 "layout": {
                 },
                 "paint": {
