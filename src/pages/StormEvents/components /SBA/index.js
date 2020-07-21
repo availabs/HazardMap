@@ -11,7 +11,7 @@ import * as d3 from "d3";
 import {setActiveStateGeoid} from "store/stormEvents";
 import {CSVLink,/* CSVDownload*/} from 'react-csv';
 import SBAEventsLayer from "../../SBAEventsLayer";
-import Select from "../../../../components/avl-components/components/Inputs/select";
+import Select from "../../../../components/avl-components/components/Inputs/select.js";
 
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
