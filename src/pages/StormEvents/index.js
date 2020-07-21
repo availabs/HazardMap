@@ -278,16 +278,11 @@ class NationalLanding extends React.Component {
                             }}>
                             Export Data
                         </button>
-                        {this.state.showModal ?
-                            <Modal
-                                show={true}
-                                onHide = {(e) =>{
-                                    this.setState({
-                                        showModal:false
-                                    })
-                                }}
-                                showCloseButton = {true}
-                                usePositioned={true}>
+                        <Modal show={ this.state.showModal }
+                               onHide={ e => this.setState({ showModal: false }) }
+                               showCloseButton = {false}
+                        >
+                            <div style={ { width: `${ window.innerWidth * 0.85 }px` } }>
                                 <div className="w-full overflow-auto">
                                     <div className="flex justify-between">
                                         <button
@@ -320,10 +315,8 @@ class NationalLanding extends React.Component {
                                         minRows={this.state.data.length}
                                     />
                                 </div>
-                            </Modal>
-                            :
-                            null
-                        }
+                            </div>
+                        </Modal>
                         {/*<HazardStatBox
                                 geoid={[""]}
                                 year={this.state.update.year}
