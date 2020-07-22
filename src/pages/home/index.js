@@ -158,7 +158,7 @@ export default {
   name: 'Home',
   component: HomePage,
   layoutSettings: {
-    fixed: true,
+    fixed: false,
     headerBar: false,
     nav: 'top',
     theme: 'light'

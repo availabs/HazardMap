@@ -8,7 +8,7 @@ import throttle from "lodash.throttle"
 let host = "http://localhost:4444/graph/"
 //let host = 'https://graph.availabs.org/'
 
-
+/**/
 class CustomSource extends HttpDataSource {
     onBeforeRequest (config) {
         if (window.localStorage) {
@@ -22,7 +22,7 @@ class CustomSource extends HttpDataSource {
 
 function cacheFromStorage () {
     let falcorCache = {}
-    if (localStorage && localStorage.getItem('falcorCache')) {
+    if (localStorage && localStorage.getItem('falcorCache') && process.env.NODE_ENV === 'production' ) {
         //let token = localStorage.getItem('token')
         //let user = localStorage.getItem('currentUser')
         //if (token && user) {
