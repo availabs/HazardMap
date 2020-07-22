@@ -43,10 +43,19 @@ class HazardListTable extends React.Component{
     }
 
     fetchFalcorDeps(){
-        return this.props.falcor.get(['severeWeather',this.props.geoid,this.state.hazards,this.props.year,['total_damage', 'num_episodes','annualized_damage']]) // "" is for the whole country
-            .then(response =>{
-                return response
+        if(this.props.data.storm_event === 'sba'){
+            return this.props.falcor.get(
+                [this.props.data.storm_event,this.props.data.category,this.props.geoid,this.state,hazards,this.props.year,this.props.data.columns],
+            ).then(response =>{
+                console.log('response',response)
             })
+        }else{
+            return this.props.falcor.get(['severeWeather',this.props.geoid,this.state.hazards,this.props.year,['total_damage', 'num_episodes','annualized_damage']]) // "" is for the whole country
+                .then(response =>{
+                    return response
+                })
+        }
+
     }
 
     processData(){

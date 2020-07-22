@@ -113,6 +113,7 @@ class SBAEventsLayer extends MapLayer {
             return falcorGraph.get(
                 ['sba',["all"],this.counties,this.filters.hazard.value,this.filters.year.value,['total_loss', 'loan_total', 'num_loans']],
             ).then(d => {
+                console.log('d',d)
                 //console.timeEnd('get severeWeather')
                 this.render(this.map)
             })

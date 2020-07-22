@@ -3,15 +3,16 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import AvlMap from "components/AvlMap";
-import SBAEventsLayerFactory from "../../SBAEventsLayer"
+import SBAEventsLayerFactory from "./SBAEventsLayer"
 import Legend from "components/AvlMap/components/legend/Legend"
 import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
 import {setActiveStateGeoid} from "store/stormEvents";
 import {CSVLink,/* CSVDownload*/} from 'react-csv';
-import SBAEventsLayer from "../../SBAEventsLayer";
-import Select from "../../../../components/avl-components/components/Inputs/select.js";
+import SBAEventsLayer from "./SBAEventsLayer";
+import Select from "../../components/avl-components/components/Inputs/select.js";
+import HazardListTable from "../components /listTable/hazardListTable";
 
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -203,6 +204,13 @@ class SBAHazardLoans extends React.Component {
                                 onChange={this.handleChange}
                             />
                         </div>
+                        <HazardListTable
+                            data={{storm_event:"sba",category:["all"],columns:['total_loss', 'loan_total', 'num_loans']}}
+                            geoid={this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
+                            year={this.state.year}
+                            setHazard={this.setHazard.bind(this)}
+                            activeHazard={this.state.hazard}
+                        />
                     </div>
                 </div>
             </div>

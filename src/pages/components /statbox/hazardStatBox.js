@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
-import {falcorGraph} from "../../../../store/falcorGraphNew";
+import {falcorGraph} from "../../../store/falcorGraphNew";
 import { fnum } from "utils/sheldusUtils"
 import * as d3 from "d3";
 var _ = require('lodash')

@@ -4,12 +4,12 @@ import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import AvlMap from "components/AvlMap";
 import StormEventsLayerFactory from "./StormEventsLayer"
-import StackedBarGraph from "./components /bar /stackedBarGraph";
+import StackedBarGraph from "../components /bar /stackedBarGraph";
 //import HazardStatBox from "./components /statbox/hazardStatBox";
 import Legend from "components/AvlMap/components/legend/Legend"
 import { fnum } from "utils/sheldusUtils"
-import HazardListTable from "./components /listTable/hazardListTable";
-import SBAHazardLoans from "./components /SBA";
+import HazardListTable from "../components /listTable/hazardListTable";
+import SBAHazardLoans from "../SBAEvents/index";
 import Select from "components/avl-components/components/Inputs/select";
 import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
@@ -322,6 +322,7 @@ class NationalLanding extends React.Component {
                                 year={this.state.update.year}
                             />*/}
                         <HazardListTable
+                            data={{storm_event:"severeWeather",category:["all"],columns:['total_loss', 'loan_total', 'num_loans']}}
                             geoid={this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
                             year={this.state.year}
                             setHazard={this.setHazard.bind(this)}
