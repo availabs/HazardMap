@@ -45,12 +45,12 @@ class HazardListTable extends React.Component{
     fetchFalcorDeps(){
         if(this.props.data.storm_event === 'sba'){
             return this.props.falcor.get(
-                [this.props.data.storm_event,this.props.data.category,this.props.geoid,this.state,hazards,this.props.year,this.props.data.columns],
+                [this.props.data.storm_event,this.props.data.category,this.props.geoid,this.state.hazards,this.props.year,this.props.data.columns],
             ).then(response =>{
-                console.log('response',response)
+                return response
             })
         }else{
-            return this.props.falcor.get(['severeWeather',this.props.geoid,this.state.hazards,this.props.year,['total_damage', 'num_episodes','annualized_damage']]) // "" is for the whole country
+            return this.props.falcor.get([this.props.data.storm_event,this.props.geoid,this.state.hazards,this.props.year,this.props.data.columns]) // "" is for the whole country
                 .then(response =>{
                     return response
                 })
@@ -59,21 +59,34 @@ class HazardListTable extends React.Component{
     }
 
     processData(){
-        let graph = get(falcorGraph.getCache(),['severeWeather',this.props.geoid],null)
         let data = []
+        let graph = null
+        let header_columns = ["name","value"]
+        if(this.props.data.storm_event === 'sba'){
+            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,this.props.data.category,this.props.geoid],null)
+            header_columns.push(...this.props.data.columns)
+        }else{
+            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,this.props.geoid],null)
+            header_columns.push(...this.props.data.columns)
+        }
         if(graph){
-            Object.keys(graph).forEach(hazard =>{
-                hazards.forEach(item =>{
-                    if(item.value === hazard){
-                        data.push({
-                            name: item.name,
-                            value: item.value,
-                            total_damage : get(graph,[hazard,this.props.year,"total_damage"],0),
-                            num_episodes: get(graph,[hazard,this.props.year,"num_episodes"],0),
-                            annualized_damage : get(graph,[hazard,'allTime','annualized_damage'],0) // fixed as 'allTime'
-                        })
-                    }
-                })
+            data = Object.keys(graph).map(hazard =>{
+                return header_columns.reduce((a,header) =>{
+                    hazards.forEach(item =>{
+                        if(item.value === hazard){
+                            if (header === 'name' || header === 'value') {
+                                a[header] = item[header]
+                            }
+                            else if(header === 'annualized_damage'){
+                                a[header] = get(graph,[hazard,"allTime",header],0)
+                            }
+                            else{
+                                a[header] = get(graph,[hazard,this.props.year,header],0)
+                            }
+                        }
+                    })
+                    return a
+                },{})
 
             })
         }
@@ -82,7 +95,6 @@ class HazardListTable extends React.Component{
 
     render(){
         let listTableData = this.processData()
-       // console.log('props',this.props)
         return(
                 <div className="align-middle inline-block min-w-full overflow-hidden"
                     key={0}>
@@ -92,21 +104,27 @@ class HazardListTable extends React.Component{
                             <th className="px-3  py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
                                 Hazard
                             </th>
-                            <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
-                                Damage-{this.props.year}
-                            </th>
-                            <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
-                                Yearly Avg Damage
-                            </th>
-                            <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
-                                # Episodes
-                            </th>
+                            {this.props.data.header.map(header =>{
+                                if(header === 'Damage' || header === 'Total Loss'){
+                                    return (
+                                        <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
+                                            {header}-{this.props.year}
+                                        </th>
+                                    )}else{
+                                        return(
+                                            <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
+                                                {header}
+                                            </th>
+                                        )
+                                    }
+                                })}
+
                         </tr>
                         </thead>
                         <tbody>
                         {   listTableData.length > 0 ?
                             listTableData
-                            .sort((a,b) => b.annualized_damage - a.annualized_damage)
+                            .sort((a,b) => b[this.props.data.sort] - a[this.props.data.sort])
                             .map((hazard,i) =>{
                                 return(
                                     <tr className={`bg-white  ${this.props.activeHazard === hazard.value ? 'border-b-4 border-blue-300' : 'border-b border-gray-200' }` }
@@ -131,15 +149,14 @@ class HazardListTable extends React.Component{
                                                 {hazard.name}
                                             </div>
                                         </td>
-                                        <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right">
-                                            {fnum(hazard.total_damage)}
-                                        </td>
-                                        <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right">
-                                            {fnum(hazard.annualized_damage)}
-                                        </td>
-                                        <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right">
-                                            {fmt(hazard.num_episodes)}
-                                        </td>
+                                        {this.props.data.columns.map(column =>{
+                                            return (
+                                                <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right">
+                                                    {!column.includes("num") ? fnum(hazard[column]) : fmt(hazard[column])}
+                                                </td>
+                                            )
+                                        })}
+
                                     </tr>
                                 )
                             })

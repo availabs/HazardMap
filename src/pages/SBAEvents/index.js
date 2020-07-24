@@ -13,6 +13,7 @@ import {CSVLink,/* CSVDownload*/} from 'react-csv';
 import SBAEventsLayer from "./SBAEventsLayer";
 import Select from "../../components/avl-components/components/Inputs/select.js";
 import HazardListTable from "../components /listTable/hazardListTable";
+import StackedBarGraph from "../components /bar /stackedBarGraph";
 
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -169,10 +170,24 @@ class SBAHazardLoans extends React.Component {
                             layerProps={{
                                 [this.SBAEventsLayer.name]: {
                                     year: this.state.year,
+                                    hazard : this.state.hazard,
                                     fips : this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : null
                                 }
                             }}
                         />
+                        <div className='relative bottom-40 h-40 z-90 w-full'>
+                            <StackedBarGraph
+                                height={200}
+                                data={{storm_event:"sba",
+                                    category:["all"],
+                                    columns:['total_loss'],
+                                    header:['Total Loss',' $ Loan','# Loans'],
+                                    sort:["total_loss"]}}
+                                setYear={this.setYear.bind(this)}
+                                initialLoad={this.state.initialLoad}
+                                hazard={this.state.hazard}
+                            />
+                        </div>
                     </div>
                 </div>
                 <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
@@ -205,7 +220,11 @@ class SBAHazardLoans extends React.Component {
                             />
                         </div>
                         <HazardListTable
-                            data={{storm_event:"sba",category:["all"],columns:['total_loss', 'loan_total', 'num_loans']}}
+                            data={{storm_event:"sba",
+                                category:["all"],
+                                columns:['total_loss', 'loan_total', 'num_loans'],
+                                header:['Total Loss',' $ Loan','# Loans'],
+                                sort:["total_loss"]}}
                             geoid={this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
                             year={this.state.year}
                             setHazard={this.setHazard.bind(this)}

@@ -233,6 +233,10 @@ class NationalLanding extends React.Component {
                         <div className='relative bottom-40 h-40 z-90 w-full'>
                             <StackedBarGraph
                                 height={200}
+                                data={{storm_event:"severeWeather",category:[""],
+                                    columns:['total_damage'],
+                                    header:['Damage','Yearly Avg Damage','# Episodes'],
+                                    sort:"annualized_damage"}}
                                 setYear={this.setYear.bind(this)}
                                 initialLoad={this.state.initialLoad}
                                 hazard={this.state.hazard}
@@ -322,7 +326,10 @@ class NationalLanding extends React.Component {
                                 year={this.state.update.year}
                             />*/}
                         <HazardListTable
-                            data={{storm_event:"severeWeather",category:["all"],columns:['total_loss', 'loan_total', 'num_loans']}}
+                            data={{storm_event:"severeWeather",category:[""],
+                                columns:['total_damage', 'num_episodes','annualized_damage'],
+                                header:['Damage','Yearly Avg Damage','# Episodes'],
+                                sort:"annualized_damage"}}
                             geoid={this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
                             year={this.state.year}
                             setHazard={this.setHazard.bind(this)}

@@ -79,20 +79,35 @@ class StackedBarGraph extends React.Component{
                         return a
                     },[])
                 }
-                this.props.falcor.get(['severeWeather',"",this.hazards,years,['total_damage', 'num_episodes']]) // "" is for the whole country
-                    .then(response =>{
+                if(this.props.data.storm_event === 'sba'){
+                    return this.props.falcor.get(
+                        [this.props.data.storm_event,this.props.data.category,"",this.hazards,years,this.props.data.columns],
+                    ).then(response =>{
                         this.setState({
                             isLoading : false
                         })
                         return response
-
                     })
+                }else{
+                    return this.props.falcor.get([this.props.data.storm_event,"",this.hazards,years,this.props.data.columns]) // "" is for the whole country
+                        .then(response =>{
+                            this.setState({
+                                isLoading : false
+                            })
+                            return response
+                        })
+                }
 
             })
     }
 
     transformData(){
-        let graph = get(falcorGraph.getCache(),['severeWeather',""],null)
+        let graph = null
+        if(this.props.data.storm_event === 'sba'){
+            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,this.props.data.category,""],null)
+        }else{
+            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,""],null)
+        }
         let graph_data = []
         if(graph) {
             graph_data = years.reduce((a, year) => {
@@ -101,9 +116,9 @@ class StackedBarGraph extends React.Component{
                 })
                 return a
             }, [])
-            Object.keys(graph).forEach(function (hazard) {
+            Object.keys(graph).forEach(hazard => {
                 graph_data.forEach(item => {
-                    item[hazard] = get(graph, [hazard,item.year, "total_damage"], 0)
+                    item[hazard] = get(graph, [hazard,item.year,...this.props.data.columns], 0)
                 })
             })
         }
