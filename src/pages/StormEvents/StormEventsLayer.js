@@ -253,7 +253,6 @@ export default (props = {}) =>
             layers: ["states","counties"],
             pinned:false,
             dataFunc: function (d) {
-                console.log(d)
                 const {properties} = d
                 let fips = ''
                 let fips_name = ''

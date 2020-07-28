@@ -105,7 +105,7 @@ class HazardListTable extends React.Component{
                                 Hazard
                             </th>
                             {this.props.data.header.map(header =>{
-                                if(header === 'Damage' || header === 'Total Loss'){
+                                if(header === 'Damage' || header === 'Total Loss' || header === 'Actual Amount Paid'){
                                     return (
                                         <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
                                             {header}-{this.props.year}

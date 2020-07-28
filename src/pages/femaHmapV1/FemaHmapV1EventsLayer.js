@@ -47,7 +47,8 @@ for (let i = start_year; i <= end_year; i++) {
 let hazard = null
 let state_fips = null
 let onLoadBounds = {}
-class SBAEventsLayer extends MapLayer {
+
+class FemaHmapV1EventsLayer extends MapLayer{
     receiveProps(oldProps, newProps) {
         if (this.filters.year.value !== newProps.year) {
             this.filters.year.value = newProps.year ?
@@ -101,7 +102,6 @@ class SBAEventsLayer extends MapLayer {
 
     }
 
-
     fetchData() {
         if (this.counties.length === 0) {
             return Promise.resolve()
@@ -111,7 +111,7 @@ class SBAEventsLayer extends MapLayer {
         }
         if(this.counties){
             return falcorGraph.get(
-                ['sba',["all"],this.counties,this.filters.hazard.value,this.filters.year.value,['total_loss', 'loan_total', 'num_loans']],
+                ['hmap_v1',this.counties,this.filters.hazard.value,this.filters.year.value,['actual_amount_paid']],
             ).then(d => {
                 //console.timeEnd('get severeWeather')
                 this.render(this.map)
@@ -148,7 +148,6 @@ class SBAEventsLayer extends MapLayer {
 
     }
 
-
     render(map) {
         if(this.state) {
             this.popover.layers =['counties']
@@ -158,8 +157,8 @@ class SBAEventsLayer extends MapLayer {
         let data = falcorGraph.getCache()
         let hazard = this.filters.hazard.value
         let year = this.filters.year.value
-        let measure = 'total_loss'
-        let sw = get(data, 'sba.all', {})
+        let measure = 'actual_amount_paid'
+        let sw = get(data, 'hmap_v1', {})
         let lossByCounty = Object.keys(sw)
             .reduce((a, c) => {
                 if (get(sw[c], `${hazard}.${year}.${measure}`, false)) {
@@ -237,7 +236,7 @@ class SBAEventsLayer extends MapLayer {
 }
 
 export default (props = {}) =>
-    new SBAEventsLayer("SBA Events", {
+    new FemaHmapV1EventsLayer("Fema Hmap", {
         ...props,
         selectedStations: new Map(),
         stationFeatures: [],
@@ -251,7 +250,6 @@ export default (props = {}) =>
             layers: ["states","counties"],
             pinned:false,
             dataFunc: function (d) {
-
                 const {properties} = d
                 let fips = ''
                 let fips_name = ''
@@ -268,7 +266,7 @@ export default (props = {}) =>
                     fips = properties.state_fips
                     fips_name = properties.state_name
                 }
-                falcorGraph.get(['sba',['all'],properties.state_fips,this.filters.hazard.value, this.filters.year.value, ['total_loss', 'loan_total', 'num_loans']])
+                falcorGraph.get(['hmap_v1',properties.state_fips,this.filters.hazard.value, this.filters.year.value, ['actual_amount_paid']])
                     .then(response =>{
                         return response
                     })
@@ -279,19 +277,10 @@ export default (props = {}) =>
                     </div>)
                     ],
                     [   (<div className='text-sm bg-white'>
-                        Total Loss : {fnum(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'total_loss'],0))}
+                        Actual Amount Paid : {fnum(get(falcorGraph.getCache(),['hmap_v1',fips,this.filters.hazard.value,this.filters.year.value,'actual_amount_paid'],0))}
                     </div>)
                     ],
-                    [
-                        (<div className='text-sm bg-white'>
-                            Total Loan : {fnum(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'loan_total'],0))}
-                        </div>)
-                    ],
-                    [
-                        (<div className='text-sm bg-white'>
-                            # Loans : {fmt(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'num_loans'],0))}
-                        </div>)
-                    ]
+
                 ]
             }
         },

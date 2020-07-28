@@ -10,6 +10,7 @@ import Legend from "components/AvlMap/components/legend/Legend"
 import { fnum } from "utils/sheldusUtils"
 import HazardListTable from "../components /listTable/hazardListTable";
 import SBAHazardLoans from "../SBAEvents/index";
+import FemaHmapV1 from "../femaHmapV1/index";
 import Select from "components/avl-components/components/Inputs/select";
 import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
@@ -431,7 +432,7 @@ export default [
     path: '/fema/',
     mainNav: true,
     exact: true,
-    name: 'FEMA Distaster Declarations',
+    name: 'FEMA Hazard Mitigation Assisted Properties Version 1',
     layoutSettings: {
         fixed: true,
         maxWidth: '',//'max-w-7xl',
@@ -446,7 +447,7 @@ export default [
             style: {height: 'calc(100vh)'}
         },
         children: [
-            connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
+            connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaHmapV1))
         ]
     }
 },
