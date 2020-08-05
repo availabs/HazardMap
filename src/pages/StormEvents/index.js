@@ -102,6 +102,8 @@ class NationalLanding extends React.Component {
                 domain: [...years, 'allTime'],
                 value: []
             },
+            geography : [{name : 'County',value : 'counties'},{name:'Municipality',value:'cousubs'},{name:'Tracts',value:'tracts'}],
+            geography_filter : 'counties',
             data : [],
             current_fips : [],
             current_fips_name : "us",
@@ -135,6 +137,11 @@ class NationalLanding extends React.Component {
             this.setState({hazard})
         }
     }
+    setGeography = (e) =>{
+        if(this.state.geography_filter !== e.target.value){
+            this.setState({ ...this.state, [e.target.id]: e.target.value })
+        }
+    }
 
     fetchFalcorDeps() {
         return this.props.falcor.get(
@@ -142,7 +149,7 @@ class NationalLanding extends React.Component {
             .then(response =>{
                 this.counties = Object.keys(response.json.geo).filter(d => d!== '$__path')
                     .reduce((out,state) =>{
-                        if(this.props.activeStateGeoid && this.props.activeStateGeoid[0].state_fips !== ""){
+                        if(this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== ""){
                             out = [...response.json.geo[this.props.activeStateGeoid[0].state_fips].counties]
                         }else{
                             out = [...out,...response.json.geo[state].counties]
@@ -227,7 +234,8 @@ class NationalLanding extends React.Component {
                                 [this.StormEventsLayer.name]: {
                                     year: this.state.year,
                                     hazard : this.state.hazard,
-                                    fips : this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : null
+                                    fips : this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : null,
+                                    geography : this.state.geography_filter
                                 }
                             }}
                         />
@@ -246,24 +254,52 @@ class NationalLanding extends React.Component {
                     </div>
                 </div>
                 <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
-                        {this.props.activeStateGeoid && !this.props.activeStateGeoid.map(d => d.state_fips).includes("")?
-                        <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">
-                        <span className="block sm:inline">{this.props.activeStateGeoid.map(d => d.state_fips)}-{this.props.activeStateGeoid.map(d => d.state_name)}</span>
-                        <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
-                        <svg className="fill-current h-6 w-6 text-blue-500"
-                             role="button"
-                             xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 20 20"
-                             onClick={(e) =>{
-                                 e.target.closest(`#closeMe`).style.display = 'none'
-                                 this.props.setActiveStateGeoid([{state_fips:"",state_name:""}])
-                             }}>
-                            <title>Close</title>
-                            <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
-                        </svg>
-                        </span>
-                    </div>
-                        :null}
+                        {
+                        this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== "" ?
+                            <div>
+                                <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">
+                                    <span className="block sm:inline">{this.props.activeStateGeoid.map(d => d.state_fips)}-{this.props.activeStateGeoid.map(d => d.state_name)}</span>
+                                    <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                                        <svg className="fill-current h-6 w-6 text-blue-500"
+                                             role="button"
+                                             xmlns="http://www.w3.org/2000/svg"
+                                             viewBox="0 0 20 20"
+                                             onClick={(e) =>{
+                                                 e.target.closest(`#closeMe`).style.display = 'none'
+                                                 this.props.setActiveStateGeoid([{state_fips:"",state_name:""}])
+                                             }}>
+                                            <title>Close</title>
+                                            <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div>
+                                    <select
+                                        className="block appearance-none w-full bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative shadow leading-tight focus:outline-none focus:shadow-outline"
+                                        onChange={this.setGeography.bind(this)}
+                                        value = {this.state.geography_filter}
+                                        id = 'geography_filter'
+                                    >
+                                        {this.state.geography.map((geo,i) =>{
+                                            return(
+                                                <option key={i} value={geo.value}>{geo.name}</option>
+                                            )
+                                        })}
+                                    </select>
+                                    <div
+                                        className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                                             viewBox="0 0 20 20">
+                                            <path
+                                                d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                            </div>
+                        :null
+                        }
+
                     <div className='bg-white rounded h-full w-full shadow'>
                         <div className='text-3xl'>
                             <Select
@@ -322,16 +358,12 @@ class NationalLanding extends React.Component {
                                 </div>
                             </div>
                         </Modal>
-                        {/*<HazardStatBox
-                                geoid={[""]}
-                                year={this.state.update.year}
-                            />*/}
                         <HazardListTable
                             data={{storm_event:"severeWeather",category:[""],
                                 columns:['total_damage', 'num_episodes','annualized_damage'],
                                 header:['Damage','Yearly Avg Damage','# Episodes'],
                                 sort:"annualized_damage"}}
-                            geoid={this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
+                            geoid={this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
                             year={this.state.year}
                             setHazard={this.setHazard.bind(this)}
                             activeHazard={this.state.hazard}
@@ -380,7 +412,7 @@ export default [
     }
 },
     {
-        path: 'stormevents/state/:stateId',
+        path: '/stormevents/state/:stateId',
         mainNav: false,
         exact: true,
         name: 'Storm Events',
