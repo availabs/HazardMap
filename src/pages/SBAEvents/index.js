@@ -14,6 +14,8 @@ import SBAEventsLayer from "./SBAEventsLayer";
 import Select from "../../components/avl-components/components/Inputs/select.js";
 import HazardListTable from "../components /listTable/hazardListTable";
 import StackedBarGraph from "../components /bar /stackedBarGraph";
+import Table from "../../components/avl-components/components/Table";
+import Modal from "../../components/avl-components/components/Modal/avl-modal";
 
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -43,7 +45,38 @@ const hazards = [
     {value:'winterweat', name:'Snow Storm'},
     {value:'volcano', name:'Volcano'},
     {value:'coastal', name:'Coastal Hazards'}
-]
+];
+const tableCols = [
+    {
+        Header: 'County',
+        accessor: 'county_fips_name',
+    },
+    {
+        Header: 'Year',
+        accessor: 'year',
+        disableFilters: true
+    },
+    {
+        Header: 'Hazard',
+        accessor: 'hazard',
+        disableFilters: true
+    },
+    {
+        Header: 'Total Loss',
+        accessor: 'total_loss',
+        disableFilters: true
+    },
+    {
+        Header: '$ Loan',
+        accessor: 'loan_total',
+        disableFilters: true
+    },
+    {
+        Header: '# Loans',
+        accessor: 'num_loans',
+        disableFilters: true
+    }
+];
 class SBAHazardLoans extends React.Component {
     SBAEventsLayer = SBAEventsLayer({active: true});
     constructor(props) {
@@ -53,6 +86,9 @@ class SBAHazardLoans extends React.Component {
             layer: 'Tracts Layer',
             year: 'allTime',
             hazard: 'riverine',
+            data : [],
+            current_fips : [],
+            current_fips_name : "us",
             select: {
                 domain: [...years, 'allTime'],
                 value: []
@@ -93,7 +129,7 @@ class SBAHazardLoans extends React.Component {
             .then(response =>{
                 this.counties = Object.keys(response.json.geo).filter(d => d!== '$__path')
                     .reduce((out,state) =>{
-                        if(this.props.activeStateGeoid && this.props.activeStateGeoid[0].state_fips !== ""){
+                        if(this.props.activeStateGeoid.length>0 && this.props.activeStateGeoid[0].state_fips !== ""){
                             out = [...response.json.geo[this.props.activeStateGeoid[0].state_fips].counties]
                         }else{
                             out = [...out,...response.json.geo[state].counties]
@@ -111,10 +147,12 @@ class SBAHazardLoans extends React.Component {
                                 county_fips_name : `${get(geo_names,`${item}.name`,'')},${get(sw,`${item}.${this.state.hazard}.${this.state.year}.${'state'}`,'')}`,
                                 year: this.state.year,
                                 hazard : hazards.map(d => d.value === this.state.hazard ? d.name : ''),
-                                //total_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_damage'}`, 0)),
+                                total_loss : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_loss'}`, 0)),
+                                loan_total : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'loan_total'}`, 0)),
+                                num_loans : fmt(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_loans'}`, 0))
                             })
                         })
-                        let lossByCounty = Object.keys(sw)
+                        let lossByCounty= Object.keys(sw)
                             .reduce((a, c) => {
                                 if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)) {
                                     a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)
@@ -191,7 +229,7 @@ class SBAHazardLoans extends React.Component {
                     </div>
                 </div>
                 <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
-                    {this.props.activeStateGeoid && !this.props.activeStateGeoid.map(d => d.state_fips).includes("")?
+                    {this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== ""?
                         <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">
                             <span className="block sm:inline">{this.props.activeStateGeoid.map(d => d.state_fips)}-{this.props.activeStateGeoid.map(d => d.state_name)}</span>
                             <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
@@ -219,13 +257,61 @@ class SBAHazardLoans extends React.Component {
                                 onChange={this.handleChange}
                             />
                         </div>
+                        <button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            onClick ={(e) =>{
+                                this.setState({
+                                    showModal : true
+                                })
+                            }}>
+                            Export Data
+                        </button>
+                        <Modal show={ this.state.showModal }
+                               onHide={ e => this.setState({ showModal: false }) }
+                               showCloseButton = {false}
+                        >
+                            <div style={ { width: `${ window.innerWidth * 0.85 }px` } }>
+                                <div className="w-full overflow-auto">
+                                    <div className="flex justify-between">
+                                        <button
+                                            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+                                            <svg className="fill-current w-4 h-4 mr-2"
+                                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
+                                            </svg>
+                                            <CSVLink className='btn btn-secondary btn-sm'
+                                                     style={{width:'100%'}}
+                                                     data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_counties.csv`}>Download CSV</CSVLink>
+                                        </button>
+                                        <button
+                                            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+                                            onClick = {(e) =>{
+                                                this.setState({
+                                                    showModal:false
+                                                })
+                                            }}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                    <Table
+                                        defaultPageSize={10}
+                                        showPagination={false}
+                                        columns={tableCols}
+                                        data={this.state.data}
+                                        initialPageSize={10}
+                                        minRows={this.state.data.length}
+                                    />
+                                </div>
+                            </div>
+                        </Modal>
                         <HazardListTable
                             data={{storm_event:"sba",
                                 category:["all"],
                                 columns:['total_loss', 'loan_total', 'num_loans'],
                                 header:['Total Loss',' $ Loan','# Loans'],
                                 sort:["total_loss"]}}
-                            geoid={this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
+                            geoid={this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
                             year={this.state.year}
                             setHazard={this.setHazard.bind(this)}
                             activeHazard={this.state.hazard}
