@@ -104,15 +104,19 @@ class HazardListTable extends React.Component{
                             <th className="px-3  py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
                                 Hazard
                             </th>
-                            {this.props.data.header.map(header =>{
+                            {this.props.data.header.map((header,i) =>{
                                 if(header === 'Damage' || header === 'Total Loss' || header === 'Actual Amount Paid'){
                                     return (
-                                        <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
+                                        <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase "
+                                            key={i}
+                                        >
                                             {header}-{this.props.year}
                                         </th>
                                     )}else{
                                         return(
-                                            <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
+                                            <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase "
+                                                key={i}
+                                            >
                                                 {header}
                                             </th>
                                         )
@@ -129,7 +133,7 @@ class HazardListTable extends React.Component{
                                 return(
                                     <tr className={`bg-white  ${this.props.activeHazard === hazard.value ? 'border-b-4 border-blue-300' : 'border-b border-gray-200' }` }
                                         key={i} id={hazard.value}>
-                                        <td style={{backgroundColor:hazardcolors[hazard.value]}} className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-100">
+                                        <td style={{backgroundColor:hazardcolors[hazard.value]}} className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-100" key={i}>
                                             <div
                                                 className="hover:text-blue-100 cursor-pointer"
                                                 
@@ -149,9 +153,9 @@ class HazardListTable extends React.Component{
                                                 {hazard.name}
                                             </div>
                                         </td>
-                                        {this.props.data.columns.map(column =>{
+                                        {this.props.data.columns.map((column,i) =>{
                                             return (
-                                                <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right">
+                                                <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right" key={i}>
                                                     {!column.includes("num") ? fnum(hazard[column]) : fmt(hazard[column])}
                                                 </td>
                                             )

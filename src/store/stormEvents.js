@@ -26,7 +26,7 @@ export const actions = {
 };
 
 let initialState = {
-    activeStateGeoid: null,
+    activeStateGeoid: [],
 };
 
 const ACTION_HANDLERS = {
