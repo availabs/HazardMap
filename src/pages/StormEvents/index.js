@@ -17,7 +17,7 @@ import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
 import {setActiveStateGeoid} from "store/stormEvents";
-import {CSVLink,/* CSVDownload*/} from 'react-csv';
+import {CSVLink} from 'react-csv';
 
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
