@@ -93,7 +93,7 @@ class SBAHazardLoans extends React.Component {
             .then(response =>{
                 this.counties = Object.keys(response.json.geo).filter(d => d!== '$__path')
                     .reduce((out,state) =>{
-                        if(this.props.activeStateGeoid && this.props.activeStateGeoid[0].state_fips !== ""){
+                        if(this.props.activeStateGeoid.length>0 && this.props.activeStateGeoid[0].state_fips !== ""){
                             out = [...response.json.geo[this.props.activeStateGeoid[0].state_fips].counties]
                         }else{
                             out = [...out,...response.json.geo[state].counties]
@@ -191,7 +191,7 @@ class SBAHazardLoans extends React.Component {
                     </div>
                 </div>
                 <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
-                    {this.props.activeStateGeoid && !this.props.activeStateGeoid.map(d => d.state_fips).includes("")?
+                    {this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== ""?
                         <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">
                             <span className="block sm:inline">{this.props.activeStateGeoid.map(d => d.state_fips)}-{this.props.activeStateGeoid.map(d => d.state_name)}</span>
                             <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
@@ -219,13 +219,22 @@ class SBAHazardLoans extends React.Component {
                                 onChange={this.handleChange}
                             />
                         </div>
+                        <button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            onClick ={(e) =>{
+                                this.setState({
+                                    showModal : true
+                                })
+                            }}>
+                            Export Data
+                        </button>
                         <HazardListTable
                             data={{storm_event:"sba",
                                 category:["all"],
                                 columns:['total_loss', 'loan_total', 'num_loans'],
                                 header:['Total Loss',' $ Loan','# Loans'],
                                 sort:["total_loss"]}}
-                            geoid={this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
+                            geoid={this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
                             year={this.state.year}
                             setHazard={this.setHazard.bind(this)}
                             activeHazard={this.state.hazard}
