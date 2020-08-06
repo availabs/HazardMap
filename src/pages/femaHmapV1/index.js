@@ -13,6 +13,8 @@ import Select from "../../components/avl-components/components/Inputs/select.js"
 import HazardListTable from "../components /listTable/hazardListTable";
 import StackedBarGraph from "../components /bar /stackedBarGraph";
 import FemaHmapV1EventsLayer from "./FemaHmapV1EventsLayer";
+import Modal from "../../components/avl-components/components/Modal/avl-modal";
+import Table from "../../components/avl-components/components/Table";
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
 let years = []
@@ -41,7 +43,28 @@ const hazards = [
     {value:'winterweat', name:'Snow Storm'},
     {value:'volcano', name:'Volcano'},
     {value:'coastal', name:'Coastal Hazards'}
-]
+];
+const tableCols = [
+    {
+        Header: 'County',
+        accessor: 'county_fips_name',
+    },
+    {
+        Header: 'Year',
+        accessor: 'year',
+        disableFilters: true
+    },
+    {
+        Header: 'Hazard',
+        accessor: 'hazard',
+        disableFilters: true
+    },
+    {
+        Header: 'Actual Amount Paid',
+        accessor: 'actual_amount_paid',
+        disableFilters: true
+    },
+];
 class FemaHmapV1 extends React.Component {
     FemaHmapV1EventsLayer = FemaHmapV1EventsLayer({active: true});
     constructor(props) {
@@ -51,6 +74,9 @@ class FemaHmapV1 extends React.Component {
             layer: 'Tracts Layer',
             year: 'allTime',
             hazard: 'riverine',
+            data : [],
+            current_fips : [],
+            current_fips_name : "us",
             select: {
                 domain: [...years, 'allTime'],
                 value: []
@@ -109,7 +135,7 @@ class FemaHmapV1 extends React.Component {
                                 county_fips_name : `${get(geo_names,`${item}.name`,'')},${get(sw,`${item}.${this.state.hazard}.${this.state.year}.${'state'}`,'')}`,
                                 year: this.state.year,
                                 hazard : hazards.map(d => d.value === this.state.hazard ? d.name : ''),
-                                //total_damage : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_damage'}`, 0)),
+                                actual_amount_paid : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'actual_amount_paid'}`, 0)),
                             })
                         })
                         let lossByCounty = Object.keys(sw)
@@ -219,6 +245,54 @@ class FemaHmapV1 extends React.Component {
                                 onChange={this.handleChange}
                             />
                         </div>
+                        <button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            onClick ={(e) =>{
+                                this.setState({
+                                    showModal : true
+                                })
+                            }}>
+                            Export Data
+                        </button>
+                        <Modal show={ this.state.showModal }
+                               onHide={ e => this.setState({ showModal: false }) }
+                               showCloseButton = {false}
+                        >
+                            <div style={ { width: `${ window.innerWidth * 0.85 }px` } }>
+                                <div className="w-full overflow-auto">
+                                    <div className="flex justify-between">
+                                        <button
+                                            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+                                            <svg className="fill-current w-4 h-4 mr-2"
+                                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
+                                            </svg>
+                                            <CSVLink className='btn btn-secondary btn-sm'
+                                                     style={{width:'100%'}}
+                                                     data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_counties.csv`}>Download CSV</CSVLink>
+                                        </button>
+                                        <button
+                                            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+                                            onClick = {(e) =>{
+                                                this.setState({
+                                                    showModal:false
+                                                })
+                                            }}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                    <Table
+                                        defaultPageSize={10}
+                                        showPagination={false}
+                                        columns={tableCols}
+                                        data={this.state.data}
+                                        initialPageSize={10}
+                                        minRows={this.state.data.length}
+                                    />
+                                </div>
+                            </div>
+                        </Modal>
                         <HazardListTable
                             data={{
                                 storm_event:"hmap_v1",
