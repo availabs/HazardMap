@@ -201,9 +201,9 @@ class SBAEventsLayer extends MapLayer {
         let hazard = this.filters.hazard.value
         let year = this.filters.year.value
         let measure = 'total_loss'
-        let sw = this.filters.geography.value === 'counties' ? get(data, 'sba.all', {}) : get(data, 'sba.all.byZip', {})
         let geography = state_fips && !state_fips.includes("") ? this.filters.geography.value : 'counties'
-        let filtered_geographies = this.filters.geography.value === 'counties' ? this.filtered_geographies : this.zip_codes
+        let filtered_geographies = geography === 'counties' ? this.filtered_geographies : this.zip_codes
+        let sw = geography === 'counties' ? get(data, 'sba.all', {}) : get(data, 'sba.all.byZip', {})
         let lossByFilteredGeoids = Object.keys(sw)
             .reduce((a,c) =>{
                 if(filtered_geographies){
