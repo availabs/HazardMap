@@ -60,6 +60,9 @@ class SBAEventsLayer extends MapLayer {
         if (oldProps.fips !== newProps.fips) {
             state_fips = newProps.fips
         }
+        if(oldProps.geography !== newProps.geography){
+            this.filters.geography.value = newProps.geography
+        }
 
     }
 
@@ -79,6 +82,10 @@ class SBAEventsLayer extends MapLayer {
             state_fips = newProps.fips
             this.doAction(["fetchLayerData"]);
         }
+        if(oldProps.geography !== newProps.geography){
+            this.filters.geography.value = newProps.geography
+            this.doAction(["fetchLayerData"]);
+        }
 
     }
 
@@ -88,7 +95,7 @@ class SBAEventsLayer extends MapLayer {
             ['geo', fips, 'counties', 'geoid']
         )
             .then(response => {
-                this.counties = Object.values(response.json.geo)
+                this.filtered_geographies = Object.values(response.json.geo)
                     .reduce((out, state) => {
                         if (state.counties) {
                             out = [...out, ...state.counties]
@@ -96,27 +103,62 @@ class SBAEventsLayer extends MapLayer {
                         return out
                     }, [])
                 onLoadBounds = map.getBounds()
-                this.fetchData()
+                this.fetchData().then(d => this.render(this.map))
             })
 
     }
 
 
     fetchData() {
-        if (this.counties.length === 0) {
+        if (this.filtered_geographies.length === 0) {
             return Promise.resolve()
         }
         if (hazard) {
             this.filters.hazard.value = hazard
         }
-        if(this.counties){
-            return falcorGraph.get(
-                ['sba',["all"],this.counties,this.filters.hazard.value,this.filters.year.value,['total_loss', 'loan_total', 'num_loans']],
-            ).then(d => {
-                //console.timeEnd('get severeWeather')
-                this.render(this.map)
+        let geo_fips = state_fips && !state_fips.includes("") ? state_fips : fips
+        let geography = state_fips && !state_fips.includes("") ? this.filters.geography.value : 'counties'
+        return falcorGraph.get(['geo',geo_fips,'counties','geoid'])
+            .then(response =>{
+                if(geography === 'counties'){
+                    this.filtered_geographies = Object.values(response.json.geo)
+                        .reduce((out, state) => {
+                            if (state.counties) {
+                                out = [...out, ...state.counties]
+                            }
+                            return out
+                        }, [])
+                    if(this.filtered_geographies){
+                        falcorGraph.get(
+                            ['sba',["all"],this.filtered_geographies,this.filters.hazard.value,this.filters.year.value,['total_loss', 'loan_total', 'num_loans']],
+                        ).then(d => {
+                            this.render(this.map)
+                        })
+                    }
+                }
+                if(geography === 'zip_codes'){
+                    falcorGraph.get(['geo',this.filtered_geographies,'byZip',['zip_codes']])
+                        .then(response => {
+                            this.zip_codes = Object.values(response.json.geo).reduce((out,geo) =>{
+                                if(geo.byZip){
+                                    out = [...out,...geo.byZip['zip_codes']]
+                                }
+                                return out
+                            },[])
+                            if(this.zip_codes){
+                                falcorGraph.get(
+                                    ['sba',["all"],'byZip',this.zip_codes,this.filters.hazard.value,this.filters.year.value,['total_loss', 'loan_total', 'num_loans']],
+                                ).then(d => {
+                                    //console.timeEnd('get severeWeather')
+                                    this.render(this.map)
+                                })
+                            }
+                        })
+
+
+                }
             })
-        }
+
 
     }
 
@@ -159,15 +201,21 @@ class SBAEventsLayer extends MapLayer {
         let hazard = this.filters.hazard.value
         let year = this.filters.year.value
         let measure = 'total_loss'
-        let sw = get(data, 'sba.all', {})
-        let lossByCounty = Object.keys(sw)
-            .reduce((a, c) => {
-                if (get(sw[c], `${hazard}.${year}.${measure}`, false)) {
-                    a[c] = get(sw[c], `${hazard}.${year}.${measure}`, false)
+        let sw = this.filters.geography.value === 'counties' ? get(data, 'sba.all', {}) : get(data, 'sba.all.byZip', {})
+        let geography = state_fips && !state_fips.includes("") ? this.filters.geography.value : 'counties'
+        let filtered_geographies = this.filters.geography.value === 'counties' ? this.filtered_geographies : this.zip_codes
+        let lossByFilteredGeoids = Object.keys(sw)
+            .reduce((a,c) =>{
+                if(filtered_geographies){
+                    filtered_geographies.filter(d => d !== '$__path').forEach(geo =>{
+                        if(geo === c && get(sw[c], `${hazard}.${year}.${measure}`, false)){
+                            a[c] = get(sw[c], `${hazard}.${year}.${measure}`, false)
+                        }
+                    })
                 }
                 return a
-            }, {})
-        let lossDomain = Object.values(lossByCounty).sort((a, b) => a - b)
+            },{})
+        let lossDomain = Object.values(lossByFilteredGeoids).sort((a, b) => a - b)
 
         let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
             d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]
@@ -182,11 +230,48 @@ class SBAEventsLayer extends MapLayer {
             .range(
                 range //["#f2efe9", "#fadaa6", "#f7c475", "#f09a10", "#cf4010"]
             )
-        let colors = Object.keys(lossByCounty)
+        let colors = Object.keys(lossByFilteredGeoids)
             .reduce((a, c) => {
-                a[c] = colorScale(lossByCounty[c])
+                a[c] = colorScale(lossByFilteredGeoids[c])
                 return a
             }, {})
+        if(geography === "zip_codes" && Object.keys(lossByFilteredGeoids).length > 0 && this.zip_codes){
+            map.setLayoutProperty('counties', 'visibility', 'none');
+            map.setLayoutProperty('zipcodes', 'visibility', 'visible');
+            map.setFilter('zipcodes', [
+                "all",
+                [
+                    "match",
+                    ["get", "ZCTA5CE10"],
+                    [...new Set(this.zip_codes)],
+                    true,
+                    false
+                ]
+            ])
+            map.setPaintProperty(
+                'zipcodes',
+                'fill-color',
+                ['case',
+                    ["has", ["to-string", ["get", 'ZCTA5CE10']], ["literal", colors]],
+                    ["get", ["to-string", ["get", 'ZCTA5CE10']], ["literal", colors]],
+                    "hsl(0, 3%, 94%)"
+                ]
+            )
+        }
+        if(geography === "counties" && Object.keys(lossByFilteredGeoids).length > 0){
+            map.setLayoutProperty('zipcodes', 'visibility', 'none');
+            map.setLayoutProperty('counties', 'visibility', 'visible');
+            map.setFilter('counties', ["all", ["match", ["get", "county_fips"],this.filtered_geographies, true, false]])
+            map.setPaintProperty(
+                'counties',
+                'fill-color',
+                ['case',
+                    ["has", ["to-string", ["get", 'county_fips']], ["literal", colors]],
+                    ["get", ["to-string", ["get", 'county_fips']], ["literal", colors]],
+                    "hsl(0, 3%, 94%)"
+                ]
+            );
+        }
         map.on('click',(e, layer)=> {
             let relatedFeatures = map.queryRenderedFeatures(e.point, {
                 layers: ['states']
@@ -194,23 +279,30 @@ class SBAEventsLayer extends MapLayer {
             if(relatedFeatures[0]){
                 let state_fips = relatedFeatures.reduce((a, c) => {
                     a = c.properties.state_fips
+
                     return a
                 }, '')
                 let state_name = relatedFeatures.reduce((a, c) => {
                     a = c.properties.state_name
                     return a
                 }, '')
-                this.state = state_fips
+                this.state_fips = state_fips
                 this.state_name = state_name
                 this.infoBoxes.overview.show = true
-                map.setFilter('counties', ["all", ["match", ["get", "state_fips"], [state_fips], true, false]]);
+                map.setFilter("states",["all",
+                    ["match", ["get", "state_fips"],[state_fips],true,false]
+                ])
                 map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
                 this.forceUpdate()
             }
         })
         if(state_fips){
             if(state_fips.includes("")){
-                map.setFilter('counties',undefined)
+                this.state_fips = ""
+                this.state_name = ""
+                map.setFilter('states',undefined)
+                map.setLayoutProperty('zipcodes', 'visibility', 'none');
+                map.setLayoutProperty('counties', 'visibility', 'visible');
                 map.setPaintProperty(
                     'counties',
                     'fill-color',
@@ -224,15 +316,7 @@ class SBAEventsLayer extends MapLayer {
                 this.forceUpdate()
             }
         }
-        map.setPaintProperty(
-            'counties',
-            'fill-color',
-            ['case',
-                ["has", ["to-string", ["get", 'county_fips']], ["literal", colors]],
-                ["get", ["to-string", ["get", 'county_fips']], ["literal", colors]],
-                "hsl(0, 3%, 94%)"
-            ]
-        );
+
     }
 }
 
@@ -248,48 +332,74 @@ export default (props = {}) =>
             }
         },*/
         popover: {
-            layers: ["states","counties"],
+            layers: ["states","counties","zipcodes"],
             pinned:false,
             dataFunc: function (d) {
-
                 const {properties} = d
                 let fips = ''
                 let fips_name = ''
-                if(store.getState().stormEvents.activeStateGeoid){
-                    let state = store.getState().stormEvents.activeStateGeoid.map(d => d.state_fips)
-                    if(!state.includes("")){
-                        fips = properties.county_fips
-                        fips_name = properties.county_name
+                if(state_fips){
+                    if(!state_fips.includes("")){
+                        if(this.filters.geography.value === 'counties'){
+                            fips = properties.county_fips ? properties.county_fips : ''
+                            fips_name = properties.county_name ? properties.county_name : ''
+                        }else{
+                            fips = properties["ZCTA5CE10"] ? properties["ZCTA5CE10"] : ''
+                            fips_name = ''
+                        }
                     }else{
-                        fips = properties.state_fips
-                        fips_name = properties.state_name
+                        fips = properties.state_fips ? properties.state_fips : ''
+                        fips_name = properties.state_name ? properties.state_name : ''
                     }
                 }else{
-                    fips = properties.state_fips
-                    fips_name = properties.state_name
+                    fips = properties.state_fips ? properties.state_fips : ''
+                    fips_name = properties.state_name ? properties.state_name : ''
                 }
-                falcorGraph.get(['sba',['all'],properties.state_fips,this.filters.hazard.value, this.filters.year.value, ['total_loss', 'loan_total', 'num_loans']])
-                    .then(response =>{
-                        return response
-                    })
-
+                if(fips && this.filters.geography.value === 'counties'){
+                    falcorGraph.get(['sba',['all'],fips,this.filters.hazard.value, this.filters.year.value, ['total_loss', 'loan_total', 'num_loans']])
+                        .then(response =>{
+                            return response
+                        })
+                }if(fips && this.filters.geography.value === 'zip_codes'){
+                    falcorGraph.get(['sba',["all"],'byZip',this.zip_codes,this.filters.hazard.value,this.filters.year.value,['total_loss', 'loan_total', 'num_loans']],
+                        ['geo',fips])
+                        .then(response =>{
+                            return response
+                        })
+                }
                 return [
                     [   (<div className='text-lg text-bold bg-white'>
-                        {fips_name} - {this.filters.year.value}
+                        {fips_name !== '' ? fips_name : get(falcorGraph.getCache(),['geo',fips,'name'],'')}
                     </div>)
                     ],
                     [   (<div className='text-sm bg-white'>
-                        Total Loss : {fnum(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'total_loss'],0))}
+                        Total Loss : {
+                        this.filters.geography.value === 'counties'?
+                        fnum(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'total_loss'],0))
+                        :
+                            fnum(get(falcorGraph.getCache(),['sba','all','byZip',fips,this.filters.hazard.value,this.filters.year.value,'total_loss'],0))
+
+                    }
                     </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                            Total Loan : {fnum(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'loan_total'],0))}
+                            Total Loan : {
+                            this.filters.geography.value === 'counties'?
+                                fnum(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'loan_total'],0))
+                            :
+                                fnum(get(falcorGraph.getCache(),['sba','all','byZip',fips,this.filters.hazard.value,this.filters.year.value,'loan_total'],0))
+                        }
                         </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                            # Loans : {fmt(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'num_loans'],0))}
+                            # Loans : {
+                            this.filters.geography.value === 'counties'?
+                            fmt(get(falcorGraph.getCache(),['sba','all',fips,this.filters.hazard.value,this.filters.year.value,'num_loans'],0))
+                            :
+                                fmt(get(falcorGraph.getCache(),['sba','all','byZip',fips,this.filters.hazard.value,this.filters.year.value,'num_loans'],0))
+                        }
                         </div>)
                     ]
                 ]
@@ -320,6 +430,13 @@ export default (props = {}) =>
                     "url": "mapbox://lobenichou.albersusa",
                     "type": "vector"
                 }
+            },
+            {
+                id:'albersusa_zip_codes',
+                source:{
+                    "url":"mapbox://am3081.4jgx8fkw",
+                    "type":"vector"
+                }
             }
         ],
         filters: {
@@ -332,6 +449,11 @@ export default (props = {}) =>
                 type: 'dropdown',
                 value: 'riverine',
                 domain: hazards
+            },
+            'geography':{
+                type:'dropdown',
+                value : 'counties',
+                domain : []
             }
         },
         layers: [
@@ -341,6 +463,29 @@ export default (props = {}) =>
                 "source": "albersusa",
                 "source-layer": "albersusa",
                 "filter": ["match", ["get", "type"], ["county"], true, false],
+                "layout": {},
+                "paint": {
+                    "fill-color": "hsl(0, 3%, 94%)",
+                    "fill-opacity": [
+                        "case",
+                        ["boolean", ["feature-state", "hover"], false],
+                        0,
+                        1
+                    ],
+                    "fill-outline-color": [
+                        "case",
+                        ["boolean", ["feature-state", "hover"], false],
+                        "hsl(0, 4%, 85%)",
+                        "hsl(0, 4%, 85%)"
+                    ],
+                }
+            },
+            {
+                "id": "zipcodes",
+                "type": "fill",
+                "source": "albersusa_zip_codes",
+                "source-layer": "albersusa_zip_codes",
+                "filter": ["match", ["get", "type"],["ZCTA5CE10"],true, false],
                 "layout": {},
                 "paint": {
                     "fill-color": "hsl(0, 3%, 94%)",
@@ -422,7 +567,7 @@ export default (props = {}) =>
                     return (
                         <ControlBase
                             layer={props}
-                            state = {props.layer.state}
+                            state_fips = {props.layer.state_fips}
                             state_name = {props.layer.state_name}
                         />
                     )
@@ -430,7 +575,7 @@ export default (props = {}) =>
                 show:true
             }
         },
-        state: null,
+        state_fips: null,
         state_name : null,
 
     })
@@ -440,14 +585,14 @@ class NationalLandingControlBase extends React.Component{
     constructor(props) {
         super(props);
         this.state={
-            stateGeoid : props.state,
-            stateName : props.state_name
+            current_state_name : props.state_name,
+            current_state_fips : props.state_fips
         }
     }
 
     componentDidUpdate(prevProps){
-        if(this.props.state !== prevProps.state){
-            this.props.setActiveStateGeoid([{state_fips: this.props.state,state_name:this.props.state_name}])
+        if(this.props.state_fips !== prevProps.state_fips && this.props.state_name !== prevProps.state_name){
+            this.props.setActiveStateGeoid([{state_fips: this.props.state_fips,state_name:this.props.state_name}])
         }
     }
 

@@ -89,6 +89,8 @@ class SBAHazardLoans extends React.Component {
             data : [],
             current_fips : [],
             current_fips_name : "us",
+            geography : [{name : 'County',value : 'counties'},{name:'Zip Codes',value:'zip_codes'}],
+            geography_filter : 'counties',
             select: {
                 domain: [...years, 'allTime'],
                 value: []
@@ -120,6 +122,11 @@ class SBAHazardLoans extends React.Component {
     setHazard = (hazard) =>{
         if (this.state.hazard !== hazard) {
             this.setState({hazard})
+        }
+    }
+    setGeography = (e) =>{
+        if(this.state.geography_filter !== e.target.value){
+            this.setState({ ...this.state, [e.target.id]: e.target.value })
         }
     }
 
@@ -209,7 +216,8 @@ class SBAHazardLoans extends React.Component {
                                 [this.SBAEventsLayer.name]: {
                                     year: this.state.year,
                                     hazard : this.state.hazard,
-                                    fips : this.props.activeStateGeoid ? this.props.activeStateGeoid.map(d => d.state_fips) : null
+                                    fips : this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : null,
+                                    geography : this.state.geography_filter
                                 }
                             }}
                         />
@@ -230,9 +238,10 @@ class SBAHazardLoans extends React.Component {
                 </div>
                 <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
                     {this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== ""?
-                        <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">
-                            <span className="block sm:inline">{this.props.activeStateGeoid.map(d => d.state_fips)}-{this.props.activeStateGeoid.map(d => d.state_name)}</span>
-                            <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <div>
+                            <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">
+                                <span className="block sm:inline">{this.props.activeStateGeoid.map(d => d.state_fips)}-{this.props.activeStateGeoid.map(d => d.state_name)}</span>
+                                <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
                         <svg className="fill-current h-6 w-6 text-blue-500"
                              role="button"
                              xmlns="http://www.w3.org/2000/svg"
@@ -245,7 +254,31 @@ class SBAHazardLoans extends React.Component {
                             <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
                         </svg>
                         </span>
+                            </div>
+                            <div>
+                                <select
+                                    className="block appearance-none w-full bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative shadow leading-tight focus:outline-none focus:shadow-outline"
+                                    onChange={this.setGeography.bind(this)}
+                                    value = {this.state.geography_filter}
+                                    id = 'geography_filter'
+                                >
+                                    {this.state.geography.map((geo,i) =>{
+                                        return(
+                                            <option key={i} value={geo.value}>{geo.name}</option>
+                                        )
+                                    })}
+                                </select>
+                                <div
+                                    className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                                         viewBox="0 0 20 20">
+                                        <path
+                                            d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
+
                         :null}
                     <div className='bg-white rounded h-full w-full shadow'>
                         <div className='text-3xl'>
