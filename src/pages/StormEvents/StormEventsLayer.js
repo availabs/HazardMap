@@ -176,7 +176,6 @@ class StormEventsLayer extends MapLayer {
         let measure = 'total_damage'
         let sw = get(data, 'severeWeather', {})
         let geography = state_fips && !state_fips.includes("") ? this.filters.geography.value : 'counties'
-
         let lossByFilteredGeoids = Object.keys(sw)
             .reduce((a,c) =>{
                 if(this.filtered_geographies){
@@ -253,7 +252,6 @@ class StormEventsLayer extends MapLayer {
                 ]
             )
         }
-
         map.on('click',(e, layer)=> {
             let relatedFeatures = map.queryRenderedFeatures(e.point, {
                 layers: ['states']

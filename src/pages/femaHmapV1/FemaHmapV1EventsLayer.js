@@ -159,6 +159,7 @@ class FemaHmapV1EventsLayer extends MapLayer{
         let year = this.filters.year.value
         let measure = 'actual_amount_paid'
         let sw = get(data, 'hmap_v1', {})
+
         let lossByCounty = Object.keys(sw)
             .reduce((a, c) => {
                 if (get(sw[c], `${hazard}.${year}.${measure}`, false)) {
@@ -210,6 +211,8 @@ class FemaHmapV1EventsLayer extends MapLayer{
         if(state_fips){
             if(state_fips.includes("")){
                 map.setFilter('counties',undefined)
+                this.state = ""
+                this.state_name = ""
                 map.setPaintProperty(
                     'counties',
                     'fill-color',
@@ -411,7 +414,7 @@ export default (props = {}) =>
                     return (
                         <ControlBase
                             layer={props}
-                            state = {props.layer.state}
+                            state_fips = {props.layer.state_fips}
                             state_name = {props.layer.state_name}
                         />
                     )
@@ -429,14 +432,14 @@ class NationalLandingControlBase extends React.Component{
     constructor(props) {
         super(props);
         this.state={
-            stateGeoid : props.state,
-            stateName : props.state_name
+            current_state_name : props.state_name,
+            current_state_fips : props.state_fips
         }
     }
 
     componentDidUpdate(prevProps){
-        if(this.props.state !== prevProps.state){
-            this.props.setActiveStateGeoid([{state_fips: this.props.state,state_name:this.props.state_name}])
+        if(this.props.state_fips !== prevProps.state_fips && this.props.state_name !== prevProps.state_name){
+            this.props.setActiveStateGeoid([{state_fips: this.props.state_fips,state_name:this.props.state_name}])
         }
     }
 
