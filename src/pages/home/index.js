@@ -120,8 +120,8 @@ const HomePage = () => (
         <div className="col-span-1 flex justify-center md:col-span-2 lg:col-span-1">
           <img
             className="h-12"
-            src="https://www.fema.gov/profiles/fema_gov/themes/unicorn/img/fema-logo-blue.svg"
-            alt="Mirage"
+            src="/img/fema_logo.svg"
+            alt="FEMA"
           />
         </div>
         {/*<div className="col-span-1 flex justify-center md:col-span-2 lg:col-span-1">
