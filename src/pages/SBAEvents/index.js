@@ -16,6 +16,7 @@ import HazardListTable from "../components /listTable/hazardListTable";
 import StackedBarGraph from "../components /bar /stackedBarGraph";
 import Table from "../../components/avl-components/components/Table";
 import Modal from "../../components/avl-components/components/Modal/avl-modal";
+import {falcorGraph} from "../../store/falcorGraphNew";
 
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -131,51 +132,103 @@ class SBAHazardLoans extends React.Component {
     }
 
     fetchFalcorDeps() {
-        return this.props.falcor.get(
-            ['geo',fips, 'counties', 'geoid'])
-            .then(response =>{
-                this.counties = Object.keys(response.json.geo).filter(d => d!== '$__path')
-                    .reduce((out,state) =>{
-                        if(this.props.activeStateGeoid.length>0 && this.props.activeStateGeoid[0].state_fips !== ""){
-                            out = [...response.json.geo[this.props.activeStateGeoid[0].state_fips].counties]
-                        }else{
-                            out = [...out,...response.json.geo[state].counties]
+        let geo_fips = this.props.activeStateGeoid.length === 0 ? fips : this.props.activeStateGeoid[0].state_fips
+        let geography = this.state.geography_filter === 'counties' ? 'counties' : this.state.geography_filter
+        if(geography === 'counties'){
+            return falcorGraph.get(['geo',geo_fips,'counties','geoid'])
+                .then(response =>{
+                    if(geography === 'counties'){
+                        this.filtered_geographies = Object.values(response.json.geo)
+                            .reduce((out, state) => {
+                                if (state.counties) {
+                                    out = [...out, ...state.counties]
+                                }
+                                return out
+                            }, [])
+                        if(this.filtered_geographies){
+                            falcorGraph.get(
+                                ['sba','all',this.filtered_geographies,this.state.hazard,this.state.year,['total_loss','loan_total','num_loans','state_abbrev']],
+                                ['geo',this.filtered_geographies,['name']]
+                            ).then(response => {
+                                let geo_names = get(response,'json.geo',{})
+                                let sw = get(response, 'json.sba.all', {})
+                                let data = []
+                                Object.keys(sw).filter(d => d !== '$__path').forEach(item =>{
+                                    data.push({
+                                        county_fips_name : `${get(geo_names,`${item}.name`,'')},${get(sw,`${item}.${this.state.hazard}.${this.state.year}.${'state_abbrev'}`,'')}`,
+                                        year: this.state.year,
+                                        hazard : hazards.map(d => d.value === this.state.hazard ? d.name : ''),
+                                        total_loss : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_loss'}`, 0)),
+                                        loan_total : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'loan_total'}`, 0)),
+                                        num_loans : fmt(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_loans'}`, 0))
+                                    })
+                                })
+                                let lossByCounty= Object.keys(sw)
+                                    .reduce((a, c) => {
+                                        if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)) {
+                                            a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)
+                                        }
+                                        return a
+                                    }, {})
+                                let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
+                                let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
+                                    d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
+                                this.setState({
+                                    domain : domain,
+                                    data : data
+                                })
+                                return response
+                            })
+                        }
+                    }
+
+                })
+        }
+        if(geography === 'zip_codes'){
+            return falcorGraph.get(['geo',this.filtered_geographies,'byZip',['zip_codes']])
+                .then(response => {
+                    this.zip_codes = Object.values(response.json.geo).reduce((out,geo) =>{
+                        if(geo.byZip){
+                            out = [...out,...geo.byZip['zip_codes']]
                         }
                         return out
                     },[])
-                this.props.falcor.get(['sba','all',this.counties,this.state.hazard,this.state.year,['total_loss','loan_total','num_loans']],
-                    ['geo',this.counties,['name']])
-                    .then(response =>{
-                        let geo_names = get(response,'json.geo',{})
-                        let sw = get(response, 'json.sba.all', {})
-                        let data = []
-                        Object.keys(sw).filter(d => d !== '$__path').forEach(item =>{
-                            data.push({
-                                county_fips_name : `${get(geo_names,`${item}.name`,'')},${get(sw,`${item}.${this.state.hazard}.${this.state.year}.${'state'}`,'')}`,
-                                year: this.state.year,
-                                hazard : hazards.map(d => d.value === this.state.hazard ? d.name : ''),
-                                total_loss : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_loss'}`, 0)),
-                                loan_total : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'loan_total'}`, 0)),
-                                num_loans : fmt(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_loans'}`, 0))
+                    if(this.zip_codes){
+                        falcorGraph.get(
+                            ['sba','all','byZip',this.zip_codes,this.state.hazard,this.state.year,['total_loss','loan_total','num_loans','state_abbrev']]
+                        ).then(response => {
+                            let sw = get(response, 'json.sba.all.byZip', {})
+                            let data = []
+                            Object.keys(sw).filter(d => d !== '$__path').forEach(item =>{
+                                data.push({
+                                    county_fips_name : `${item}`,
+                                    year: this.state.year,
+                                    hazard : hazards.map(d => d.value === this.state.hazard ? d.name : ''),
+                                    total_loss : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'total_loss'}`, 0)),
+                                    loan_total : fnum(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'loan_total'}`, 0)),
+                                    num_loans : fmt(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_loans'}`, 0))
+                                })
                             })
+                            let lossByCounty= Object.keys(sw)
+                                .reduce((a, c) => {
+                                    if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)) {
+                                        a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)
+                                    }
+                                    return a
+                                }, {})
+                            let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
+                            let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
+                                d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
+                            this.setState({
+                                domain : domain,
+                                data : data
+                            })
+                            return response
                         })
-                        let lossByCounty= Object.keys(sw)
-                            .reduce((a, c) => {
-                                if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)) {
-                                    a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)
-                                }
-                                return a
-                            }, {})
-                        let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
-                        let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
-                            d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
-                        this.setState({
-                            domain : domain,
-                            data : data
-                        })
-                        return response
-                    })
-            })
+                    }
+                })
+        }
+
     }
     handleChange(e) {
         this.setState({ year: e })
@@ -314,7 +367,7 @@ class SBAHazardLoans extends React.Component {
                                             </svg>
                                             <CSVLink className='btn btn-secondary btn-sm'
                                                      style={{width:'100%'}}
-                                                     data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_counties.csv`}>Download CSV</CSVLink>
+                                                     data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_${this.state.geography_filter}.csv`}>Download CSV</CSVLink>
                                         </button>
                                         <button
                                             className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"

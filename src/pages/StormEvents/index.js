@@ -144,20 +144,20 @@ class NationalLanding extends React.Component {
     }
 
     fetchFalcorDeps() {
+        let geo_fips = this.props.activeStateGeoid.length === 0 ? fips : this.props.activeStateGeoid[0].state_fips
+        let geography = this.state.geography_filter === 'counties' ? 'counties' : this.state.geography_filter
         return this.props.falcor.get(
-            ['geo',fips, 'counties', 'geoid'])
+            ['geo',geo_fips,geography, 'geoid'])
             .then(response =>{
-                this.counties = Object.keys(response.json.geo).filter(d => d!== '$__path')
-                    .reduce((out,state) =>{
-                        if(this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== ""){
-                            out = [...response.json.geo[this.props.activeStateGeoid[0].state_fips].counties]
-                        }else{
-                            out = [...out,...response.json.geo[state].counties]
+                this.filtered_geographies = Object.values(response.json.geo)
+                    .reduce((out, state) => {
+                        if (state[geography]) {
+                            out = [...out, ...state[geography]]
                         }
                         return out
-                    },[])
-                this.props.falcor.get(['severeWeather',this.counties,this.state.hazard,this.state.year,['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips']],
-                    ['geo',this.counties,['name']])
+                    }, [])
+                this.props.falcor.get(['severeWeather',this.filtered_geographies,this.state.hazard,this.state.year,['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips']],
+                    ['geo',this.filtered_geographies,['name']])
                     .then(response =>{
                         let geo_names = get(response,'json.geo',{})
                         let sw = get(response, 'json.severeWeather', {})
@@ -186,7 +186,7 @@ class NationalLanding extends React.Component {
                             d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
                         this.setState({
                             domain : domain,
-                            data : data
+                            data :data
                         })
                         return response
                     })
@@ -334,7 +334,7 @@ class NationalLanding extends React.Component {
                                             </svg>
                                             <CSVLink className='btn btn-secondary btn-sm'
                                                      style={{width:'100%'}}
-                                                     data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_counties.csv`}>Download CSV</CSVLink>
+                                                     data={this.state.data} filename={`${this.state.current_fips_name}_${this.state.hazard}_${this.state.year}_${this.state.geography_filter}.csv`}>Download CSV</CSVLink>
                                         </button>
                                         <button
                                             className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
