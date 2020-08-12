@@ -226,7 +226,7 @@ class NationalLanding extends React.Component {
                             //hazards={this.props.hazards}
                             fips={''}
                             styles={[
-                                {name: 'Blank', style: 'mapbox://styles/am3081/ck80d5hds0r9y1ip3cs3aplld'}
+                                {name: 'Blank', style: 'mapbox://styles/am3081/ckaml4r1e1uip1ipgtx5vm9zk'}
                             ]}
                             sidebar={false}
                             attributes={false}
