@@ -1,4 +1,5 @@
 import React from 'react'
+import DataDownload from "./DataDownload";
 
 const MetaData = () => (
 <div className="bg-gray-50 overflow-hidden mt-16 min-h-screen">
@@ -146,11 +147,16 @@ const MetaData = () => (
             </p>
           </div>
         </div>
+        <div className="w-full sm:grid sm:col-gap-8 sm:row-gap-10 lg:col-span-2 lg:mt-0">
+          <DataDownload/>
+        </div>
+
       </div>
     </div>
   </div>
-</div>)
+</div>
 
+)
 
 export default {
   path: "/downloads",
@@ -166,3 +172,4 @@ export default {
     theme: 'light'
   }
 }
+
