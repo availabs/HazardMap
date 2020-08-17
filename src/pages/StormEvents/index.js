@@ -198,9 +198,6 @@ class NationalLanding extends React.Component {
 
 
     render() {
-        window.addEventListener('popstate', (event) => {
-            window.history.replaceState({state : '1'},"whole","/stormevents/")
-        });
         return (
             <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
                 <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
@@ -267,6 +264,7 @@ class NationalLanding extends React.Component {
                                              onClick={(e) =>{
                                                  e.target.closest(`#closeMe`).style.display = 'none'
                                                  this.props.setActiveStateGeoid([{state_fips:"",state_name:""}])
+                                                 window.history.pushState({state : '1'},"state","/stormevents/")
                                              }}>
                                             <title>Close</title>
                                             <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>

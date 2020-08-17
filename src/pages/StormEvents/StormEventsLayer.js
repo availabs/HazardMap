@@ -273,6 +273,7 @@ class StormEventsLayer extends MapLayer {
                 map.setFilter("states",["all",
                     ["match", ["get", "state_fips"],[state_fips],true,false]
                 ])
+                map.setFilter('counties', ["all", ["match", ["get", "county_fips"],this.filtered_geographies, true, false]])
                 map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
                 this.forceUpdate()
             }

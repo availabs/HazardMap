@@ -109,14 +109,25 @@ class FemaHmapV1EventsLayer extends MapLayer{
         if (hazard) {
             this.filters.hazard.value = hazard
         }
-        if(this.counties){
-            return falcorGraph.get(
-                ['hmap_v1',this.counties,this.filters.hazard.value,this.filters.year.value,['actual_amount_paid']],
-            ).then(d => {
-                //console.timeEnd('get severeWeather')
-                this.render(this.map)
+        let geo_fips = state_fips && !state_fips.includes("") ? state_fips : fips
+        return falcorGraph.get(['geo',geo_fips,'counties','geoid'])
+            .then(response =>{
+                this.filtered_geographies = Object.values(response.json.geo)
+                    .reduce((out, state) => {
+                        if (state['counties']) {
+                            out = [...out, ...state['counties']]
+                        }
+                        return out
+                    }, [])
+                if(this.filtered_geographies.length > 0){
+                    falcorGraph.get(
+                        ['hmap_v1',this.filtered_geographies,this.filters.hazard.value,this.filters.year.value,['actual_amount_paid']],
+                    ).then(d => {
+                        //console.timeEnd('get severeWeather')
+                        this.render(this.map)
+                    })
+                }
             })
-        }
 
     }
 
@@ -161,12 +172,16 @@ class FemaHmapV1EventsLayer extends MapLayer{
         let sw = get(data, 'hmap_v1', {})
 
         let lossByCounty = Object.keys(sw)
-            .reduce((a, c) => {
-                if (get(sw[c], `${hazard}.${year}.${measure}`, false)) {
-                    a[c] = get(sw[c], `${hazard}.${year}.${measure}`, false)
+            .reduce((a,c) =>{
+                if(this.filtered_geographies){
+                    this.filtered_geographies.filter(d => d !== '$__path').forEach(geo =>{
+                        if(geo === c && get(sw[c], `${hazard}.${year}.${measure}`, false)){
+                            a[c] = get(sw[c], `${hazard}.${year}.${measure}`, false)
+                        }
+                    })
                 }
                 return a
-            }, {})
+            },{})
         let lossDomain = Object.values(lossByCounty).sort((a, b) => a - b)
 
         let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
@@ -200,19 +215,29 @@ class FemaHmapV1EventsLayer extends MapLayer{
                     a = c.properties.state_name
                     return a
                 }, '')
-                this.state = state_fips
+                this.state_fips  = state_fips
                 this.state_name = state_name
                 this.infoBoxes.overview.show = true
-                map.setFilter('counties', ["all", ["match", ["get", "state_fips"], [state_fips], true, false]]);
+                map.setFilter('states', [
+                    "all",
+                    [
+                        "match",
+                        ["get", "state_fips"],
+                        [state_fips],
+                        true,
+                        false
+                    ]
+                ]);
                 map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
                 this.forceUpdate()
             }
         })
         if(state_fips){
             if(state_fips.includes("")){
-                map.setFilter('counties',undefined)
-                this.state = ""
+                this.state_fips = ""
                 this.state_name = ""
+                map.setFilter('states',undefined)
+                map.setLayoutProperty('counties', 'visibility', 'visible');
                 map.setPaintProperty(
                     'counties',
                     'fill-color',
