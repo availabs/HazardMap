@@ -7,6 +7,7 @@ import Login from "pages/Login"
 import Logout from "pages/Logout"
 import Home from "pages/home"
 import DataDownload from "pages/DataDownload"
+import Methodology from "pages/Methodology/methodology"
 
 
 export default [
@@ -16,6 +17,7 @@ export default [
 	Logout,
 	Home,
 	DataDownload,
+	...Methodology,
 	// -- util
 	NoMatch
 ];

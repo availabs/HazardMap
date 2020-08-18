@@ -1,6 +1,6 @@
 import React from "react"
 
-import { DMS_DOCS } from "components/DMS/docs/dms-docs.type"
+import { DMS_DOCS } from "components/methodology.js/docs/dms-docs.type"
 
 class Component extends React.Component {
   render() {
