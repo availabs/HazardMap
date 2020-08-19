@@ -216,7 +216,6 @@ class DataDownload extends React.Component{
                                 if(this.zip_codes){
                                     this.props.falcor.get([this.state.dataset,'all','byZip',this.zip_codes,this.state.user_hazards,[{from:1996,to:2018}],attributes])
                                         .then(response =>{
-                                            console.log('response',response)
                                             let graph = get(response.json,[this.state.dataset,'all','byZip'],{})
                                             Object.keys(graph).filter(d => d!== '$__path').forEach(geo =>{
                                                 this.state.user_hazards.forEach(hazard =>{

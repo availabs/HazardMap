@@ -21,3 +21,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+/tasks/sba/database_config.py
+/tasks/hmap/database_config.py
+/tasks/severe-weather-sql/database_config.py
+/tasks/geo_populate_cousubs_tracts/database_config.py
+/tasks/QA/database_config.py
