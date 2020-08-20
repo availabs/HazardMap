@@ -120,7 +120,9 @@ def calculate(cursor):
                 with t as
             ( select sum(property_damage) as total_property_damage,
               count(*) as total_records
-            from severe_weather.details)
+            from severe_weather.details
+            where event_type IN """+"("+str(hazards2severeWeather[hazard]).strip('[]')+")"+"""
+            )
             select
             """+"'"+str(hazard)+"'"+""" as hazard,
             count(geoid) as total_geoid_not_null_records,

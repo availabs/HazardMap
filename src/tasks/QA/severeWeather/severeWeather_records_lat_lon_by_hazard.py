@@ -120,7 +120,9 @@ def calculate(cursor):
              with t as
         ( select
         count(*) as total_records
-        from severe_weather.details)
+        from severe_weather.details
+        where event_type IN """+"("+str(hazards2severeWeather[hazard]).strip('[]')+")"+"""
+        )
             select
             """+"'"+str(hazard)+"'"+""" as hazard,
             count(*) as records_with_lat_lon,
