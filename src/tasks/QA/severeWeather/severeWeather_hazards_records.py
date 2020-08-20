@@ -79,7 +79,7 @@ hazards2severeWeather = {
     'HAIL/ICY ROADS',
     "HAIL FLOODING"
 ],
-'earthquake': [],
+'earthquake': [''],
 'drought': ['Drought'],
 'avalanche': ['Avalanche'],
 'coldwave': [
@@ -109,6 +109,9 @@ hazards2severeWeather = {
 ]
 }
 
+EARLIEST_YEAR = 1996
+LATEST_YEAR = 2018
+
 def calculate(cursor):
     hazards = sys.argv[1:]
     results = []
@@ -127,17 +130,24 @@ def calculate(cursor):
             t.total_property_damage as total_property_damage,
             ROUND(sum(property_damage) * 100.0 / t.total_property_damage, 2) as property_damage_records_percentage
             from severe_weather.details,
-            t 
+            t
             WHERE geoid is not null and cousub_geoid is not null and tract_geoid is not null
             and event_type IN """+"("+str(hazards2severeWeather[hazard]).strip('[]')+")"+"""
+            AND year >= """+str(EARLIEST_YEAR)+"""
             GROUP BY t.total_property_damage,t.total_records
         """
         cursor.execute(sql)
-        results.append(cursor.fetchall())
+        test = cursor.fetchall()
+        print(test)
+        if len(test) == 0:
+            results.append([(hazard,"0","0","0","0","0","0")])
+        else:
+            results.append(test)
 
     output = pandas.DataFrame(data=np.concatenate(results),
                            index=None,
                            columns=["hazard", "total_geoid_not_null_records","total_geoid_records","geoid_records_percentage","total_property_damage_geoid_not_null","total_property_damage","property_damage_records_percentage"])
+
     output.to_csv("hazards_data_output.csv")
 
 
