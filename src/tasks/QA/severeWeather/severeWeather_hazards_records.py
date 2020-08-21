@@ -150,7 +150,7 @@ def calculate(cursor):
                            index=None,
                            columns=["hazard", "total_geoid_not_null_records","total_geoid_records","geoid_records_percentage","total_property_damage_geoid_not_null","total_property_damage","property_damage_records_percentage"])
 
-    output.to_csv("hazards_data_output.csv")
+    output.to_csv("csv/hazards_data_output.csv")
 
 
 def main():

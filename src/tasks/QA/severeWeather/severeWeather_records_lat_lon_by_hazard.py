@@ -146,7 +146,7 @@ def calculate(cursor):
                               index=None,
                               columns=["hazard","records_with_lat_lon","total_records","records_with_lat_lon_percentage"])
 
-    output.to_csv("hazards_data_lat_lon_output.csv")
+    output.to_csv("csv/hazards_data_lat_lon_output.csv")
 
 def main():
 

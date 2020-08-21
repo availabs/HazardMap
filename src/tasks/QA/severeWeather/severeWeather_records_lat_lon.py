@@ -28,7 +28,7 @@ def calculate(cursor):
     """
     cursor.execute(sql)
     results = pandas.DataFrame(np.array(cursor.fetchall()))
-    results.to_csv("severeWeather_records_lat_lon.csv", index=False,header=["records_with_lat_lon","total_records","records_with_lat_lon_percentage"])
+    results.to_csv("csv/severeWeather_records_lat_lon.csv", index=False,header=["records_with_lat_lon","total_records","records_with_lat_lon_percentage"])
 
 
 

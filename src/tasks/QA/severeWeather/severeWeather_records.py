@@ -31,7 +31,7 @@ from severe_weather.details,
     """
     cursor.execute(sql)
     results = pandas.DataFrame(np.array(cursor.fetchall()))
-    results.to_csv("severeWeather_records.csv", index=False,header=["total_geoid_not_null_records","total_geoid_records","geoid_records_percentage","total_property_damage_geoid_not_null","total_property_damage","property_damage_records_percentage"])
+    results.to_csv("csv/severeWeather_records.csv", index=False,header=["total_geoid_not_null_records","total_geoid_records","geoid_records_percentage","total_property_damage_geoid_not_null","total_property_damage","property_damage_records_percentage"])
 
 
 
