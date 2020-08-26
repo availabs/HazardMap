@@ -46,3 +46,11 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+'''
+SELECT geoid,cousub_geoid,tract_geoid,begin_lat,begin_lon
+from severe_weather.details 
+WHERE begin_lat is not null and begin_lon is not null
+and (geoid is null or cousub_geoid is null or tract_geoid is null)
+and year >='1996'
+'''

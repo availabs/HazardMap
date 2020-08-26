@@ -15,9 +15,11 @@ def calculate(cursor):
          with t as
     ( select sum(property_damage) as total_property_damage,
 	  count(*) as total_records
-    from severe_weather.details)
+    from severe_weather.details
+    WHERE year >= """+str(EARLIEST_YEAR)+"""
+    )
 select
-count(geoid) as total_geoid_not_null_records,
+count(*) as total_geoid_not_null_records,
 t.total_records as total_geoid_records,
 ROUND(count(*) * 100.0 / t.total_records, 2) as geoid_records_percentage,
 sum(property_damage) as total_property_damage_geoid_not_null,

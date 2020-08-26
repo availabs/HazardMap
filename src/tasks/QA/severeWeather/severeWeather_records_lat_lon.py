@@ -15,7 +15,9 @@ def calculate(cursor):
          with t as
     ( select
     count(*) as total_records
-    from severe_weather.details)
+    from severe_weather.details
+    WHERE year >= """+str(EARLIEST_YEAR)+"""
+    )
 		select
 		count(*) as records_with_lat_lon,
 		t.total_records as total_records,
@@ -23,6 +25,7 @@ def calculate(cursor):
 		from severe_weather.details,
 		t
 		WHERE begin_lat is not null and begin_lon is not null
+		AND geoid is not null and cousub_geoid is not null and tract_geoid is not null 
 		AND year  >= """+str(EARLIEST_YEAR)+"""
 		GROUP BY t.total_records
     """
