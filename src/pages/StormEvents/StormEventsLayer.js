@@ -128,6 +128,7 @@ class StormEventsLayer extends MapLayer {
                         return out
                     }, [])
                 if(this.filtered_geographies.length > 0){
+                    console.log('filtered',this.filtered_geographies)
                     falcorGraph.get(
                         ['severeWeather', this.filtered_geographies, this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips']],
 

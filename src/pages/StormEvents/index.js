@@ -11,6 +11,7 @@ import { fnum } from "utils/sheldusUtils"
 import HazardListTable from "../components /listTable/hazardListTable";
 import SBAHazardLoans from "../SBAEvents/index";
 import FemaHmapV1 from "../femaHmapV1/index";
+import FemaDisasters from '../fema_disasters/index'
 import Select from "components/avl-components/components/Inputs/select";
 import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
@@ -481,5 +482,27 @@ export default [
         ]
     }
 },
-
+    {
+        path: '/fema_disasters/',
+        mainNav: true,
+        exact: true,
+        name: 'FEMA Disasters',
+        layoutSettings: {
+            fixed: true,
+            maxWidth: '',//'max-w-7xl',
+            headerBar: false,
+            nav: 'top',
+            theme: 'flat',
+        },
+        component: {
+            type: 'div',
+            props: {
+                className: 'w-full overflow-hidden pt-16 focus:outline-none',
+                style: {height: 'calc(100vh)'}
+            },
+            children: [
+                connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasters))
+            ]
+        }
+    },
 ]
