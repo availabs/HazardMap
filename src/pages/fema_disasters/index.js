@@ -35,36 +35,75 @@ const hazards = [
     {value:'volcano', name:'Volcano'},
     {value:'coastal', name:'Coastal Hazards'}
 ];
-const attributes=['declaration_type',
-    'declaration_title',
-    'declaration_request_number',
-    'state',
-    'declaration_date']
+const attributes=['disaster_number',
+    'total_number_ia_approved',
+    'total_amount_ihp_approved',
+    'total_amount_ha_approved',
+    'total_amount_ona_approved',
+    'total_obligated_amount_pa',
+    'total_obligated_amount_cat_ab',
+    'total_obligated_amount_cat_c2g',
+    'pa_load_date',
+    'ia_load_date',
+    'total_obligated_amount_hmgp',
+    'last_refresh']
 const tableCols = [
     {
-        Header: 'State',
-        accessor: 'state',
+        Header: 'Disaster Number',
+        accessor: 'disaster_number',
     },
     {
-        Header: 'Declaration Title',
-        accessor: 'declaration_title',
+        Header: 'Total Number IA Approved',
+        accessor: 'total_number_ia_approved',
         disableFilters: true
     },
     {
-        Header: 'Declaration Request Number',
-        accessor: 'declaration_request_number',
+        Header: 'Total Amount IHP Approved',
+        accessor: 'total_amount_ihp_approved',
         disableFilters: true
     },
     {
-        Header : 'Declaration Type',
-        accessor: 'declaration_type',
+        Header : 'Total Amount ONA Approved',
+        accessor: 'total_amount_ona_approved',
         disableFilters: true
     },
     {
-        Header : 'Declaration Date',
-        accessor: 'declaration_date',
+        Header : 'Total Obligated Amount PA',
+        accessor: 'total_obligated_amount_pa',
+        disableFilters: true
+    },
+    {
+        Header:'Total Obligated Amount CAT AB',
+        accessor:'total_obligated_amount_cat_ab',
+        disableFilters: true
+    },
+    {
+        Header:'Total Obligated Amount CAT C2G',
+        accessor:'total_obligated_amount_cat_c2g',
+        disableFilters: true
+    },
+    {
+        Header:'PA Load Date',
+        accessor: 'pa_load_date',
+        disableFilters: true
+    },
+    {
+        Header:'IA Load Date',
+        accessor: 'ia_load_date',
+        disableFilters: true
+    },
+    {
+        Header:'Total Obligated Amount HGMP',
+        accessor: 'total_obligated_amount_hmgp',
+        disableFilters: true
+    },
+    {
+        Header:'Last Refresh',
+        accessor: 'last_refresh',
         disableFilters: true
     }
+
+
 ];
 class FemaDisasters extends React.Component {
     constructor(props) {
@@ -90,23 +129,22 @@ class FemaDisasters extends React.Component {
 
 
     fetchFalcorDeps() {
-        return this.props.falcor.get(['femaHazards','length'])
+        return this.props.falcor.get(['fema','disasters','length'])
             .then(response =>{
-                let length = get(response.json,['femaHazards','length'],null)
+                let length = get(response.json,['fema','disasters','length'],null)
                 let data = []
                 if(length){
-                    this.props.falcor.get(['femaHazards','byIndex',[{from:0,to:1000}],attributes])
+                    this.props.falcor.get(['fema','disasters','byIndex',[{from:0,to:length-1}],attributes])
                         .then(response =>{
-                            let graph = get(response.json,['femaHazards','byIndex'],{})
+                            let graph = get(response.json,['fema','disasters','byIndex'],{})
                             Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
                                 data.push(attributes.reduce((out,attribute) =>{
                                     if(graph[item][attribute]){
-                                        out[attribute] =  attribute.includes('date') ? new Date(graph[item][attribute]).toLocaleDateString('en-US') :graph[item][attribute]
+                                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute]).toLocaleDateString('en-US') :graph[item][attribute]
                                     }
                                     return out
                                 },{}))
                             })
-                            data = data.sort((a,b) => {return new Date(a['declaration_date']) - new Date(b['declaration_date'])})
                             this.setState({
                                 data : data
                             })
