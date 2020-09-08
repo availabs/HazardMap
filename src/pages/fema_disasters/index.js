@@ -46,16 +46,6 @@ const tableCols = [
         accessor: 'state',
     },
     {
-        Header: 'Year',
-        accessor: 'year',
-        disableFilters: true
-    },
-    {
-        Header: 'Hazard',
-        accessor: 'hazard',
-        disableFilters: true
-    },
-    {
         Header: 'Declaration Title',
         accessor: 'declaration_title',
         disableFilters: true
