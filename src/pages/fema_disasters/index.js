@@ -35,6 +35,11 @@ const hazards = [
     {value:'volcano', name:'Volcano'},
     {value:'coastal', name:'Coastal Hazards'}
 ];
+const attributes=['declaration_type',
+    'declaration_title',
+    'declaration_request_number',
+    'state',
+    'declaration_date']
 const tableCols = [
     {
         Header: 'State',
@@ -95,31 +100,30 @@ class FemaDisasters extends React.Component {
 
 
     fetchFalcorDeps() {
-        return this.props.falcor.get(['femaDisasters',fips,hazards.map(d => d.value),[{from:start_year,to:end_year}],['declaration_title', 'declaration_request_number', 'state', 'declaration_type', 'declaration_date']])
+        return this.props.falcor.get(['femaHazards','length'])
             .then(response =>{
-                let fd = get(response, 'json.femaDisasters', {})
+                let length = get(response.json,['femaHazards','length'],null)
                 let data = []
-                Object.keys(fd).filter(d =>  d !== '$__path').forEach(item =>{
-                    Object.keys(fd[item]).filter(d =>  d !== '$__path').forEach(hazard =>{
-                        years.forEach(year =>{
-                            console.log('check',get(fd, [item,hazard,year,'state'],''))
-                            data.push({
-                                hazard : hazard,
-                                year : year,
-                                state : get(fd, [item,hazard,year,'state'],'None'),
-                                declaration_title : get(fd, [item,hazard,year,'declaration_title'],'None'),
-                                declaration_request_number : get(fd,[item,hazard,year,'declaration_request_number'],'None'),
-                                declaration_type: get(fd,[item,hazard,year,'declaration_type'],'None'),
-                                declaration_date : get(fd,[item,hazard,year,'declaration_date'],'')
+                if(length){
+                    this.props.falcor.get(['femaHazards','byIndex',[{from:0,to:1000}],attributes])
+                        .then(response =>{
+                            let graph = get(response.json,['femaHazards','byIndex'],{})
+                            Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
+                                data.push(attributes.reduce((out,attribute) =>{
+                                    if(graph[item][attribute]){
+                                        out[attribute] =  attribute.includes('date') ? new Date(graph[item][attribute]).toLocaleDateString('en-US') :graph[item][attribute]
+                                    }
+                                    return out
+                                },{}))
+                            })
+                            data = data.sort((a,b) => {return new Date(a['declaration_date']) - new Date(b['declaration_date'])})
+                            this.setState({
+                                data : data
                             })
                         })
 
-                    })
-                })
-                data = data.sort((a,b) => b.declaration_date - a.declaration_date)
-                this.setState({
-                    data : data
-                })
+                }
+
             })
     }
     handleChange(e) {
@@ -136,6 +140,7 @@ class FemaDisasters extends React.Component {
                     data={this.state.data}
                     initialPageSize={10}
                     minRows={this.state.data.length}
+                    sortBy = {{id:'declaration_date',sortBy:'desc'}}
                 /> : <div> Loading</div>}
             </div>
             /*<div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
