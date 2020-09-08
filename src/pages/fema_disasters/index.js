@@ -128,8 +128,18 @@ class FemaDisasters extends React.Component {
 
     render() {
         return (
-            <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
-                {/*<div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
+            <div>
+                {this.state.data.length > 0 ? <Table
+                    defaultPageSize={10}
+                    showPagination={false}
+                    columns={tableCols}
+                    data={this.state.data}
+                    initialPageSize={10}
+                    minRows={this.state.data.length}
+                /> : <div> Loading</div>}
+            </div>
+            /*<div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
+                {/!*<div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
                     <div className='h-full'>
                         <div className="relative top-0 right-auto h-8 w-2/6">
                         </div>
@@ -141,17 +151,10 @@ class FemaDisasters extends React.Component {
                     <div className='bg-white rounded h-full w-full shadow'>
 
                     </div>
-                </div>*/}
-                {this.state.data.length > 0 ? <Table
-                    defaultPageSize={10}
-                    showPagination={false}
-                    columns={tableCols}
-                    data={this.state.data}
-                    initialPageSize={10}
-                    minRows={this.state.data.length}
-                /> : <div> Loading</div>}
+                </div>*!/}
 
-            </div>
+
+            </div>*/
         )
     }
 }
