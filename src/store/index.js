@@ -7,15 +7,12 @@ import falcorCache from "utils/redux-falcor-new/falcorCache"
 
 import user from './user';
 import stormEvents from "./stormEvents";
-import options from 'components/CensusCharts/options.store.js'
 import messages from './messages';
 
 const reducer = combineReducers({
   user,
   stormEvents,
-  options,
   messages,
-  // graph
   falcorCache
 });
 

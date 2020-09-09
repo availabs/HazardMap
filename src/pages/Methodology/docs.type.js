@@ -1,5 +1,5 @@
 const ctpDoc = {
-    app: "ctp",
+    app: "npmrds",
     type: "doc-page",
     attributes: [
         { key: "section",

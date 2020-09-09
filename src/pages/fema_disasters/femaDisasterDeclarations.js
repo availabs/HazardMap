@@ -6,6 +6,7 @@ import Table from "../../components/avl-components/components/Table";
 import SBAHazardLoans from "../SBAEvents";
 import FemaHmapV1 from "../femaHmapV1";
 import FemaDisasters from "./index";
+import { withRouter } from "react-router";
 
 const tableCols = [
     {
@@ -82,13 +83,10 @@ const mapDispatchToProps = {
 };
 export default [
     {
-        path: '/fema_disasters/disaster/:disasterId/',
+        path: '/fema_disasters/disaster/:disasterId',
         mainNav: false,
         exact: true,
         name: 'Disaster Declaration',
-        breadcrumbs: [
-            {name: 'disasterId', path: '/fema_disasters/disaster/'}
-        ],
         layoutSettings: {
             fixed: true,
             maxWidth: '',//'max-w-7xl',
@@ -96,16 +94,7 @@ export default [
             nav: 'top',
             theme: 'flat',
         },
-        component: {
-            type: 'div',
-            props: {
-                className: 'w-full overflow-hidden pt-16 focus:outline-none',
-                style: {height: 'calc(100vh)'},
-
-            },
-            children: [
-                connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))
-            ]
-        }
+        component: connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))
+        
     }
 ]
