@@ -505,4 +505,5 @@ export default [
             ]
         }
     },
+
 ]

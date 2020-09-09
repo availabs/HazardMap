@@ -6,6 +6,7 @@ import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
 import Table from "../../components/avl-components/components/Table";
+import {Link} from 'react-router-dom';
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
 let years = []
@@ -51,6 +52,13 @@ const tableCols = [
     {
         Header: 'Disaster Number',
         accessor: 'disaster_number',
+        Cell: (data) => {
+            return (
+                <div style={{cursor: 'pointer'}}>
+                    <Link to={`/fema_disasters/disaster/${data.row.original.disaster_number}`}>{data.row.original.disaster_number}</Link>
+                </div>
+            )
+        }
     },
     {
         Header: 'Total Number IA Approved',
@@ -102,17 +110,14 @@ const tableCols = [
         accessor: 'last_refresh',
         disableFilters: true
     }
-
-
 ];
 class FemaDisasters extends React.Component {
     constructor(props) {
         super(props);
-        // Don't call this.setState() here!
         this.state = {
             data : []
         };
-        this.handleChange = this.handleChange.bind(this)
+
     }
     componentDidMount(){
         document.body.classList.add("overflow-y-hidden")
@@ -140,7 +145,7 @@ class FemaDisasters extends React.Component {
                             Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
                                 data.push(attributes.reduce((out,attribute) =>{
                                     if(graph[item][attribute]){
-                                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute]).toLocaleDateString('en-US') :graph[item][attribute]
+                                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute]).toLocaleDateString('en-US') : graph[item][attribute] || 'None'
                                     }
                                     return out
                                 },{}))
@@ -154,8 +159,8 @@ class FemaDisasters extends React.Component {
 
             })
     }
-    handleChange(e) {
-    }
+
+
 
 
     render() {
@@ -168,7 +173,6 @@ class FemaDisasters extends React.Component {
                     data={this.state.data}
                     initialPageSize={10}
                     minRows={this.state.data.length}
-                    sortBy = {{id:'declaration_date',sortBy:'desc'}}
                 /> : <div> Loading</div>}
             </div>
             /*<div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>

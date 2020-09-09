@@ -8,6 +8,7 @@ import Logout from "pages/Logout"
 import Home from "pages/home"
 import DataDownload from "pages/DataDownload"
 import Methodology from "pages/Methodology/methodology"
+import FemaDisasterDeclaration from "./pages/fema_disasters/femaDisasterDeclarations";
 
 
 export default [
@@ -18,6 +19,7 @@ export default [
 	Home,
 	DataDownload,
 	...Methodology,
+	...FemaDisasterDeclaration,
 	// -- util
 	NoMatch
 ];
