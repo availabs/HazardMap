@@ -48,11 +48,12 @@ class FemaDisasterDeclarations extends React.Component{
     }
 
     fetchFalcorDeps(){
+        console.log('props',this.props)
         return this.props.falcor.get([''])
     }
 
     render(){
-        console.log('props',this.props)
+
         return (
             <div>
                 {/*{this.state.data.length > 0 ? <Table
@@ -94,7 +95,6 @@ export default [
             nav: 'top',
             theme: 'flat',
         },
-        component: connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))
-        
+        component: connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))        
     }
 ]

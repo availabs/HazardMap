@@ -128,9 +128,6 @@ class FemaDisasters extends React.Component {
         };
     }
 
-    componentDidUpdate(prevProps){
-
-    }
 
 
     fetchFalcorDeps() {
@@ -159,8 +156,6 @@ class FemaDisasters extends React.Component {
 
             })
     }
-
-
 
 
     render() {
@@ -206,4 +201,29 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = {
 
 };
-export default connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasters))
+export default [
+    {
+        path: '/fema_disasters/',
+        mainNav: true,
+        exact: true,
+        name: 'FEMA Disasters',
+        layoutSettings: {
+            fixed: true,
+            maxWidth: '',//'max-w-7xl',
+            headerBar: false,
+            nav: 'top',
+            theme: 'flat',
+        },
+        component: {
+            type: 'div',
+            props: {
+                className: 'w-full overflow-hidden pt-16 focus:outline-none',
+                style: {height: 'calc(100vh)'}
+            },
+            children: [
+                connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasters))
+            ]
+        }
+    },
+
+]
