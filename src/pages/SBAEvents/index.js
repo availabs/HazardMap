@@ -419,4 +419,28 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = {
     setActiveStateGeoid
 };
-export default connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(SBAHazardLoans))
+export default [
+    {
+        path: '/sba/',
+        mainNav: true,
+        exact: true,
+        name: 'SBA Hazard Loans',
+        layoutSettings: {
+            fixed: true,
+            maxWidth: '',//'max-w-7xl',
+            headerBar: false,
+            nav: 'top',
+            theme: 'flat',
+        },
+        component: {
+            type: 'div',
+            props: {
+                className: 'w-full overflow-hidden pt-16 focus:outline-none',
+                style: {height: 'calc(100vh)'}
+            },
+            children: [
+                connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(SBAHazardLoans))
+            ]
+        }
+    },
+]

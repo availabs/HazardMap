@@ -47,11 +47,12 @@ class FemaDisasterDeclarations extends React.Component{
     }
 
     fetchFalcorDeps(){
+        console.log('props',this.props)
         return this.props.falcor.get([''])
     }
 
     render(){
-        console.log('props',this.props)
+
         return (
             <div>
                 {/*{this.state.data.length > 0 ? <Table
@@ -101,11 +102,11 @@ export default [
             props: {
                 className: 'w-full overflow-hidden pt-16 focus:outline-none',
                 style: {height: 'calc(100vh)'},
-
             },
             children: [
                 connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))
-            ]
+            ],
+
         }
     }
 ]
