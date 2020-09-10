@@ -11,6 +11,11 @@ const tableCols = [
         accessor: 'disaster_number',
     },
     {
+        Header: 'Designated Area',
+        accessor: 'designated_area',
+        disableFilters: true
+    },
+    {
         Header: 'Declaration Title',
         accessor: 'declaration_title',
         disableFilters: true
@@ -36,7 +41,7 @@ const tableCols = [
     }
 ];
 
-const attributes=['disaster_number','declaration_title','declaration_request_number','state','declaration_type','declaration_date']
+const attributes=['disaster_number','designated_area','declaration_title','declaration_request_number','state','declaration_type','declaration_date']
 
 class FemaDisasterDeclarations extends React.Component{
     constructor(props) {
@@ -53,7 +58,7 @@ class FemaDisasterDeclarations extends React.Component{
             .then(response =>{
                 let length = get(response.json,['fema','disasters',disaster_number,'declarations','length'],null)
                 if(length){
-                    this.props.falcor.get(['fema','disasters',[disaster_number],'declarations','byIndex',[{from:0,to:length}],attributes])
+                    this.props.falcor.get(['fema','disasters',disaster_number,'declarations','byIndex',[{from:0,to:length-1}],attributes])
                         .then(response =>{
                             let graph = get(response.json,['fema','disasters',disaster_number,'declarations','byIndex'],{})
                             Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
