@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // import { Switch } from "react-router"
-import { BrowserRouter, Switch, Router} from 'react-router-dom';
+import { BrowserRouter, Switch} from 'react-router-dom';
 import ScrollToTop from 'utils/ScrollToTop'
 
 import Routes from 'Routes';
@@ -9,9 +9,7 @@ import Layout from 'components/avl-components/DefaultLayout'
 
 import { auth } from 'store/user';
 
-import { createBrowserHistory } from "history";
 
-const history = createBrowserHistory();
 
 class App extends Component {
   state = {
@@ -30,27 +28,23 @@ class App extends Component {
     return (
       <BrowserRouter>
         <ScrollToTop />
-        
-          <Router history={history}>\
-          <Switch>
-            {Routes.map((route, i) => {
-              return (
-                <Layout 
-                  logo={(<div className='px-12'>HHD</div>)}
-                  key={ i }
-                  { ...route }
-                  authed={ this.props.user.authed }
-                  isAuthenticating={ this.state.isAuthenticating }
-                  menus={ Routes.filter(r => r.mainNav) }
-                  router={ this.props.router }
-                  user={ this.props.user }
-                />
-              );
-            })}
-            </Switch>
-
-          </Router>
-              </BrowserRouter>
+        <Switch>
+          {Routes.map((route, i) => {
+            return (
+              <Layout 
+                logo={(<div className='px-12'>HHD</div>)}
+                key={ i }
+                { ...route }
+                authed={ this.props.user.authed }
+                isAuthenticating={ this.state.isAuthenticating }
+                menus={ Routes.filter(r => r.mainNav) }
+                
+                user={ this.props.user }
+              />
+            );
+          })}
+        </Switch>
+      </BrowserRouter>
     );
   }
 }

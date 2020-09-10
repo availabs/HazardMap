@@ -6,7 +6,6 @@ import Table from "../../components/avl-components/components/Table";
 import SBAHazardLoans from "../SBAEvents";
 import FemaHmapV1 from "../femaHmapV1";
 import FemaDisasters from "./index";
-import { withRouter } from "react-router";
 
 const tableCols = [
     {
@@ -48,14 +47,13 @@ class FemaDisasterDeclarations extends React.Component{
     }
 
     fetchFalcorDeps(){
-        console.log('props',this.props)
         return this.props.falcor.get([''])
     }
 
     render(){
-
+        console.log('props',this.props)
         return (
-            <div>
+            <div style={{padding: 150}}>
                 {/*{this.state.data.length > 0 ? <Table
                     defaultPageSize={10}
                     showPagination={false}
@@ -71,23 +69,14 @@ class FemaDisasterDeclarations extends React.Component{
     }
 }
 
-const mapStateToProps = (state, ownProps) => {
-    return {
-        activeStateGeoid : state.stormEvents.activeStateGeoid,
-        activeStateAbbrev : state.stormEvents.activeStateAbbrev,
-        graph: state.graph,
-        hazards: get(state.graph, 'riskIndex.hazards.value', [])
-    };
-};
-const mapDispatchToProps = {
 
-};
 export default [
     {
         path: '/fema_disasters/disaster/:disasterId',
         mainNav: false,
-        exact: true,
+        exact: false,
         name: 'Disaster Declaration',
+       
         layoutSettings: {
             fixed: true,
             maxWidth: '',//'max-w-7xl',
@@ -95,6 +84,8 @@ export default [
             nav: 'top',
             theme: 'flat',
         },
-        component: connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))        
+        component: reduxFalcor(FemaDisasterDeclarations)
+            
+
     }
 ]
