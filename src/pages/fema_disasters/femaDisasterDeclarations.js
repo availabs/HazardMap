@@ -3,10 +3,7 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import Table from "../../components/avl-components/components/Table";
-import SBAHazardLoans from "../SBAEvents";
-import FemaHmapV1 from "../femaHmapV1";
-import FemaDisasters from "./index";
-import { withRouter } from "react-router";
+import {withRouter} from 'react-router'
 
 const tableCols = [
     {
@@ -39,6 +36,8 @@ const tableCols = [
     }
 ];
 
+const attributes=['disaster_number','declaration_title','declaration_request_number','state','declaration_type','declaration_date']
+
 class FemaDisasterDeclarations extends React.Component{
     constructor(props) {
         super(props);
@@ -48,24 +47,43 @@ class FemaDisasterDeclarations extends React.Component{
     }
 
     fetchFalcorDeps(){
-        console.log('props',this.props)
-        return this.props.falcor.get([''])
+        let disaster_number = window.location.pathname.split("/")[3]
+        let data = []
+        return this.props.falcor.get(['fema','disasters',[disaster_number],'declarations','length'])
+            .then(response =>{
+                let length = get(response.json,['fema','disasters',disaster_number,'declarations','length'],null)
+                if(length){
+                    this.props.falcor.get(['fema','disasters',[disaster_number],'declarations','byIndex',[{from:0,to:length}],attributes])
+                        .then(response =>{
+                            let graph = get(response.json,['fema','disasters',disaster_number,'declarations','byIndex'],{})
+                            Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
+                                if(graph[item]){
+                                    data.push(attributes.reduce((out,attribute) =>{
+                                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute]).toLocaleDateString('en-US') : graph[item][attribute] || 'None'
+                                        return out
+                                    },{}))
+                                }
+
+                            })
+                            this.setState({
+                                data : data
+                            })
+                        })
+                }
+            })
     }
 
     render(){
-
         return (
             <div>
-                {/*{this.state.data.length > 0 ? <Table
+                {this.state.data.length > 0 ? <Table
                     defaultPageSize={10}
                     showPagination={false}
                     columns={tableCols}
                     data={this.state.data}
                     initialPageSize={10}
                     minRows={this.state.data.length}
-                    onRowClick={function(e,row){ console.log('e',e,row)}}
-                /> : <div> Loading</div>}*/}
-                in here
+                /> : <div> No data</div>}
             </div>
         )
     }
@@ -95,6 +113,15 @@ export default [
             nav: 'top',
             theme: 'flat',
         },
-        component: connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))        
+        component: {
+            type: 'div',
+            props: {
+                className: 'w-full overflow-hidden pt-16 focus:outline-none',
+                style: {height: 'calc(100vh)'}
+            },
+            children: [
+                connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))
+            ]
+        }
     }
 ]
