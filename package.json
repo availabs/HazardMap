@@ -33,6 +33,8 @@
     "match-sorter": "^4.1.0",
     "moment": "^2.27.0",
     "papaparse": "^5.2.0",
+    "prop-types": "^15.7.2",
+    "query-string": "^6.13.1",
     "react": "^16.13.1",
     "react-csv": "^2.0.3",
     "react-dom": "^16.13.1",
