@@ -5,6 +5,10 @@ import get from 'lodash.get';
 import Table from "../../components/avl-components/components/Table";
 import {withRouter} from 'react-router'
 import {fnum} from "../../utils/sheldusUtils";
+import * as d3 from "d3";
+var format =  d3.format("~s")
+const fmt = (d) => d < 1000 ? d : format(d)
+
 
 const tableCols = [
     {
@@ -43,6 +47,17 @@ const tableCols = [
 ];
 
 const attributes=['disaster_number','designated_area','declaration_title','declaration_request_number','state','declaration_type','declaration_date']
+let stat_boxes = [
+    {name:'# IA Approved',value:'total_number_ia_approved',amount:0},
+    {name:'$ IHP Approved',value:'total_amount_ihp_approved',amount:0},
+    {name:'$ ONA Approved',value:'total_amount_ona_approved',amount:0},
+    {name:'$ Obligated PA',value:'total_obligated_amount_pa',amount:0},
+    {name:'$ Obligated CAT AB',value:'total_obligated_amount_cat_ab',amount:0},
+    {name:'$ Obligate CAT C2G',value:'total_obligated_amount_cat_c2g',amount:0},
+    {name:'$ Obligated HMGP',value:'total_obligated_amount_hmgp',amount:0},
+    {name:'Total Funds',value:'total_funds'}
+];
+let total_funds = 0
 
 class FemaDisasterDeclarations extends React.Component{
     constructor(props) {
@@ -71,40 +86,81 @@ class FemaDisasterDeclarations extends React.Component{
         if(Object.keys(this.props.falcorCache).length > 0){
             let graph = get(this.props.falcorCache,['fema','disasters','declarations','byId'],{})
             let data = [];
+            let disaster_number = window.location.pathname.split("/")[3]
             Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
-                data.push(
-                    attributes.reduce((out,attribute) =>{
-                        if(graph[item][attribute]){
-                            out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute].value).toLocaleDateString('en-US') : attribute === 'disaster_number' ? graph[item][attribute].value  :fnum(graph[item][attribute].value) || '$0'
-                        }
-                        return out
-                    },{}))
+                if(graph[item]['disaster_number'].value.toString() === disaster_number.toString()){
+                    data.push(
+                        attributes.reduce((out,attribute) =>{
+                            if(graph[item][attribute]){
+                                out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute].value).toLocaleDateString('en-US') : attribute === 'disaster_number' ? graph[item][attribute].value  :fnum(graph[item][attribute].value) || '$0'
+                            }
+                            return out
+                        },{}))
+                }
             })
+            let femaDisasterData = get(this.props.falcorCache,['fema','disasters','byId',window.location.pathname.split("/")[3]],null)
+            if(femaDisasterData){
+                Object.keys(femaDisasterData).filter(d => d!=='$__path').forEach(item =>{
+                    stat_boxes.map(d =>{
+                        if(d && d.value !== 'total_funds' && femaDisasterData[d.value]){
+                            d.amount  = parseFloat(femaDisasterData[d.value].value) || 0
+                        }
+                    })
+                    total_funds = stat_boxes.reduce((a,c) =>{
+                        if(c.value !== 'total_funds'){
+                            a += c.amount
+                        }
+                        return a
+                    },0)
+                })
+            }
             return data
         }
     }
 
     render(){
+
         let data = this.processData()
         return (
-            <div className="max-w-7x">
-                {data && data.length > 0 ?
-                    <Table
-                        defaultPageSize={10}
-                        showPagination={false}
-                        columns={tableCols}
-                        data={data}
-                        initialPageSize={10}
-                        minRows={data.length}
-                        sortBy={'declaration_date'}
-                        sortOrder={'desc'}
-                    />
-                    :
-                    <div>
-                        Loading ....
-                    </div>
-                }
+            <div>
+                <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-4">
+                    {stat_boxes.map((stat_box,i) =>{
+                        return(
+                            <div className="bg-white overflow-hidden shadow rounded-lg"  key={i}>
+                                <div className="px-4 py-5 sm:p-6">
+                                    <dl>
+                                        <dt className="text-sm leading-5 font-medium text-gray-500 truncate">
+                                            {stat_box.name}
+                                        </dt>
+                                        <dd className="mt-1 text-3xl leading-9 font-semibold text-gray-900">
+                                            {stat_box.value !== 'total_funds' ? stat_box.value.includes('number')? fmt(stat_box.amount) :fnum(stat_box.amount): fnum(total_funds)}
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+                <div className="max-w-7x">
+                    {data && data.length > 0 ?
+                        <Table
+                            defaultPageSize={10}
+                            showPagination={false}
+                            columns={tableCols}
+                            data={data}
+                            initialPageSize={10}
+                            minRows={data.length}
+                            sortBy={'declaration_date'}
+                            sortOrder={'desc'}
+                        />
+                        :
+                        <div>
+                            Loading ....
+                        </div>
+                    }
+                </div>
             </div>
+
         )
     }
 }
@@ -114,7 +170,6 @@ const mapStateToProps = (state, ownProps) => {
         activeStateGeoid : state.stormEvents.activeStateGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
         graph: state.graph,
-        hazards: get(state.graph, 'riskIndex.hazards.value', [])
     };
 };
 const mapDispatchToProps = {
