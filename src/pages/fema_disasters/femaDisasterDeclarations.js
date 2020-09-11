@@ -7,6 +7,7 @@ import {withRouter} from 'react-router'
 import {fnum} from "../../utils/sheldusUtils";
 import * as d3 from "d3";
 var format =  d3.format("~s")
+var _ = require("lodash")
 const fmt = (d) => d < 1000 ? d : format(d)
 
 
@@ -69,12 +70,13 @@ class FemaDisasterDeclarations extends React.Component{
 
     fetchFalcorDeps(){
         let disaster_number = window.location.pathname.split("/")[3]
-        let data = []
+
         return this.props.falcor.get(['fema','disasters',[disaster_number],'declarations','length'])
             .then(response =>{
                 let length = get(response.json,['fema','disasters',disaster_number,'declarations','length'],null)
                 if(length){
-                    this.props.falcor.get(['fema','disasters',disaster_number,'declarations','byIndex',[{from:0,to:length-1}],attributes])
+                    this.props.falcor.get(['fema','disasters',disaster_number,'declarations','byIndex',[{from:0,to:length-1}],attributes],
+                        ['fema','disasters','byId',disaster_number,stat_boxes.map(d => d.value)])
                         .then(response =>{
                             return response
                         })
@@ -92,7 +94,10 @@ class FemaDisasterDeclarations extends React.Component{
                     data.push(
                         attributes.reduce((out,attribute) =>{
                             if(graph[item][attribute]){
-                                out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute].value).toLocaleDateString('en-US') : attribute === 'disaster_number' ? graph[item][attribute].value  :fnum(graph[item][attribute].value) || '$0'
+                                out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ?
+                                    new Date(graph[item][attribute].value).toLocaleDateString('en-US') :
+                                    attribute.includes('number')
+                                    ? graph[item][attribute].value  :fnum(graph[item][attribute].value) || '$0'
                             }
                             return out
                         },{}))
@@ -122,8 +127,9 @@ class FemaDisasterDeclarations extends React.Component{
 
         let data = this.processData()
         return (
-            <div>
-                <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-4">
+            <div className="container max-w-7xl mx-auto">
+                <h1>{data && data.length > 0? `${_.uniq(_.map(data, 'declaration_title')).join(",")} - ${_.uniq(_.map(data, 'state')).join(",")}` : 'Loading'}</h1>
+                <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-5">
                     {stat_boxes.map((stat_box,i) =>{
                         return(
                             <div className="bg-white overflow-hidden shadow rounded-lg"  key={i}>
@@ -141,7 +147,7 @@ class FemaDisasterDeclarations extends React.Component{
                         )
                     })}
                 </div>
-                <div className="max-w-7x">
+                <div>
                     {data && data.length > 0 ?
                         <Table
                             defaultPageSize={10}
