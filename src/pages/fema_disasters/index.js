@@ -115,7 +115,7 @@ class FemaDisasters extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            data : []
+
         };
 
     }
@@ -134,22 +134,10 @@ class FemaDisasters extends React.Component {
         return this.props.falcor.get(['fema','disasters','length'])
             .then(response =>{
                 let length = get(response.json,['fema','disasters','length'],null)
-                let data = []
                 if(length){
                     this.props.falcor.get(['fema','disasters','byIndex',[{from:0,to:length-1}],attributes])
                         .then(response =>{
-                            let graph = get(response.json,['fema','disasters','byIndex'],{})
-                            Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
-                                data.push(attributes.reduce((out,attribute) =>{
-                                    if(graph[item][attribute]){
-                                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute]).toLocaleDateString('en-US') : graph[item][attribute] || 'None'
-                                    }
-                                    return out
-                                },{}))
-                            })
-                            this.setState({
-                                data : data
-                            })
+                            return response
                         })
 
                 }
@@ -157,36 +145,44 @@ class FemaDisasters extends React.Component {
             })
     }
 
+    processData(){
+        if(Object.keys(this.props.falcorCache).length > 0){
+            let graph = get(this.props.falcorCache,['fema','disasters','byId'],{})
+            let data = []
+            Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
+                data.push(
+                    attributes.reduce((out,attribute) =>{
+                    if(graph[item][attribute]){
+                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute].value).toLocaleDateString('en-US') : attribute === 'disaster_number' ? graph[item][attribute].value  :fnum(graph[item][attribute].value) || '$0'
+                    }
+                    return out
+                },{}))
+            })
+            return data
+        }
+    }
 
     render() {
+        let data = this.processData();
         return (
-            <div>
-                {this.state.data.length > 0 ? <Table
-                    defaultPageSize={10}
-                    showPagination={false}
-                    columns={tableCols}
-                    data={this.state.data}
-                    initialPageSize={10}
-                    minRows={this.state.data.length}
-                /> : <div> Loading</div>}
+            <div className="max-w-7x">
+                {data && data.length > 0 ?
+                    <Table
+                        defaultPageSize={10}
+                        showPagination={false}
+                        columns={tableCols}
+                        data={data}
+                        initialPageSize={10}
+                        minRows={data.length}
+                        sortBy={'last_refresh'}
+                        sortOrder={'desc'}
+                    />
+                    :
+                    <div>
+                        Loading ....
+                    </div>
+                }
             </div>
-            /*<div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
-                {/!*<div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
-                    <div className='h-full'>
-                        <div className="relative top-0 right-auto h-8 w-2/6">
-                        </div>
-                        <div className='relative bottom-40 h-40 z-90 w-full'>
-                        </div>
-                    </div>
-                </div>
-                <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
-                    <div className='bg-white rounded h-full w-full shadow'>
-
-                    </div>
-                </div>*!/}
-
-
-            </div>*/
         )
     }
 }

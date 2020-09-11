@@ -4,6 +4,7 @@ import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import Table from "../../components/avl-components/components/Table";
 import {withRouter} from 'react-router'
+import {fnum} from "../../utils/sheldusUtils";
 
 const tableCols = [
     {
@@ -60,35 +61,49 @@ class FemaDisasterDeclarations extends React.Component{
                 if(length){
                     this.props.falcor.get(['fema','disasters',disaster_number,'declarations','byIndex',[{from:0,to:length-1}],attributes])
                         .then(response =>{
-                            let graph = get(response.json,['fema','disasters',disaster_number,'declarations','byIndex'],{})
-                            Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
-                                if(graph[item]){
-                                    data.push(attributes.reduce((out,attribute) =>{
-                                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute]).toLocaleDateString('en-US') : graph[item][attribute] || 'None'
-                                        return out
-                                    },{}))
-                                }
-
-                            })
-                            this.setState({
-                                data : data
-                            })
+                            return response
                         })
                 }
             })
     }
 
+    processData(){
+        if(Object.keys(this.props.falcorCache).length > 0){
+            let graph = get(this.props.falcorCache,['fema','disasters','declarations','byId'],{})
+            let data = [];
+            Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
+                data.push(
+                    attributes.reduce((out,attribute) =>{
+                        if(graph[item][attribute]){
+                            out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute].value).toLocaleDateString('en-US') : attribute === 'disaster_number' ? graph[item][attribute].value  :fnum(graph[item][attribute].value) || '$0'
+                        }
+                        return out
+                    },{}))
+            })
+            return data
+        }
+    }
+
     render(){
+        let data = this.processData()
         return (
-            <div>
-                {this.state.data.length > 0 ? <Table
-                    defaultPageSize={10}
-                    showPagination={false}
-                    columns={tableCols}
-                    data={this.state.data}
-                    initialPageSize={10}
-                    minRows={this.state.data.length}
-                /> : <div> No data</div>}
+            <div className="max-w-7x">
+                {data && data.length > 0 ?
+                    <Table
+                        defaultPageSize={10}
+                        showPagination={false}
+                        columns={tableCols}
+                        data={data}
+                        initialPageSize={10}
+                        minRows={data.length}
+                        sortBy={'declaration_date'}
+                        sortOrder={'desc'}
+                    />
+                    :
+                    <div>
+                        Loading ....
+                    </div>
+                }
             </div>
         )
     }
