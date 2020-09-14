@@ -15,27 +15,6 @@ const end_year = 2019
 for (let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
-const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
-const hazards = [
-    {value:'wind', name:'Wind'},
-    {value:'wildfire', name:'Wildfire'},
-    {value:'tsunami', name:'Tsunami/Seiche'},
-    {value:'tornado', name:'Tornado'},
-    {value:'riverine', name:'Flooding'},
-    {value:'lightning', name:'Lightning'},
-    {value:'landslide', name:'Landslide'},
-    {value:'icestorm', name:'Ice Storm'},
-    {value:'hurricane', name:'Hurricane'},
-    {value:'heatwave', name:'Heat Wave'},
-    {value:'hail', name:'Hail'},
-    {value:'earthquake', name:'Earthquake'},
-    {value:'drought', name:'Drought'},
-    {value:'avalanche', name:'Avalanche'},
-    {value:'coldwave', name:'Coldwave'},
-    {value:'winterweat', name:'Snow Storm'},
-    {value:'volcano', name:'Volcano'},
-    {value:'coastal', name:'Coastal Hazards'}
-];
 const attributes=['disaster_number',
     'total_number_ia_approved',
     'total_amount_ihp_approved',
@@ -111,13 +90,20 @@ const tableCols = [
         disableFilters: true
     }
 ];
+let stat_boxes = [
+    {name:'# IA Approved',value:'total_number_ia_approved',amount:0},
+    {name:'$ IHP Approved',value:'total_amount_ihp_approved',amount:0},
+    {name:'$ ONA Approved',value:'total_amount_ona_approved',amount:0},
+    {name:'$ Obligated PA',value:'total_obligated_amount_pa',amount:0},
+    {name:'$ Obligated CAT AB',value:'total_obligated_amount_cat_ab',amount:0},
+    {name:'$ Obligate CAT C2G',value:'total_obligated_amount_cat_c2g',amount:0},
+    {name:'$ Obligated HMGP',value:'total_obligated_amount_hmgp',amount:0},
+    {name:'Total Funds',value:'total_funds'}
+]
+let total_funds = 0
 class FemaDisasters extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            data : []
-        };
-
     }
     componentDidMount(){
         document.body.classList.add("overflow-y-hidden")
@@ -134,22 +120,10 @@ class FemaDisasters extends React.Component {
         return this.props.falcor.get(['fema','disasters','length'])
             .then(response =>{
                 let length = get(response.json,['fema','disasters','length'],null)
-                let data = []
                 if(length){
                     this.props.falcor.get(['fema','disasters','byIndex',[{from:0,to:length-1}],attributes])
                         .then(response =>{
-                            let graph = get(response.json,['fema','disasters','byIndex'],{})
-                            Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
-                                data.push(attributes.reduce((out,attribute) =>{
-                                    if(graph[item][attribute]){
-                                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute]).toLocaleDateString('en-US') : graph[item][attribute] || 'None'
-                                    }
-                                    return out
-                                },{}))
-                            })
-                            this.setState({
-                                data : data
-                            })
+                            return response
                         })
 
                 }
@@ -157,36 +131,77 @@ class FemaDisasters extends React.Component {
             })
     }
 
+    processData(){
+        if(Object.keys(this.props.falcorCache).length > 0){
+            let graph = get(this.props.falcorCache,['fema','disasters','byId'],{})
+            let data = []
+
+            Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
+                data.push(
+                    attributes.reduce((out,attribute) =>{
+                    if(graph[item][attribute]){
+                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute].value).toLocaleDateString('en-US') : attribute !== 'disaster_number'? fnum(graph[item][attribute].value) || 0 : graph[item][attribute].value
+                    }
+                    return out
+                },{}))
+                stat_boxes.map(d =>{
+                    if(d && d.value !== 'total_funds' && graph[item][d.value].value){
+                        d.amount += parseFloat(graph[item][d.value].value)
+                    }
+                })
+                total_funds = stat_boxes.reduce((a,c) =>{
+                    if(c.value !== 'total_funds'){
+                        a += c.amount
+                    }
+                    return a
+                },0)
+            })
+            return data
+        }
+    }
 
     render() {
+        let data = this.processData();
         return (
             <div>
-                {this.state.data.length > 0 ? <Table
-                    defaultPageSize={10}
-                    showPagination={false}
-                    columns={tableCols}
-                    data={this.state.data}
-                    initialPageSize={10}
-                    minRows={this.state.data.length}
-                /> : <div> Loading</div>}
-            </div>
-            /*<div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
-                {/!*<div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
-                    <div className='h-full'>
-                        <div className="relative top-0 right-auto h-8 w-2/6">
-                        </div>
-                        <div className='relative bottom-40 h-40 z-90 w-full'>
-                        </div>
-                    </div>
+                <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-4">
+                    {stat_boxes.map((stat_box,i) =>{
+                        return(
+                            <div className="bg-white overflow-hidden shadow rounded-lg"  key={i}>
+                                <div className="px-4 py-5 sm:p-6">
+                                    <dl>
+                                        <dt className="text-sm leading-5 font-medium text-gray-500 truncate">
+                                            {stat_box.name}
+                                        </dt>
+                                        <dd className="mt-1 text-3xl leading-9 font-semibold text-gray-900">
+                                            {stat_box.value !== 'total_funds' ? stat_box.value.includes('number')? fmt(stat_box.amount) :fnum(stat_box.amount): fnum(total_funds)}
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        )
+                    })}
                 </div>
-                <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
-                    <div className='bg-white rounded h-full w-full shadow'>
+                <div className="max-w-7x">
+                    {data && data.length > 0 ?
+                        <Table
+                            defaultPageSize={10}
+                            showPagination={false}
+                            columns={tableCols}
+                            data={data}
+                            initialPageSize={10}
+                            minRows={data.length}
+                            sortBy={'last_refresh'}
+                            sortOrder={'desc'}
+                        />
+                        :
+                        <div>
+                            Loading ....
+                        </div>
+                    }
+                </div>
+            </div>
 
-                    </div>
-                </div>*!/}
-
-
-            </div>*/
         )
     }
 }
