@@ -3,12 +3,14 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import Table from "../../components/avl-components/components/Table";
+
 import {withRouter} from 'react-router'
 import {fnum} from "../../utils/sheldusUtils";
 import * as d3 from "d3";
 var format =  d3.format("~s")
 var _ = require("lodash")
 const fmt = (d) => d < 1000 ? d : format(d)
+
 
 
 const tableCols = [
@@ -75,12 +77,13 @@ class FemaDisasterDeclarations extends React.Component{
             .then(response =>{
                 let length = get(response.json,['fema','disasters',disaster_number,'declarations','length'],null)
                 if(length){
+
                     this.props.falcor.get(['fema','disasters',disaster_number,'declarations','byIndex',[{from:0,to:length-1}],attributes],
                         ['fema','disasters','byId',disaster_number,stat_boxes.map(d => d.value)])
                         .then(response =>{
                             return response
                         })
-                }
+                } else { return Promise.resolve({}) }
             })
     }
 
@@ -125,7 +128,9 @@ class FemaDisasterDeclarations extends React.Component{
 
     render(){
 
+
         let data = this.processData()
+
         return (
             <div className="container max-w-7xl mx-auto">
                 <h1>{data && data.length > 0? `${_.uniq(_.map(data, 'declaration_title')).join(",")} - ${_.uniq(_.map(data, 'state')).join(",")}` : 'Loading'}</h1>
@@ -139,7 +144,13 @@ class FemaDisasterDeclarations extends React.Component{
                                             {stat_box.name}
                                         </dt>
                                         <dd className="mt-1 text-3xl leading-9 font-semibold text-gray-900">
-                                            {stat_box.value !== 'total_funds' ? stat_box.value.includes('number')? fmt(stat_box.amount) :fnum(stat_box.amount): fnum(total_funds)}
+                                            {
+                                                stat_box.value !== 'total_funds' ? 
+                                                stat_box.value.includes('number') ? 
+                                                    fmt(stat_box.amount) : 
+                                                    fnum(stat_box.amount): 
+                                                    fnum(total_funds)
+                                            }
                                         </dd>
                                     </dl>
                                 </div>
@@ -171,22 +182,15 @@ class FemaDisasterDeclarations extends React.Component{
     }
 }
 
-const mapStateToProps = (state, ownProps) => {
-    return {
-        activeStateGeoid : state.stormEvents.activeStateGeoid,
-        activeStateAbbrev : state.stormEvents.activeStateAbbrev,
-        graph: state.graph,
-    };
-};
-const mapDispatchToProps = {
 
-};
+
 export default [
     {
         path: '/fema_disasters/disaster/:disasterId',
         mainNav: false,
-        exact: true,
+        exact: false,
         name: 'Disaster Declaration',
+       
         layoutSettings: {
             fixed: true,
             maxWidth: '',//'max-w-7xl',
@@ -194,15 +198,8 @@ export default [
             nav: 'top',
             theme: 'flat',
         },
-        component: {
-            type: 'div',
-            props: {
-                className: 'w-full overflow-hidden pt-16 focus:outline-none',
-                style: {height: 'calc(100vh)'}
-            },
-            children: [
-                connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))
-            ]
-        }
+        component: reduxFalcor(FemaDisasterDeclarations)
+            
     }
+
 ]

@@ -13,13 +13,13 @@ import { falcorGraph } from 'store/falcorGraphNew'
 import 'styles/tailwind.css';
 
 ReactDOM.render(
-  <React.StrictMode>
-   	<Provider store={ store }>
-  		<FalcorProvider falcor={ falcorGraph }>
-	    	<App />
-      </FalcorProvider>
-  	</Provider>
-  </React.StrictMode>,
+  	<React.StrictMode>
+   		<Provider store={ store }>
+  			<FalcorProvider falcor={ falcorGraph }>
+	    		<App />
+      		</FalcorProvider>
+  		</Provider>
+  	</React.StrictMode>,
   document.getElementById('root')
 );
 
