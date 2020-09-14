@@ -7,7 +7,7 @@ import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
 import Table from "../../components/avl-components/components/Table";
 import {Link} from 'react-router-dom';
-var format =  d3.format("~s")
+var format =  d3.format(".2s")
 const fmt = (d) => d < 1000 ? d : format(d)
 let years = []
 const start_year = 1996
@@ -163,14 +163,14 @@ class FemaDisasters extends React.Component {
     render() {
         let data = this.processData();
         return (
-            <div>
-                <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-4">
+            <div className="container max-w-7xl mx-auto">
+                <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-5">
                     {stat_boxes.map((stat_box,i) =>{
                         return(
                             <div className="bg-white overflow-hidden shadow rounded-lg"  key={i}>
                                 <div className="px-4 py-5 sm:p-6">
                                     <dl>
-                                        <dt className="text-sm leading-5 font-medium text-gray-500 truncate">
+                                        <dt className="text-sm leading-5 font-medium text-gray-500">
                                             {stat_box.name}
                                         </dt>
                                         <dd className="mt-1 text-3xl leading-9 font-semibold text-gray-900">
@@ -182,7 +182,7 @@ class FemaDisasters extends React.Component {
                         )
                     })}
                 </div>
-                <div className="max-w-7x">
+                <div>
                     {data && data.length > 0 ?
                         <Table
                             defaultPageSize={10}
