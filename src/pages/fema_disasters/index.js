@@ -126,7 +126,7 @@ class FemaDisasters extends React.Component {
                             return response
                         })
 
-                }
+                }else { return Promise.resolve({}) }
 
             })
     }
@@ -140,7 +140,9 @@ class FemaDisasters extends React.Component {
                 data.push(
                     attributes.reduce((out,attribute) =>{
                     if(graph[item][attribute]){
-                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute].value).toLocaleDateString('en-US') : attribute !== 'disaster_number'? fnum(graph[item][attribute].value) || 0 : graph[item][attribute].value
+                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ?
+                            new Date(graph[item][attribute].value).toLocaleDateString('en-US') :
+                            attribute !== 'disaster_number'? fnum(graph[item][attribute].value) || 0 : graph[item][attribute].value
                     }
                     return out
                 },{}))
@@ -170,7 +172,7 @@ class FemaDisasters extends React.Component {
                             <div className="bg-white overflow-hidden shadow rounded-lg"  key={i}>
                                 <div className="px-4 py-5 sm:p-6">
                                     <dl>
-                                        <dt className="text-sm leading-5 font-medium text-gray-500">
+                                        <dt className="text-sm leading-5 font-medium text-gray-500 break-words">
                                             {stat_box.name}
                                         </dt>
                                         <dd className="mt-1 text-3xl leading-9 font-semibold text-gray-900">

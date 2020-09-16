@@ -7,11 +7,13 @@ import falcorCache from "utils/redux-falcor-new/falcorCache"
 
 import user from './user';
 import stormEvents from "./stormEvents";
+import femaDisasterDeclarations from "./femaDisasterDeclarations";
 import messages from './messages';
 
 const reducer = combineReducers({
   user,
   stormEvents,
+  femaDisasterDeclarations,
   messages,
   falcorCache
 });

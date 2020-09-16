@@ -8,7 +8,7 @@ import Logout from "pages/Logout"
 import Home from "pages/home"
 import DataDownload from "pages/DataDownload"
 import Methodology from "pages/Methodology/methodology"
-import FemaDisasterDeclaration from "./pages/fema_disasters/femaDisasterDeclarations";
+import FemaDisasterDeclaration from "./pages/fema_disasters/components/femaDisasterDeclarations";
 import SBAHazardLoans from './pages/SBAEvents/index'
 import FemaHmapV1 from './pages/femaHmapV1/index'
 import FemaDisasters from './pages/fema_disasters/index'
