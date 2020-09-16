@@ -2,7 +2,7 @@ import React from 'react'
 import DataDownload from "./DataDownload";
 
 const MetaData = () => (
-<div className="bg-gray-50 overflow-hidden mt-16 min-h-screen">
+<div className="bg-gray-50 mt-16 min-h-screen">
   <div className="relative max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
     <svg
       className="absolute top-0 left-full transform -translate-x-1/2 -translate-y-3/4 lg:left-auto lg:right-full lg:translate-x-2/3 lg:translate-y-1/4"
