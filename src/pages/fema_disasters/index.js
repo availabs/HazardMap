@@ -126,7 +126,7 @@ class FemaDisasters extends React.Component {
                             return response
                         })
 
-                }
+                }else { return Promise.resolve({}) }
 
             })
     }
@@ -140,7 +140,9 @@ class FemaDisasters extends React.Component {
                 data.push(
                     attributes.reduce((out,attribute) =>{
                     if(graph[item][attribute]){
-                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ? new Date(graph[item][attribute].value).toLocaleDateString('en-US') : attribute !== 'disaster_number'? fnum(graph[item][attribute].value) || 0 : graph[item][attribute].value
+                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ?
+                            new Date(graph[item][attribute].value).toLocaleDateString('en-US') :
+                            attribute !== 'disaster_number'? fnum(graph[item][attribute].value) || 0 : graph[item][attribute].value
                     }
                     return out
                 },{}))

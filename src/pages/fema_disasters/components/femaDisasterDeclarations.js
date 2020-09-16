@@ -2,15 +2,16 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
-import Table from "../../components/avl-components/components/Table";
-
+import Table from "../../../components/avl-components/components/Table";
+import FemaDisastersIATotalsStatBoxes from "./FemaDisastersIATotalsStatBoxes";
 import {withRouter} from 'react-router'
-import {fnum} from "../../utils/sheldusUtils";
+import FemaDisastersIATotalsEventsLayer from '../layers/femaDisastersIATotalsEventsLayer'
+import {fnum} from "../../../utils/sheldusUtils";
 import * as d3 from "d3";
+import AvlMap from "../../../components/AvlMap";
 var format =  d3.format("~s")
 var _ = require("lodash")
 const fmt = (d) => d < 1000 ? d : format(d)
-
 
 
 const tableCols = [
@@ -63,11 +64,17 @@ let stat_boxes = [
 let total_funds = 0
 
 class FemaDisasterDeclarations extends React.Component{
+    FemaDisastersIATotalsEventsLayer = FemaDisastersIATotalsEventsLayer({active:true})
     constructor(props) {
         super(props);
         this.state ={
-            data : []
+
         }
+    }
+
+
+    componentDidMount(){
+
     }
 
     fetchFalcorDeps(){
@@ -127,61 +134,99 @@ class FemaDisasterDeclarations extends React.Component{
     }
 
     render(){
-
-
         let data = this.processData()
-
         return (
-            <div className="container max-w-7xl mx-auto">
-                <h1>{data && data.length > 0? `${_.uniq(_.map(data, 'declaration_title')).join(",")} - ${_.uniq(_.map(data, 'state')).join(",")}` : 'Loading'}</h1>
-                <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-5">
-                    {stat_boxes.map((stat_box,i) =>{
-                        return(
-                            <div className="bg-white overflow-hidden shadow rounded-lg"  key={i}>
-                                <div className="px-4 py-5 sm:p-6">
-                                    <dl>
-                                        <dt className="text-sm leading-5 font-medium text-gray-500 break-words">
-                                            {stat_box.name}
-                                        </dt>
-                                        <dd className="mt-1 text-3xl leading-9 font-semibold text-gray-900">
-                                            {
-                                                stat_box.value !== 'total_funds' ? 
-                                                stat_box.value.includes('number') ? 
-                                                    fmt(stat_box.amount) : 
-                                                    fnum(stat_box.amount): 
-                                                    fnum(total_funds)
-                                            }
-                                        </dd>
-                                    </dl>
+            <div className="w-full overflow-auto pt-8 focus:outline-none h-screen">
+                <div className="container max-w-7xl mx-auto">
+                    <h1>{data && data.length > 0? `${_.uniq(_.map(data, 'declaration_title')).join(",")} - ${_.uniq(_.map(data, 'state')).join(",")}` : 'Loading'}</h1>
+                    <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-5">
+                        {stat_boxes.map((stat_box,i) =>{
+                            return(
+                                <div className="bg-white overflow-hidden shadow rounded-lg"  key={i}>
+                                    <div className="px-4 py-5 sm:p-6">
+                                        <dl>
+                                            <dt className="text-sm leading-5 font-medium text-gray-500 break-words">
+                                                {stat_box.name}
+                                            </dt>
+                                            <dd className="mt-1 text-3xl leading-9 font-semibold text-gray-900">
+                                                {
+                                                    stat_box.value !== 'total_funds' ?
+                                                        stat_box.value.includes('number') ?
+                                                            fmt(stat_box.amount) :
+                                                            fnum(stat_box.amount):
+                                                        fnum(total_funds)
+                                                }
+                                            </dd>
+                                        </dl>
+                                    </div>
                                 </div>
+                            )
+                        })}
+                    </div>
+                    <div>
+                        {data && data.length > 0 ?
+                            <Table
+                                defaultPageSize={10}
+                                showPagination={false}
+                                columns={tableCols}
+                                data={data}
+                                initialPageSize={10}
+                                minRows={data.length}
+                                sortBy={'declaration_date'}
+                                sortOrder={'desc'}
+                            />
+                            :
+                            <div>
+                                Loading ....
                             </div>
-                        )
-                    })}
-                </div>
-                <div>
-                    {data && data.length > 0 ?
-                        <Table
-                            defaultPageSize={10}
-                            showPagination={false}
-                            columns={tableCols}
-                            data={data}
-                            initialPageSize={10}
-                            minRows={data.length}
-                            sortBy={'declaration_date'}
-                            sortOrder={'desc'}
+                        }
+                    </div>
+                    <div>
+                        <FemaDisastersIATotalsStatBoxes
+                            disaster_number={[window.location.pathname.split("/")[3]]}
                         />
-                        :
-                        <div>
-                            Loading ....
-                        </div>
-                    }
+                    </div>
                 </div>
+                <AvlMap
+                    layers={[
+                        this.FemaDisastersIATotalsEventsLayer
+                    ]}
+                    height={'100%'}
+                    center={[0, 0]}
+                    zoom={4}
+                    year={2018}
+                    //hazards={this.props.hazards}
+                    fips={''}
+                    styles={[
+                        {name: 'Blank', style: 'mapbox://styles/am3081/ckaml4r1e1uip1ipgtx5vm9zk'}
+                    ]}
+                    sidebar={false}
+                    attributes={false}
+                    layerProps={{
+                        [this.FemaDisastersIATotalsEventsLayer.name]: {
+                            disaster_number: window.location.pathname.split("/")[3],
+                            active_ia_amount : this.props.activeIAAmount ? this.props.activeIAAmount : 'ihp_amount'
+                        }
+                    }}
+                />
             </div>
+
 
         )
     }
 }
 
+const mapStateToProps = (state, ownProps) => {
+    return {
+        activeIAAmount:state.femaDisasterDeclarations.activeIAAmount,
+        activeStateGeoid : state.stormEvents.activeStateGeoid,
+        activeStateAbbrev : state.stormEvents.activeStateAbbrev,
+        graph: state.graph,
+        hazards: get(state.graph, 'riskIndex.hazards.value', [])
+    };
+};
+const mapDispatchToProps = {
+};
 
 
 export default [
@@ -198,7 +243,7 @@ export default [
             nav: 'top',
             theme: 'flat',
         },
-        component: reduxFalcor(FemaDisasterDeclarations)
+        component: connect(mapStateToProps,mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))
             
     }
 
