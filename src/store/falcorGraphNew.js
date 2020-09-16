@@ -7,6 +7,7 @@ import throttle from "lodash.throttle"
 
 let host = "http://localhost:4444/graph/"
 //let host = 'https://graph.availabs.org/'
+// let host = process.env.NODE_ENV === 'production' ? 'https://graph.availabs.org/' : '"http://localhost:4444/graph/';
 
 /**/
 class CustomSource extends HttpDataSource {

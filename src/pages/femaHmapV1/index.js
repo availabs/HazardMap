@@ -331,7 +331,7 @@ export default [
 
     {
         path: '/fema/',
-        mainNav: true,
+        mainNav: false,
         exact: true,
         name: 'FEMA Hazard Mitigation Assisted Properties Version 1',
         layoutSettings: {
