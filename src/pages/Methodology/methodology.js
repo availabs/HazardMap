@@ -99,7 +99,7 @@ export default [{
 },
     {
         path: "/docs",
-        mainNav: true,
+        mainNav: false,
         // exact: true,
         auth: false,
         name: 'Docs Editor',
