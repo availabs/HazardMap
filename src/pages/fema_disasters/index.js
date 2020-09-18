@@ -42,32 +42,50 @@ const tableCols = [
     {
         Header: 'Total Number IA Approved',
         accessor: 'total_number_ia_approved',
-        disableFilters: true
+        disableFilters: true,
+        Cell: (data) => {
+            return <div style = {{ textAlign: 'right'}}>{fmt(get(data,'row.values.total_number_ia_approved', ''))}</div>
+        }
     },
     {
         Header: 'Total Amount IHP Approved',
         accessor: 'total_amount_ihp_approved',
-        disableFilters: true
+        disableFilters: true,
+        Cell: (data) => {
+            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_amount_ihp_approved', ''))}</div>
+        }
     },
     {
         Header : 'Total Amount ONA Approved',
         accessor: 'total_amount_ona_approved',
-        disableFilters: true
+        disableFilters: true,
+        Cell: (data) => {
+            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_amount_ona_approved', ''))}</div>
+        }
     },
     {
         Header : 'Total Obligated Amount PA',
         accessor: 'total_obligated_amount_pa',
-        disableFilters: true
+        disableFilters: true,
+        Cell: (data) => {
+            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_obligated_amount_pa', ''))}</div>
+        }
     },
     {
         Header:'Total Obligated Amount CAT AB',
         accessor:'total_obligated_amount_cat_ab',
-        disableFilters: true
+        disableFilters: true,
+        Cell: (data) => {
+            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_obligated_amount_cat_ab', ''))}</div>
+        }
     },
     {
         Header:'Total Obligated Amount CAT C2G',
         accessor:'total_obligated_amount_cat_c2g',
-        disableFilters: true
+        disableFilters: true,
+        Cell: (data) => {
+            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_obligated_amount_cat_c2g', ''))}</div>
+        }
     },
     {
         Header:'PA Load Date',
@@ -82,7 +100,10 @@ const tableCols = [
     {
         Header:'Total Obligated Amount HGMP',
         accessor: 'total_obligated_amount_hmgp',
-        disableFilters: true
+        disableFilters: true,
+        Cell: (data) => {
+            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_obligated_amount_hmgp', ''))}</div>
+        }
     },
     {
         Header:'Last Refresh',
@@ -142,7 +163,7 @@ class FemaDisasters extends React.Component {
                     if(graph[item][attribute]){
                         out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ?
                             new Date(graph[item][attribute].value).toLocaleDateString('en-US') :
-                            attribute !== 'disaster_number'? fnum(graph[item][attribute].value) || 0 : graph[item][attribute].value
+                            attribute !== 'disaster_number'? graph[item][attribute].value || 0 : graph[item][attribute].value
                     }
                     return out
                 },{}))
