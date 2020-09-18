@@ -89,12 +89,14 @@ class FemaDisastersIATotalsEventsLayer extends MapLayer {
                 ['fema','disasters','byId',disaster_number,'ia','zipCodes']
             )
                 .then(response => {
-                    this.zip_codes = get(response.json,['fema','disasters','byId',disaster_number,'ia','zipCodes'],[])
-                    falcorGraph.get(['fema','disasters','byId',disaster_number,'ia','byZip',this.zip_codes,IA_ATTRIBUTES])
-                        .then(response =>{
-                            this.render(this.map)
-                            return response
-                        })
+                    this.zip_codes = get(response.json,['fema','disasters','byId',disaster_number,'ia','zipCodes'],[]).filter(d => d !== null)
+                    if(this.zip_codes.length > 0){
+                        falcorGraph.get(['fema','disasters','byId',disaster_number,'ia','byZip',this.zip_codes,IA_ATTRIBUTES])
+                            .then(response =>{
+                                this.render(this.map)
+                            })
+                    }
+
                 })
         }
 
