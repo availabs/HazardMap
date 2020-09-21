@@ -4,7 +4,9 @@ import {reduxFalcor} from "../../utils/redux-falcor-new";
 import get from "lodash.get";
 import {setActiveStateGeoid} from "../../store/stormEvents";
 import {CSVLink,CSVDownload} from "react-csv";
-import {fnum} from "../../utils/sheldusUtils";
+import PromptModal from "./PromptModal";
+import styled from "styled-components";
+
 import * as d3 from "d3";
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -29,7 +31,11 @@ const hazards = [
     {value:'winterweat', name:'Snow Storm'},
     {value:'volcano', name:'Volcano'},
     {value:'coastal', name:'Coastal Hazards'}
-]
+];
+const DIV = styled.div`
+${props => props.theme.panelDropdownScrollBar};
+`;
+
 class DataDownload extends React.Component{
     constructor(props) {
         super(props);
@@ -39,8 +45,8 @@ class DataDownload extends React.Component{
             state_fips:null,
             county:'',
             geolevel: 'counties',
-            geolevels:[{name : 'County',value : 'counties'},{name:'Municipality',value:'cousubs'},{name:'Tracts',value:'tracts'}],
-            geolevels_sba:[{name : 'County',value : 'counties'},{name:'Zip Codes',value:'zip_codes'}],
+            geolevels:[{name : 'County',value : 'counties',disabled:false},{name:'Municipality',value:'cousubs',disabled:true},{name:'Tracts',value:'tracts',disabled:true}],
+            geolevels_sba:[{name : 'County',value : 'counties',disabled:false},{name:'Zip Codes',value:'zip_codes',disabled:true}],
             hazard: new Map(),
             user_hazards :[],
             data: [],
@@ -49,7 +55,6 @@ class DataDownload extends React.Component{
 
         }
         this.onChange = this.onChange.bind(this)
-
     }
 
 
@@ -76,8 +81,10 @@ class DataDownload extends React.Component{
                     },[])
             })
         }else{
+            /*if(e.target.id === 'geolevel'){
+                console.log('check',e.target)
+            }*/
             this.setState({ ...this.state, [e.target.id]: e.target.value });
-
         }
     }
 
@@ -113,9 +120,12 @@ class DataDownload extends React.Component{
                 }
             })
         }
-
-
-
+        if(this.state.state_fips !== prevState.state_fips){
+            this.setState({
+                changed: true
+            })
+            this.countiesDataDropDown()
+        }
     }
 
     fetchFalcorDeps(){
@@ -134,7 +144,7 @@ class DataDownload extends React.Component{
                                     return out
                                 }, [])
                             this.props.falcor.get(['geo',this.state.county !== '' ? this.state.county : this.counties,this.state.geolevel])
-                                .then(response =>{
+                                .then( async response =>{
                                     this.filtered_geo = Object.values(response.json.geo)
                                         .reduce((out, state) => {
                                             if (state[this.state.geolevel]) {
@@ -142,6 +152,7 @@ class DataDownload extends React.Component{
                                             }
                                             return out
                                         }, [])
+                                    await this.props.falcor.get(['geo',this.filtered_geo,'name'])
                                     if(this.filtered_geo.length > 0 && this.state.dataset!== 'sba' && this.state.user_hazards.length ){
                                         let chunks = _.chunk(this.filtered_geo,20)
                                         let disaster_requests = []
@@ -151,7 +162,6 @@ class DataDownload extends React.Component{
                                                 to: 2019
                                             }], attributes])
                                         })
-                                        disaster_requests.push(['geo',this.filtered_geo,'name'])
                                         return disaster_requests.reduce((a, c, cI) => a.then(() => {
                                             this.props.falcor.get(c)
                                                 .then(response =>{
@@ -163,33 +173,19 @@ class DataDownload extends React.Component{
                                             })
                                     }
                                     if(this.state.dataset === 'sba' && this.state.user_hazards.length){
-                                        if(this.state.geolevel === 'zip_codes') {
-                                            this.props.falcor.get(['geo', this.counties, 'byZip', ['zip_codes']])
-                                                .then(response => {
+                                        if(this.state.geolevel === 'zip_codes' && this.state.county !== "") {
+                                            this.props.falcor.get(['geo',this.state.county, 'byZip', ['zip_codes']])
+                                                .then(async response =>{
                                                     this.zip_codes = Object.values(response.json.geo).reduce((out, geo) => {
                                                         if (geo.byZip) {
                                                             out = [...out, ...geo.byZip['zip_codes']]
                                                         }
                                                         return out
                                                     }, [])
-                                                    let chunks = _.chunk(this.zip_codes,20),requests = []
-                                                    chunks.forEach(chunk =>{
-                                                        requests.push([this.state.dataset, 'all', 'byZip',chunk,
-                                                            this.state.user_hazards, [{
-                                                                from: 1996,
-                                                                to: 2018
-                                                            }], attributes])
-                                                    })
-                                                    return requests.reduce((a, c, cI) => a.then(() => {
-                                                        this.props.falcor.get(c)
-                                                            .then(response =>{
-                                                                return response
-                                                            })
-                                                    }), Promise.resolve())
-                                                        .then(response =>{
-                                                            return response
-                                                        })
-                                                    //return response
+                                                    return await this.props.falcor.get([this.state.dataset,'all','byZip',this.zip_codes,this.state.user_hazards, [{
+                                                        from: 1996,
+                                                        to: 2018
+                                                    }], attributes])
                                                 })
                                         }
                                         else {
@@ -200,7 +196,6 @@ class DataDownload extends React.Component{
                                                     to: 2018
                                                 }], attributes])
                                             })
-                                            requests.push(['geo',this.filtered_geo,'name'])
                                             return requests.reduce((a, c, cI) => a.then(() => {
                                                 this.props.falcor.get(c)
                                                     .then(response =>{
@@ -313,12 +308,7 @@ class DataDownload extends React.Component{
             })
 
         }
-        console.log('data',data)
         return data
-        /*return new Promise((resolve, reject) => {
-
-            return resolve(data)
-        });*/
     }
 
     downloadHandler(e){
@@ -332,7 +322,6 @@ class DataDownload extends React.Component{
     render(){
         let states_data = this.statesDataDropDown() || []
         let counties_data = this.countiesDataDropDown() || []
-        console.log('check',this.state.changed)
         return (
             <form>
                 <div className="w-full max-w-full ">
@@ -374,7 +363,6 @@ class DataDownload extends React.Component{
                                         onChange={this.onChange.bind(this)}
                                         value = {this.state.state_fips}
                                         id = 'state_fips'
-                                        required
                                     >
                                         <option key={0} value={""}>---Select a state---</option>
                                         {states_data.length > 0 ?states_data.map((item,i) =>{
@@ -414,7 +402,15 @@ class DataDownload extends React.Component{
                             </div>
                             <div className="sm:col-span-6">
                                 <label htmlFor="username" className="block text-sm font-medium leading-5 text-gray-700 flex-initial">
-                                    Geo Level <span className="text-red-600">*</span>
+                                    Geo Level
+                                    <span className="text-red-600">
+                                        *
+                                    </span>
+                                    <span style={{'float': 'right'}}
+                                    >
+                                        <PromptModal prompt={'Please select a county in order to enable the sub geolevels'} id={'geo_level'}/>
+                                        </span>
+
                                 </label>
                                 <div className="mt-1 flex rounded-md shadow-sm">
                                     <select
@@ -422,19 +418,25 @@ class DataDownload extends React.Component{
                                         onChange={this.onChange.bind(this)}
                                         value = {this.state.geolevel}
                                         id = 'geolevel'
-                                        placeholder="State"
+                                        placeholder="Geo Level"
                                         required
                                     >
                                         <option key={0} value={""}>---Select a GeoLevel---</option>
                                         {this.state.dataset !== 'sba' ? this.state.geolevels.map((item,i) =>{
                                                 return(
-                                                    <option key={i+1} value={item.value}>{item.name}</option>
+                                                    <option key={i+1} value={item.value}
+                                                            disabled={item.value ==='counties' && this.state.county === "" ? false : this.state.county === "" }>
+                                                        {item.name}
+                                                    </option>
                                                 )
                                             })
                                             :
                                             this.state.geolevels_sba.map((item,i) =>{
                                                 return(
-                                                    <option key={i+1} value={item.value}>{item.name}</option>
+                                                    <option key={i+1}
+                                                            value={item.value}
+                                                            disabled={item.value ==='counties' && this.state.county === "" ? false : this.state.county === "" }
+                                                    >{item.name}</option>
                                                 )
                                             })
                                         }
@@ -512,12 +514,8 @@ class DataDownload extends React.Component{
                                             </svg>
                                             <CSVLink
                                                 style={{width:'100%'}}
-                                                asyncOnClick={true}
-                                                onClick={async (event, done) => {
-
-                                                }}
                                                 data={this.state.data}
-                                                filename={`${this.state.state_fips && this.state.state_fips !== ""  ? this.props.geoData[this.state.state_fips].name : ''}_${this.state.dataset}_${this.state.geolevel}.csv`}>
+                                                filename={`${this.state.state_fips && this.state.state_fips !== ""  ? this.props.geoData[this.state.state_fips].name : ''}_${this.state.dataset}_${this.state.county!== "" ? this.props.geoData[this.state.county].name : 'all'}_${this.state.geolevel}.csv`}>
                                                 Download CSV
                                             </CSVLink>
                                         </button>

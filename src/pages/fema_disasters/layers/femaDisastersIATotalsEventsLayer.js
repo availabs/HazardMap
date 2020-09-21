@@ -6,6 +6,7 @@ import * as d3scale from 'd3-scale'
 import * as d3 from 'd3'
 import { fnum } from "utils/sheldusUtils"
 import { extent } from "d3-array"
+import falcorCache from "../../../utils/redux-falcor-new/falcorCache";
 
 
 var format =  d3.format("~s")
@@ -35,6 +36,19 @@ const IA_ATTRIBUTES = [
     'foundation_damage_count',
     'flood_damage_amount',
     'flood_damage_count'
+];
+let stat_boxes = [
+    {name:'IHP Amount',value:'ihp_amount',amount:0,count:0},
+    {name:'HA Amount',value:'ha_amount',amount:0,count:0},
+    {name:'FIP Amount',value:'fip_amount',amount:0,count:0},
+    {name:'ON A Amount',value:'on_a_amount',amount:0,count:0},
+    {name:'Rental Assistance Amount',value:'rental_assistance_amount',amount:0,count:0},
+    {name:'Repair Amount',value:'repair_amount',amount:0,count:0},
+    {name:'Replacement Amount',value:'replacement_amount',amount:0,count:0},
+    {name:'Personal Property Amount',value:'personal_property_amount',amount:0,count:0},
+    {name:'Roof Damage Amount',value:'roof_damage_amount',amount:0,count:0},
+    {name: 'Foundation Damage Amount',value:'foundation_damage_amount',amount:0,count:0},
+    {name:'Flood Damage Amount',value:'flood_damage_amount',amount:0,count:0}
 ];
 class FemaDisastersIATotalsEventsLayer extends MapLayer {
     receiveProps(oldProps, newProps) {
@@ -195,7 +209,22 @@ export default (props = {}) =>
             layers: ["zipcodes"],
             pinned:false,
             dataFunc: function (d) {
-                console.log('d',d)
+                return [
+                    [   (<div className='text-lg text-bold bg-white'>
+                        ZIP - {d.properties["ZCTA5CE10"]}
+                    </div>)
+                    ],
+                    [   (<div className='text-sm bg-white'>
+                        {stat_boxes.reduce((a,c)=>{
+                            if(c.value === this.filters.amount.value){
+                                a = c.name
+                            }
+                            return a
+                        },'')} -
+                        {fnum(get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'ia','byZip',d.properties["ZCTA5CE10"],this.filters.amount.value,'value'],0))}
+                    </div>)
+                    ],
+                ]
             }
         },
         showAttributesModal: false,
