@@ -10,68 +10,44 @@ var format =  d3.format("~s")
 var _ = require("lodash")
 const fmt = (d) => d < 1000 ? d : format(d)
 
-const IA_ATTRIBUTES = [
-    'ihp_amount',
-    'ihp_count',
-    'ha_amount',
-    'ha_count',
-    'fip_amount',
-    'fip_count',
-    'on_a_amount',
-    'on_a_count',
-    'rental_assistance_amount',
-    'rental_assistance_count',
-    'repair_amount',
-    'repair_count',
-    'replacement_amount',
-    'replacement_count',
-    'personal_property_amount',
-    'personal_property_count',
-    'roof_damage_amount',
-    'roof_damage_count',
-    'foundation_damage_amount',
-    'foundation_damage_count',
-    'flood_damage_amount',
-    'flood_damage_count'
-];
+const PA_ATTRIBUTES = [
+    'project_amount',
+    'project_amount_count',
+    'federal_share_obligated',
+    'federal_share_obligated_count',
+    'total_obligated',
+    'total_obligated_count',
+
+]
 
 let stat_boxes = [
-    {name:'$ IHP Amount',value:'ihp_amount',amount:0,count:0},
-    {name:'$ HA Amount',value:'ha_amount',amount:0,count:0},
-    {name:'$ FIP Amount',value:'fip_amount',amount:0,count:0},
-    {name:'$ ON A Amount',value:'on_a_amount',amount:0,count:0},
-    {name:'$ Rental Assistance Amount',value:'rental_assistance_amount',amount:0,count:0},
-    {name:'$ Repair Amount',value:'repair_amount',amount:0,count:0},
-    {name:'$ Replacement Amount',value:'replacement_amount',amount:0,count:0},
-    {name:'$ Personal Property Amount',value:'personal_property_amount',amount:0,count:0},
-    {name:'$ Roof Damage Amount',value:'roof_damage_amount',amount:0,count:0},
-    {name: '$ Foundation Damage Amount',value:'foundation_damage_amount',amount:0,count:0},
-    {name:'$ Flood Damage Amount',value:'flood_damage_amount',amount:0,count:0}
+    {name:'$ Project Amount',value:'project_amount',amount:0,count:0},
+    {name:'$ Federal Share Obligated Amount',value:'federal_share_obligated',amount:0,count:0},
+    {name:'$ Total Obligated Amount',value:'total_obligated',amount:0,count:0}
 ];
 
-class FemaDisastersIATotalsStatBoxes extends React.Component{
+class FemaDisastersPATotalsStatBoxes extends React.Component{
     constructor(props) {
         super(props);
     }
 
 
     fetchFalcorDeps(){
-        return this.props.falcor.get(['fema','disasters','byId',this.props.disaster_number,'ia_totals',IA_ATTRIBUTES])
+        return this.props.falcor.get(['fema','disasters','byId',this.props.disaster_number,'pa_totals',PA_ATTRIBUTES])
             .then(response =>{
                 return response
             })
     }
 
     processData(){
-        let graph = get(this.props.falcorCache,['fema','disasters','byId',this.props.disaster_number,'ia_totals'],null)
+        let graph = get(this.props.falcorCache,['fema','disasters','byId',this.props.disaster_number,'pa_totals'],null)
         if(graph){
             Object.keys(graph).forEach(item =>{
                 stat_boxes.map(d =>{
-
-                    if(d.value === item && item.includes("amount")){
+                    if(d.value === item && !item.includes("_count")){
                         d.amount = graph[item].value || 0
                     }
-                    if(item.includes("count") && d.value.split("_amount")[0]+"_count" === item){
+                    if(item.includes("count") && d.value === item.split("_count")[0]){
                         d.count = parseInt(graph[item].value) || 0
                     }
 
@@ -127,4 +103,4 @@ const mapDispatchToProps = {
     setActiveAmount
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(reduxFalcor(FemaDisastersIATotalsStatBoxes))
+export default connect(mapStateToProps,mapDispatchToProps)(reduxFalcor(FemaDisastersPATotalsStatBoxes))

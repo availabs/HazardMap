@@ -37,6 +37,17 @@ const IA_ATTRIBUTES = [
     'flood_damage_amount',
     'flood_damage_count'
 ];
+const PA_ATTRIBUTES = [
+    'project_amount',
+    'project_amount_count',
+    'federal_share_obligated',
+    'federal_share_obligated_count',
+    'total_obligated',
+    'total_obligated_count',
+
+]
+
+
 let stat_boxes = [
     {name:'IHP Amount',value:'ihp_amount',amount:0,count:0},
     {name:'HA Amount',value:'ha_amount',amount:0,count:0},
@@ -48,18 +59,22 @@ let stat_boxes = [
     {name:'Personal Property Amount',value:'personal_property_amount',amount:0,count:0},
     {name:'Roof Damage Amount',value:'roof_damage_amount',amount:0,count:0},
     {name: 'Foundation Damage Amount',value:'foundation_damage_amount',amount:0,count:0},
-    {name:'Flood Damage Amount',value:'flood_damage_amount',amount:0,count:0}
+    {name:'Flood Damage Amount',value:'flood_damage_amount',amount:0,count:0},
+    {name:'$ Project Amount',value:'project_amount',amount:0,count:0},
+    {name:'$ Federal Share Obligated Amount',value:'federal_share_obligated',amount:0,count:0},
+    {name:'$ Total Obligated Amount',value:'total_obligated',amount:0,count:0}
 ];
-class FemaDisastersIATotalsEventsLayer extends MapLayer {
+class FemaDisastersTotalsEventsLayer extends MapLayer {
     receiveProps(oldProps, newProps) {
         disaster_number = newProps.disaster_number
         if (disaster_number !== newProps.disaster_number) {
             disaster_number = newProps.disaster_number
         }
-        if(oldProps.active_ia_amount !== newProps.active_ia_amount){
-            this.filters.amount.value = newProps.active_ia_amount ?
-                newProps.active_ia_amount : newProps.active_ia_amount ? newProps.active_ia_amount : null;
+        if(oldProps.active_amount !== newProps.active_amount){
+            this.filters.amount.value = newProps.active_amount ?
+                newProps.active_amount : newProps.active_amount ? newProps.active_amount : null;
         }
+
     }
 
     onPropsChange(oldProps, newProps) {
@@ -68,11 +83,12 @@ class FemaDisastersIATotalsEventsLayer extends MapLayer {
             disaster_number = newProps.disaster_number
             this.doAction(["fetchLayerData"]);
         }
-        if(oldProps.active_ia_amount !== newProps.active_ia_amount){
-            this.filters.amount.value = newProps.active_ia_amount ?
-                newProps.active_ia_amount: newProps.active_ia_amount ? newProps.active_ia_amount : null;
+        if(oldProps.active_amount !== newProps.active_amount){
+            this.filters.amount.value = newProps.active_amount ?
+                newProps.active_amount : newProps.active_amount ? newProps.active_amount : null;
             this.doAction(["fetchLayerData"]);
         }
+
 
     }
 
@@ -99,19 +115,41 @@ class FemaDisastersIATotalsEventsLayer extends MapLayer {
 
     fetchData(){
         if(disaster_number){
-            return falcorGraph.get(
-                ['fema','disasters','byId',disaster_number,'ia','zipCodes']
-            )
-                .then(response => {
-                    this.zip_codes = get(response.json,['fema','disasters','byId',disaster_number,'ia','zipCodes'],[]).filter(d => d !== null)
-                    if(this.zip_codes.length > 0){
-                        falcorGraph.get(['fema','disasters','byId',disaster_number,'ia','byZip',this.zip_codes,IA_ATTRIBUTES])
-                            .then(response =>{
-                                this.render(this.map)
-                            })
-                    }
+            let amount = this.filters.amount.value
+            if(IA_ATTRIBUTES.includes(amount)){
+                console.log('in IA',amount)
+                return falcorGraph.get(
+                    ['fema','disasters','byId',disaster_number,'ia','zipCodes'],
 
-                })
+                )
+                    .then(response => {
+                        this.zip_codes = get(response.json,['fema','disasters','byId',disaster_number,'ia','zipCodes'],[]).filter(d => d !== null)
+                        if(this.zip_codes.length > 0){
+                            return falcorGraph.get(['fema','disasters','byId',disaster_number,'ia','byZip',this.zip_codes,IA_ATTRIBUTES])
+                                .then(response =>{
+                                    this.render(this.map)
+                                })
+                        }
+
+                    })
+            }
+            if(PA_ATTRIBUTES.includes(amount)){
+                return falcorGraph.get(
+                    ['fema','disasters','byId',disaster_number,'pa','zipCodes'],
+
+                )
+                    .then(response => {
+                        this.zip_codes = get(response.json,['fema','disasters','byId',disaster_number,'pa','zipCodes'],[]).filter(d => d !== null)
+                        if(this.zip_codes.length > 0){
+                            return falcorGraph.get(['fema','disasters','byId',disaster_number,'pa','byZip',this.zip_codes,PA_ATTRIBUTES])
+                                .then(response =>{
+                                    this.render(this.map)
+                                })
+                        }
+
+                    })
+            }
+
         }
 
     }
@@ -144,7 +182,10 @@ class FemaDisastersIATotalsEventsLayer extends MapLayer {
     }
 
     render(map){
-        let data = get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'ia','byZip'],{})
+        let data = IA_ATTRIBUTES.includes(this.filters.amount.value) ?
+            get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'ia','byZip'],{})
+            :
+            get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'pa','byZip'],{})
         if(Object.keys(data).length > 0 && this.zip_codes){
             let filteredData = Object.keys(data).reduce((a,c) =>{
                 if(this.zip_codes){
@@ -201,7 +242,7 @@ class FemaDisastersIATotalsEventsLayer extends MapLayer {
 }
 
 export default (props = {}) =>
-    new FemaDisastersIATotalsEventsLayer("FEMA Disasters IA Events", {
+    new FemaDisastersTotalsEventsLayer("FEMA Disasters IA Events", {
         ...props,
         selectedStations: new Map(),
         stationFeatures: [],
@@ -221,7 +262,11 @@ export default (props = {}) =>
                             }
                             return a
                         },'')} -
-                        {fnum(get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'ia','byZip',d.properties["ZCTA5CE10"],this.filters.amount.value,'value'],0))}
+                        {   IA_ATTRIBUTES.includes(this.filters.amount.value) ?
+                            fnum(get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'ia','byZip',d.properties["ZCTA5CE10"],this.filters.amount.value,'value'],0))
+                            :
+                            fnum(get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'pa','byZip',d.properties["ZCTA5CE10"],this.filters.amount.value,'value'],0))}
+
                     </div>)
                     ],
                 ]
@@ -271,7 +316,8 @@ export default (props = {}) =>
                 type:'dropdown',
                 value : 'ihp_amount',
                 domain:[]
-            }
+            },
+
         },
         layers: [
             {

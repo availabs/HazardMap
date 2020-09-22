@@ -5,7 +5,8 @@ import get from 'lodash.get';
 import Table from "../../../components/avl-components/components/Table";
 import FemaDisastersIATotalsStatBoxes from "./FemaDisastersIATotalsStatBoxes";
 import {withRouter} from 'react-router'
-import FemaDisastersIATotalsEventsLayer from '../layers/femaDisastersIATotalsEventsLayer'
+import FemaDisastersTotalsEventsLayer from '../layers/femaDisastersTotalsEventsLayer'
+import FemaDisastersPATotalsStatBoxes from "./FemaDisastersPATotalsStatBoxes";
 import {fnum} from "../../../utils/sheldusUtils";
 import * as d3 from "d3";
 import AvlMap from "../../../components/AvlMap";
@@ -64,7 +65,7 @@ let stat_boxes = [
 let total_funds = 0
 
 class FemaDisasterDeclarations extends React.Component{
-    FemaDisastersIATotalsEventsLayer = FemaDisastersIATotalsEventsLayer({active:true})
+    FemaDisastersTotalsEventsLayer = FemaDisastersTotalsEventsLayer({active:true})
     constructor(props) {
         super(props);
         this.state ={
@@ -186,10 +187,15 @@ class FemaDisasterDeclarations extends React.Component{
                             disaster_number={[window.location.pathname.split("/")[3]]}
                         />
                     </div>
+                    <div>
+                        <FemaDisastersPATotalsStatBoxes
+                            disaster_number={[window.location.pathname.split("/")[3]]}
+                        />
+                    </div>
                 </div>
                 <AvlMap
                     layers={[
-                        this.FemaDisastersIATotalsEventsLayer
+                        this.FemaDisastersTotalsEventsLayer
                     ]}
                     height={'100%'}
                     center={[0, 0]}
@@ -203,9 +209,9 @@ class FemaDisasterDeclarations extends React.Component{
                     sidebar={false}
                     attributes={false}
                     layerProps={{
-                        [this.FemaDisastersIATotalsEventsLayer.name]: {
+                        [this.FemaDisastersTotalsEventsLayer.name]: {
                             disaster_number: window.location.pathname.split("/")[3],
-                            active_ia_amount : this.props.activeIAAmount ? this.props.activeIAAmount : 'ihp_amount'
+                            active_amount : this.props.activeAmount ? this.props.activeAmount : 'ihp_amount',
                         }
                     }}
                 />
@@ -218,7 +224,7 @@ class FemaDisasterDeclarations extends React.Component{
 
 const mapStateToProps = (state, ownProps) => {
     return {
-        activeIAAmount:state.femaDisasterDeclarations.activeIAAmount,
+        activeAmount:state.femaDisasterDeclarations.activeAmount,
         activeStateGeoid : state.stormEvents.activeStateGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
         graph: state.graph,

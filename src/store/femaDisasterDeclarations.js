@@ -3,42 +3,45 @@
 // import { AUTH_HOST, AUTH_PROJECT_NAME } from 'config'
 
 
-const SET_IA_AMOUNT = 'USER::SET_IA_AMOUNT';
+const SET_AMOUNT = 'USER::SET_AMOUNT';
 
-function setIAAmount(id) {
+function setAmount(id) {
     return {
-        type:SET_IA_AMOUNT,
+        type:SET_AMOUNT,
         id
     }
 }
 
-export const setActiveIAAmount = (id) =>{
+
+export const setActiveAmount = (id) =>{
     return (dispatch) => {
-        dispatch(setIAAmount(id))
+        dispatch(setAmount(id))
     }
 };
 
 
 
+
+
 export const actions = {
-    setActiveIAAmount,
+    setActiveAmount,
 
 };
 
 let initialState = {
-    activeIAAmount: null,
+    activeAmount: null,
 };
 
 const ACTION_HANDLERS = {
 
-    [SET_IA_AMOUNT]: (state =initialState, action) => {
+    [SET_AMOUNT]: (state =initialState, action) => {
         const newState = Object.assign({}, state)
         if(action.id) {
-            newState.activeIAAmount = action.id;
-            localStorage.setItem('IAAmount', newState.activeIAAmount);
+            newState.activeAmount = action.id;
+            localStorage.setItem('Amount', newState.activeAmount);
         }
         return newState
-    },
+    }
 
 };
 
