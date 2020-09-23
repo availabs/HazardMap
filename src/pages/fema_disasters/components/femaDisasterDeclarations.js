@@ -7,6 +7,7 @@ import FemaDisastersIATotalsStatBoxes from "./FemaDisastersIATotalsStatBoxes";
 import {withRouter} from 'react-router'
 import FemaDisastersTotalsEventsLayer from '../layers/femaDisastersTotalsEventsLayer'
 import FemaDisastersPATotalsStatBoxes from "./FemaDisastersPATotalsStatBoxes";
+import FemaDisastersHMAMitigatedPropertiesTotalsStatBoxes from "./femaDisastersHMAMitigatedPropertiesStatBoxes";
 import {fnum} from "../../../utils/sheldusUtils";
 import * as d3 from "d3";
 import AvlMap from "../../../components/AvlMap";
@@ -189,6 +190,11 @@ class FemaDisasterDeclarations extends React.Component{
                     </div>
                     <div>
                         <FemaDisastersPATotalsStatBoxes
+                            disaster_number={[window.location.pathname.split("/")[3]]}
+                        />
+                    </div>
+                    <div>
+                        <FemaDisastersHMAMitigatedPropertiesTotalsStatBoxes
                             disaster_number={[window.location.pathname.split("/")[3]]}
                         />
                     </div>

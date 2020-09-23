@@ -46,6 +46,10 @@ const PA_ATTRIBUTES = [
     'total_obligated_count',
 
 ]
+const HMA_MITIGATED_PROPERTIES_ATTRIBUTES = [
+    'actual_amount_paid',
+    'number_of_properties'
+]
 
 
 let stat_boxes = [
@@ -62,7 +66,8 @@ let stat_boxes = [
     {name:'Flood Damage Amount',value:'flood_damage_amount',amount:0,count:0},
     {name:'$ Project Amount',value:'project_amount',amount:0,count:0},
     {name:'$ Federal Share Obligated Amount',value:'federal_share_obligated',amount:0,count:0},
-    {name:'$ Total Obligated Amount',value:'total_obligated',amount:0,count:0}
+    {name:'$ Total Obligated Amount',value:'total_obligated',amount:0,count:0},
+    {name:'$ Actual Amount Paid',value:'actual_amount_paid',amount:0,count:0},
 ];
 class FemaDisastersTotalsEventsLayer extends MapLayer {
     receiveProps(oldProps, newProps) {
@@ -149,6 +154,22 @@ class FemaDisastersTotalsEventsLayer extends MapLayer {
 
                     })
             }
+            if(HMA_MITIGATED_PROPERTIES_ATTRIBUTES.includes(amount)){
+                return falcorGraph.get(
+                    ['fema','disasters','byId',disaster_number,'hma_mitigated_properties','zipCodes'],
+
+                )
+                    .then(response => {
+                        this.zip_codes = get(response.json,['fema','disasters','byId',disaster_number,'hma_mitigated_properties','zipCodes'],[]).filter(d => d !== null)
+                        if(this.zip_codes.length > 0){
+                            return falcorGraph.get(['fema','disasters','byId',disaster_number,'hma_mitigated_properties','byZip',this.zip_codes,HMA_MITIGATED_PROPERTIES_ATTRIBUTES])
+                                .then(response =>{
+                                    this.render(this.map)
+                                })
+                        }
+
+                    })
+            }
 
         }
 
@@ -184,8 +205,10 @@ class FemaDisastersTotalsEventsLayer extends MapLayer {
     render(map){
         let data = IA_ATTRIBUTES.includes(this.filters.amount.value) ?
             get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'ia','byZip'],{})
-            :
+            : PA_ATTRIBUTES.includes(this.filters.amount.value) ?
             get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'pa','byZip'],{})
+                :
+            get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'hma_mitigated_properties','byZip'],{})
         if(Object.keys(data).length > 0 && this.zip_codes){
             let filteredData = Object.keys(data).reduce((a,c) =>{
                 if(this.zip_codes){
@@ -264,8 +287,11 @@ export default (props = {}) =>
                         },'')} -
                         {   IA_ATTRIBUTES.includes(this.filters.amount.value) ?
                             fnum(get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'ia','byZip',d.properties["ZCTA5CE10"],this.filters.amount.value,'value'],0))
+                            : PA_ATTRIBUTES.includes(this.filters.amount.value) ?
+                            fnum(get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'pa','byZip',d.properties["ZCTA5CE10"],this.filters.amount.value,'value'],0))
                             :
-                            fnum(get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'pa','byZip',d.properties["ZCTA5CE10"],this.filters.amount.value,'value'],0))}
+                                fnum(get(falcorGraph.getCache(),['fema','disasters','byId',disaster_number,'hma_mitigated_properties','byZip',d.properties["ZCTA5CE10"],this.filters.amount.value,'value'],0))
+                        }
 
                     </div>)
                     ],
