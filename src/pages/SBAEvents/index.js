@@ -15,6 +15,7 @@ import HazardListTable from "../components /listTable/hazardListTable";
 import StackedBarGraph from "../components /bar /stackedBarGraph";
 import Table from "../../components/avl-components/components/Table";
 import Modal from "../../components/avl-components/components/Modal/avl-modal";
+
 import {falcorGraph} from "../../store/falcorGraphNew";
 
 var format =  d3.format("~s")
@@ -100,11 +101,6 @@ class SBAHazardLoans extends React.Component {
     }
     componentDidMount(){
         document.body.classList.add("overflow-y-hidden")
-    }
-    componentWillUnmount(){
-        this.setState = (state,callback)=>{
-            return;
-        };
     }
 
     componentDidUpdate(prevProps){
@@ -352,7 +348,7 @@ class SBAHazardLoans extends React.Component {
                             Export Data
                         </button>
                         <Modal show={ this.state.showModal }
-                               onHide={ e => this.setState({ showModal: false }) }
+                               onHide={ () => this.setState({ showModal: false }) }
                                showCloseButton = {false}
                         >
                             <div style={ { width: `${ window.innerWidth * 0.85 }px` } }>
@@ -370,7 +366,7 @@ class SBAHazardLoans extends React.Component {
                                         </button>
                                         <button
                                             className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
-                                            onClick = {(e) =>{
+                                            onClick = {() =>{
                                                 this.setState({
                                                     showModal:false
                                                 })
