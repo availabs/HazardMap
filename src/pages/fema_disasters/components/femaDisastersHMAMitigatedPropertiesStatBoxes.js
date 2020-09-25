@@ -3,11 +3,9 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import {setActiveAmount} from "../../../store/femaDisasterDeclarations";
-import {withRouter} from 'react-router'
 import {fnum} from "../../../utils/sheldusUtils";
 import * as d3 from "d3";
 var format =  d3.format("~s")
-var _ = require("lodash")
 const fmt = (d) => d < 1000 ? d : format(d)
 
 const HMA_MITIGATED_PROPERTIES_ATTRIBUTES = [
@@ -20,10 +18,6 @@ let stat_boxes = [
 ];
 
 class FemaDisastersHMAMitigatedPropertiesTotalsStatBoxes extends React.Component{
-    constructor(props) {
-        super(props);
-    }
-
 
     fetchFalcorDeps(){
         return this.props.falcor.get(['fema','disasters','byId',this.props.disaster_number,'hma_mitigated_properties_totals',HMA_MITIGATED_PROPERTIES_ATTRIBUTES])
@@ -35,7 +29,7 @@ class FemaDisastersHMAMitigatedPropertiesTotalsStatBoxes extends React.Component
     processData(){
         let graph = get(this.props.falcorCache,['fema','disasters','byId',this.props.disaster_number,'hma_mitigated_properties_totals'],null)
         if(graph){
-            stat_boxes.map(d =>{
+            stat_boxes.forEach(d =>{
                 d.amount = graph['actual_amount_paid'].value || 0
                 d.count = fmt(graph['number_of_properties'].value) || 0
             })

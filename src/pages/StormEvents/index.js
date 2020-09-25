@@ -9,8 +9,6 @@ import StackedBarGraph from "../components /bar /stackedBarGraph";
 import Legend from "components/AvlMap/components/legend/Legend"
 import { fnum } from "utils/sheldusUtils"
 import HazardListTable from "../components /listTable/hazardListTable";
-import FemaHmapV1 from "../femaHmapV1/index";
-import FemaDisasters from '../fema_disasters/index'
 import Select from "components/avl-components/components/Inputs/select";
 import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"

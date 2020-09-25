@@ -19,10 +19,6 @@ let stat_boxes = [
 ];
 
 class FemaDisastersHMAMitigatedProjectsTotalsStatBoxes extends React.Component{
-    constructor(props) {
-        super(props);
-    }
-
 
     fetchFalcorDeps(){
         return this.props.falcor.get(['fema','disasters','byId',this.props.disaster_number,'hma_mitigated_projects_totals',HMA_MITIGATED_PROJECTS_ATTRIBUTES])
@@ -34,8 +30,8 @@ class FemaDisastersHMAMitigatedProjectsTotalsStatBoxes extends React.Component{
     processData(){
         let graph = get(this.props.falcorCache,['fema','disasters','byId',this.props.disaster_number,'hma_mitigated_projects_totals'],null)
         if(graph){
-            Object.keys(graph).forEach(item =>{
-                stat_boxes.map(d =>{
+            return Object.keys(graph).forEach(item =>{
+                 stat_boxes.forEach(d =>{
                     if(d.value === item && !item.includes("_count")){
                         d.amount = graph[item].value || 0
                     }

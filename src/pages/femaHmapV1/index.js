@@ -15,8 +15,6 @@ import StackedBarGraph from "../components /bar /stackedBarGraph";
 import FemaHmapV1EventsLayer from "./FemaHmapV1EventsLayer";
 import Modal from "../../components/avl-components/components/Modal/avl-modal";
 import Table from "../../components/avl-components/components/Table";
-var format =  d3.format("~s")
-const fmt = (d) => d < 1000 ? d : format(d)
 let years = []
 const start_year = 1996
 const end_year = 2019

@@ -118,7 +118,7 @@ class FemaDisasterDeclarations extends React.Component{
             })
             let femaDisasterData = get(this.props.falcorCache,['fema','disasters','byId',window.location.pathname.split("/")[3]],null)
             if(femaDisasterData){
-                stat_boxes.map(d =>{
+                stat_boxes.forEach(d =>{
                     if(d && d.value !== 'total_funds' && femaDisasterData[d.value]){
                         d.amount  = parseFloat(femaDisasterData[d.value].value) || 0
                     }

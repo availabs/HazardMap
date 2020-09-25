@@ -3,12 +3,8 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import {setActiveAmount} from "../../../store/femaDisasterDeclarations";
-import {withRouter} from 'react-router'
 import {fnum} from "../../../utils/sheldusUtils";
-import * as d3 from "d3";
-var format =  d3.format("~s")
-var _ = require("lodash")
-const fmt = (d) => d < 1000 ? d : format(d)
+
 
 const PA_ATTRIBUTES = [
     'project_amount',
@@ -27,9 +23,7 @@ let stat_boxes = [
 ];
 
 class FemaDisastersPATotalsStatBoxes extends React.Component{
-    constructor(props) {
-        super(props);
-    }
+
 
 
     fetchFalcorDeps(){
@@ -43,7 +37,7 @@ class FemaDisastersPATotalsStatBoxes extends React.Component{
         let graph = get(this.props.falcorCache,['fema','disasters','byId',this.props.disaster_number,'pa_totals'],null)
         if(graph){
             Object.keys(graph).forEach(item =>{
-                stat_boxes.map(d =>{
+                stat_boxes.forEach(d =>{
                     if(d.value === item && !item.includes("_count")){
                         d.amount = graph[item].value || 0
                     }

@@ -3,13 +3,12 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import AvlMap from "components/AvlMap";
-import SBAEventsLayerFactory from "./SBAEventsLayer"
 import Legend from "components/AvlMap/components/legend/Legend"
 import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
 import {setActiveStateGeoid} from "store/stormEvents";
-import {CSVLink,/* CSVDownload*/} from 'react-csv';
+import {CSVLink} from 'react-csv';
 import SBAEventsLayer from "./SBAEventsLayer";
 import Select from "../../components/avl-components/components/Inputs/select.js";
 import HazardListTable from "../components /listTable/hazardListTable";
