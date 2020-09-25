@@ -4,7 +4,7 @@ import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import {setActiveAmount} from "../../../store/femaDisasterDeclarations";
 import {fnum} from "../../../utils/sheldusUtils";
-import * as d3 from "d3";
+
 
 const HMA_MITIGATED_PROJECTS_ATTRIBUTES = [
     'project_amount',
