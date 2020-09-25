@@ -3,11 +3,12 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import Table from "../../../components/avl-components/components/Table";
+import Header from "../../../components/avl-components/components/Header/Header";
 import FemaDisastersIATotalsStatBoxes from "./FemaDisastersIATotalsStatBoxes";
-import {withRouter} from 'react-router'
 import FemaDisastersTotalsEventsLayer from '../layers/femaDisastersTotalsEventsLayer'
 import FemaDisastersPATotalsStatBoxes from "./FemaDisastersPATotalsStatBoxes";
 import FemaDisastersHMAMitigatedPropertiesTotalsStatBoxes from "./femaDisastersHMAMitigatedPropertiesStatBoxes";
+import FemaDisastersHMAMitigatedProjectsTotalsStatBoxes from "./femaDisastersHMAMitigatedProjectsStatBoxes";
 import {fnum} from "../../../utils/sheldusUtils";
 import * as d3 from "d3";
 import AvlMap from "../../../components/AvlMap";
@@ -117,19 +118,17 @@ class FemaDisasterDeclarations extends React.Component{
             })
             let femaDisasterData = get(this.props.falcorCache,['fema','disasters','byId',window.location.pathname.split("/")[3]],null)
             if(femaDisasterData){
-                Object.keys(femaDisasterData).filter(d => d!=='$__path').forEach(item =>{
-                    stat_boxes.map(d =>{
-                        if(d && d.value !== 'total_funds' && femaDisasterData[d.value]){
-                            d.amount  = parseFloat(femaDisasterData[d.value].value) || 0
-                        }
-                    })
-                    total_funds = stat_boxes.reduce((a,c) =>{
-                        if(c.value !== 'total_funds'){
-                            a += c.amount
-                        }
-                        return a
-                    },0)
+                stat_boxes.map(d =>{
+                    if(d && d.value !== 'total_funds' && femaDisasterData[d.value]){
+                        d.amount  = parseFloat(femaDisasterData[d.value].value) || 0
+                    }
                 })
+                total_funds = stat_boxes.reduce((a,c) =>{
+                    if(c.value !== 'total_funds'){
+                        a += c.amount
+                    }
+                    return a
+                },0)
             }
             return data
         }
@@ -184,17 +183,26 @@ class FemaDisasterDeclarations extends React.Component{
                         }
                     </div>
                     <div>
+                        <Header title={'Individual And Households Programs Valid Registration'}/>
                         <FemaDisastersIATotalsStatBoxes
                             disaster_number={[window.location.pathname.split("/")[3]]}
                         />
                     </div>
                     <div>
+                        <Header title={'Public Assistance Funded Projects Details v1'}/>
                         <FemaDisastersPATotalsStatBoxes
                             disaster_number={[window.location.pathname.split("/")[3]]}
                         />
                     </div>
                     <div>
+                        <Header title={'Hazard Mitigation Assistance Mitigated Properties v2'}/>
                         <FemaDisastersHMAMitigatedPropertiesTotalsStatBoxes
+                            disaster_number={[window.location.pathname.split("/")[3]]}
+                        />
+                    </div>
+                    <div>
+                        <Header title={'Hazard Mitigation Assistance Mitigated Projects v2'}/>
+                        <FemaDisastersHMAMitigatedProjectsTotalsStatBoxes
                             disaster_number={[window.location.pathname.split("/")[3]]}
                         />
                     </div>
@@ -228,7 +236,7 @@ class FemaDisasterDeclarations extends React.Component{
     }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
     return {
         activeAmount:state.femaDisasterDeclarations.activeAmount,
         activeStateGeoid : state.stormEvents.activeStateGeoid,
