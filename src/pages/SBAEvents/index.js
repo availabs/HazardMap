@@ -406,6 +406,7 @@ class SBAHazardLoans extends React.Component {
 }
 const mapStateToProps = (state) => {
     return {
+
         activeStateGeoid : state.stormEvents.activeStateGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
         graph: state.graph,
