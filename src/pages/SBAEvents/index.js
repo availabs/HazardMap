@@ -7,6 +7,7 @@ import Legend from "components/AvlMap/components/legend/Legend"
 import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
+
 import {setActiveStateGeoid} from "store/stormEvents";
 import {CSVLink} from 'react-csv';
 import SBAEventsLayer from "./SBAEventsLayer";
@@ -340,7 +341,7 @@ class SBAHazardLoans extends React.Component {
                         </div>
                         <button
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                            onClick ={(e) =>{
+                            onClick ={() =>{
                                 this.setState({
                                     showModal : true
                                 })
@@ -403,7 +404,7 @@ class SBAHazardLoans extends React.Component {
         )
     }
 }
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
     return {
         activeStateGeoid : state.stormEvents.activeStateGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
