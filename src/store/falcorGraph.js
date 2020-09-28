@@ -6,8 +6,8 @@ import store from "store"
 import { update } from "utils/redux-falcor/components/duck"
 
 //export let host =
- let host = 'https://graph.availabs.org/'
-//let host = "http://localhost:4444/graph/"
+ //let host = 'https://graph.availabs.org/'
+let host = "http://localhost:4444/graph/"
 //let host = process.env.NODE_ENV === 'production' ? 'https://graph.availabs.org/' : '/';
 
 

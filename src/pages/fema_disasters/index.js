@@ -5,6 +5,7 @@ import get from 'lodash.get';
 import { fnum } from "utils/sheldusUtils"
 import * as d3 from "d3";
 import Table from "../../components/avl-components/components/Table";
+import FemaDisastersStackedBarGraph from "./components/femaDisastersStackedBarGraph";
 import {Link} from 'react-router-dom';
 var format =  d3.format(".2s")
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -14,18 +15,23 @@ const end_year = 2019
 for (let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
-const attributes=['disaster_number',
-    'total_number_ia_approved',
+const attributes=[
+    "disaster_number",
+    "name",
+    "total_cost",
+    "disaster_type",
+    "total_number_ia_approved",
     'total_amount_ihp_approved',
     'total_amount_ha_approved',
-    'total_amount_ona_approved',
+    "total_amount_ona_approved",
     'total_obligated_amount_pa',
     'total_obligated_amount_cat_ab',
     'total_obligated_amount_cat_c2g',
     'pa_load_date',
     'ia_load_date',
     'total_obligated_amount_hmgp',
-    'last_refresh']
+    'last_refresh'
+]
 const tableCols = [
     {
         Header: 'Disaster Number',
@@ -126,12 +132,6 @@ class FemaDisasters extends React.Component {
     componentDidMount(){
         document.body.classList.add("overflow-y-hidden")
     }
-    componentWillUnmount(){
-        this.setState = (state,callback)=>{
-
-        };
-    }
-
 
 
     fetchFalcorDeps() {
@@ -145,7 +145,6 @@ class FemaDisasters extends React.Component {
                         })
 
                 }else { return Promise.resolve({}) }
-
             })
     }
 
@@ -165,8 +164,8 @@ class FemaDisasters extends React.Component {
                     return out
                 },{}))
                 stat_boxes.forEach(d =>{
-                    if(d && d.value !== 'total_funds' && graph[item][d.value].value){
-                        d.amount += parseFloat(graph[item][d.value].value)
+                    if(d && d.value !== 'total_funds'){
+                        d.amount += get(graph,[item,d.value,'value'],0) ? parseFloat(get(graph,[item,d.value,'value'],0)) : 0
                     }
                 })
                 total_funds = stat_boxes.reduce((a,c) =>{
@@ -183,44 +182,49 @@ class FemaDisasters extends React.Component {
     render() {
         let data = this.processData();
         return (
-            <div className="container max-w-7xl mx-auto">
-                <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-5">
-                    {stat_boxes.map((stat_box,i) =>{
-                        return(
-                            <div className="bg-white overflow-hidden shadow rounded-lg"  key={i}>
-                                <div className="px-4 py-5 sm:p-6">
-                                    <dl>
-                                        <dt className="text-sm leading-5 font-medium text-gray-500 break-words">
-                                            {stat_box.name}
-                                        </dt>
-                                        <dd className="mt-1 text-3xl leading-9 font-semibold text-gray-900">
-                                            {stat_box.value !== 'total_funds' ? stat_box.value.includes('number')? fmt(stat_box.amount) :fnum(stat_box.amount): fnum(total_funds)}
-                                        </dd>
-                                    </dl>
+            <div className="md:max-h-full overflow-auto">
+                <div className="container max-w-7xl mx-auto">
+                    <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-5">
+                        {stat_boxes.map((stat_box,i) =>{
+                            return(
+                                <div className="bg-white shadow rounded-lg"  key={i}>
+                                    <div className="px-4 py-5 sm:p-6">
+                                        <dl>
+                                            <dt className="text-sm leading-5 font-medium text-gray-500 break-words">
+                                                {stat_box.name}
+                                            </dt>
+                                            <dd className="mt-1 text-3xl leading-9 font-semibold text-gray-900">
+                                                {stat_box.value !== 'total_funds' ? stat_box.value.includes('number')? fmt(stat_box.amount) :fnum(stat_box.amount): fnum(total_funds)}
+                                            </dd>
+                                        </dl>
+                                    </div>
                                 </div>
+                            )
+                        })}
+                    </div>
+                    <div>
+                        {data && data.length > 0 ?
+                            <Table
+                                defaultPageSize={10}
+                                showPagination={false}
+                                columns={tableCols}
+                                data={data}
+                                initialPageSize={10}
+                                minRows={data.length}
+                                sortBy={'last_refresh'}
+                                sortOrder={'desc'}
+                            />
+                            :
+                            <div>
+                                Loading ....
                             </div>
-                        )
-                    })}
-                </div>
-                <div>
-                    {data && data.length > 0 ?
-                        <Table
-                            defaultPageSize={10}
-                            showPagination={false}
-                            columns={tableCols}
-                            data={data}
-                            initialPageSize={10}
-                            minRows={data.length}
-                            sortBy={'last_refresh'}
-                            sortOrder={'desc'}
-                        />
-                        :
-                        <div>
-                            Loading ....
-                        </div>
-                    }
+                        }
+
+                    </div>
+                    <FemaDisastersStackedBarGraph/>
                 </div>
             </div>
+
 
         )
     }
