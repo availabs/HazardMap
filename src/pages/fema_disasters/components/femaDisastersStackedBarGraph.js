@@ -4,13 +4,11 @@ import { reduxFalcor} from "utils/redux-falcor-new";
 import {ResponsiveBar} from '@nivo/bar'
 import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
+import * as d3 from "d3";
 const get = require("lodash.get");
-const attributes=[
-    "name",
-    "year",
-    "total_cost",
-    "disaster_type"
-]
+var format =  d3.format(".2s")
+const fmt = (d) => d < 1000 ? d : format(d)
+
 const hazards = [
     {value:'wind', name:'Wind',total_cost: 0},
     {value:'wildfire', name:'Wildfire',total_cost: 0},
@@ -32,7 +30,7 @@ const hazards = [
     {value:'coastal', name:'Coastal Hazards',total_cost: 0}
 ]
 let years = []
-const start_year = 1996
+const start_year = 1953
 const end_year = 2020
 for(let i = start_year; i <= end_year; i++) {
     years.push(i)
@@ -61,7 +59,7 @@ class FemaDisastersStackedBarGraph extends React.Component{
             .then(response =>{
                 let length = get(response.json,['fema','disasters','length'],null)
                 if(length){
-                    this.props.falcor.get(['fema','disasters','byIndex',[{from:0,to:length-1}],attributes])
+                    this.props.falcor.get(['fema','disasters','byIndex',[{from:0,to:length-1}],this.props.attributes])
                         .then(response =>{
                             this.setState({
                                 isLoading : false
@@ -102,38 +100,64 @@ class FemaDisastersStackedBarGraph extends React.Component{
         return graph_data
     }
 
+    calculateCountDisastersByYear (){
+        let graph = get(this.props.falcorCache,['fema','disasters','byId'],null)
+        let graph_data = []
+
+        if(graph) {
+            graph_data = years.reduce((a, year) => {
+                a.push({
+                    'year': year.toString(),
+                    'count' : 0
+                })
+                return a
+            }, [])
+            graph_data.map(d =>{
+                let count = 0
+                Object.values(graph).filter(d => d !== '$__path').forEach(item =>{
+                    if(item.year && get(item,['year','value'],0).toString() === d.year){
+                        count += 1
+                        d['count'] = count.toString()
+                    }
+                })
+            })
+        }
+        return graph_data
+    }
+
     render(){
-        let data = this.transformData()
+        let data = this.props.type === 'disasters' ? this.transformData() : this.calculateCountDisastersByYear()
+        console.log('data',data)
         if(!this.state.isLoading){
             return(
                 <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
                     <ResponsiveBar
                         data={data}
-                        keys={hazards.map(d => d.value)}
+                        keys={this.props.type ==='disasters' ? hazards.map(d => d.value) : ['count']}
                         indexBy="year"
-                        margin={{ top: 60, right: 60, bottom: 20, left: 60 }}
-                        padding={0.1}
-                        colors={(d) => hazardcolors[d.id]}
-                        groupMode={'stacked'}
+                        margin={{ top: 60, right: 80, bottom: 70, left: 80 }}
+                        padding={0.2}
+                        colors={this.props.type ==='disasters' ? (d) => hazardcolors[d.id] : {"scheme":"nivo"}}
+                        groupMode={this.props.type ==='disasters' ? 'stacked' : null}
                         enableLabel={false}
                         enableGridX={false}
                         enableGridY= {false}
                         axisBottom={{
                             tickSize: 5,
                             tickPadding: 5,
-                            tickRotation: 0,
+                            tickRotation: -60,
                             legend: 'year',
                             legendPosition: 'middle',
-                            legendOffset: 30
+                            legendOffset: 45
                         }}
                         axisLeft={{
                             tickSize: 5,
                             tickPadding: 5,
                             tickRotation: 0,
-                            legend: 'Total Cost $',
+                            legend: this.props.type ==='disasters' ? 'Total Cost $' : 'Total Count #',
                             legendPosition: 'middle',
                             legendOffset: -55,
-                            format: v => `${fnum(v)}`
+                            format: v => `${this.props.type ==='disasters' ? fnum(v) : fmt(v)}`
                         }}
                         labelSkipWidth={12}
                         labelSkipHeight={12}
@@ -171,7 +195,7 @@ class FemaDisastersStackedBarGraph extends React.Component{
                         animate={true}
                         motionStiffness={90}
                         motionDamping={15}
-                        tooltipFormat={value => `${fnum(value)}`}
+                        tooltipFormat={value => `${this.props.type ==='disasters' ? fnum(value) : fmt(value)}`}
                     />
                 </div>
             )

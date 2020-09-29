@@ -8,6 +8,7 @@ import Table from "../../components/avl-components/components/Table";
 import FemaDisastersStackedBarGraph from "./components/femaDisastersStackedBarGraph";
 import {Link} from 'react-router-dom';
 var format =  d3.format(".2s")
+var _ = require('lodash')
 const fmt = (d) => d < 1000 ? d : format(d)
 let years = []
 const start_year = 1996
@@ -18,6 +19,7 @@ for (let i = start_year; i <= end_year; i++) {
 const attributes=[
     "disaster_number",
     "name",
+    "declaration_date",
     "total_cost",
     "disaster_type",
     "total_number_ia_approved",
@@ -45,11 +47,15 @@ const tableCols = [
         }
     },
     {
-        Header: 'Total Number IA Approved',
-        accessor: 'total_number_ia_approved',
+        Header : 'Disaster Name',
+        accessor: 'name'
+    },
+    {
+        Header : 'Declaration Date',
+        accessor: 'declaration_date',
         disableFilters: true,
         Cell: (data) => {
-            return <div style = {{ textAlign: 'right'}}>{fmt(get(data,'row.values.total_number_ia_approved', ''))}</div>
+            return <div style = {{ textAlign: 'center'}}>{new Date(get(data,'row.values.declaration_date', '')).toLocaleDateString('en-US')}</div>
         }
     },
     {
@@ -61,46 +67,12 @@ const tableCols = [
         }
     },
     {
-        Header : 'Total Amount ONA Approved',
-        accessor: 'total_amount_ona_approved',
-        disableFilters: true,
-        Cell: (data) => {
-            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_amount_ona_approved', ''))}</div>
-        }
-    },
-    {
         Header : 'Total Obligated Amount PA',
         accessor: 'total_obligated_amount_pa',
         disableFilters: true,
         Cell: (data) => {
             return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_obligated_amount_pa', ''))}</div>
         }
-    },
-    {
-        Header:'Total Obligated Amount CAT AB',
-        accessor:'total_obligated_amount_cat_ab',
-        disableFilters: true,
-        Cell: (data) => {
-            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_obligated_amount_cat_ab', ''))}</div>
-        }
-    },
-    {
-        Header:'Total Obligated Amount CAT C2G',
-        accessor:'total_obligated_amount_cat_c2g',
-        disableFilters: true,
-        Cell: (data) => {
-            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_obligated_amount_cat_c2g', ''))}</div>
-        }
-    },
-    {
-        Header:'PA Load Date',
-        accessor: 'pa_load_date',
-        disableFilters: true
-    },
-    {
-        Header:'IA Load Date',
-        accessor: 'ia_load_date',
-        disableFilters: true
     },
     {
         Header:'Total Obligated Amount HGMP',
@@ -111,10 +83,13 @@ const tableCols = [
         }
     },
     {
-        Header:'Last Refresh',
-        accessor: 'last_refresh',
-        disableFilters: true
-    }
+        Header:'Total Cost',
+        accessor: 'total_cost',
+        disableFilters: true,
+        Cell: (data) => {
+            return <div style = {{ textAlign: 'right'}}>{fnum(get(data,'row.values.total_cost', ''))}</div>
+        }
+    },
 ];
 let stat_boxes = [
     {name:'# IA Approved',value:'total_number_ia_approved',amount:0},
@@ -152,17 +127,15 @@ class FemaDisasters extends React.Component {
         if(Object.keys(this.props.falcorCache).length > 0){
             let graph = get(this.props.falcorCache,['fema','disasters','byId'],{})
             let data = []
-
             Object.keys(graph).filter(d => d!=='$__path').forEach(item =>{
                 data.push(
                     attributes.reduce((out,attribute) =>{
                     if(graph[item][attribute]){
-                        out[attribute] =  attribute.includes('date') || attribute.includes('last_refresh') ?
-                            new Date(graph[item][attribute].value).toLocaleDateString('en-US') :
-                            attribute !== 'disaster_number'? graph[item][attribute].value || 0 : graph[item][attribute].value
+                        out[attribute] =  graph[item][attribute].value
                     }
                     return out
                 },{}))
+
                 stat_boxes.forEach(d =>{
                     if(d && d.value !== 'total_funds'){
                         d.amount += get(graph,[item,d.value,'value'],0) ? parseFloat(get(graph,[item,d.value,'value'],0)) : 0
@@ -175,7 +148,7 @@ class FemaDisasters extends React.Component {
                     return a
                 },0)
             })
-            return data
+            return _.filter(data,v => _.keys(v).length !== 0)
         }
     }
 
@@ -221,7 +194,28 @@ class FemaDisasters extends React.Component {
                         }
 
                     </div>
-                    <FemaDisastersStackedBarGraph/>
+                    <div>
+                        <FemaDisastersStackedBarGraph
+                            attributes={[
+                            "name",
+                            "year",
+                            "total_cost",
+                            "disaster_type"
+                        ]}
+                            type={'disasters'}
+                        />
+                    </div>
+                    <div>
+                        <FemaDisastersStackedBarGraph
+                            attributes={[
+                                "name",
+                                "year",
+                                "total_cost",
+                                "disaster_type"
+                            ]}
+                            type={'count'}
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -229,7 +223,7 @@ class FemaDisasters extends React.Component {
         )
     }
 }
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
     return {
         activeStateGeoid : state.stormEvents.activeStateGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
@@ -237,9 +231,11 @@ const mapStateToProps = (state, ownProps) => {
         hazards: get(state.graph, 'riskIndex.hazards.value', [])
     };
 };
+
 const mapDispatchToProps = {
 
 };
+
 export default [
     {
         path: '/fema_disasters/',
