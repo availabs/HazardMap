@@ -6,14 +6,18 @@ import { fnum } from "utils/sheldusUtils"
 import * as d3 from "d3";
 import Table from "../../components/avl-components/components/Table";
 import FemaDisastersStackedBarGraph from "./components/femaDisastersStackedBarGraph";
+import FemaDisastersCombinedHazardListTable from "./components/femaDisastersCombinedHazardListTable";
+import FemaDisastersCombinedEventsLayerFactory from './layers/femaDisastersCombinedTotalCostEventsLayer'
 import {Link} from 'react-router-dom';
+import Select from "../../components/avl-components/components/Inputs/select";
+import AvlMap from "../../components/AvlMap";
 var format =  d3.format(".2s")
 var _ = require('lodash')
 const fmt = (d) => d < 1000 ? d : format(d)
 let years = []
-const start_year = 1996
-const end_year = 2019
-for (let i = start_year; i <= end_year; i++) {
+const start_year = 1953
+const end_year = 2020
+for(let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
 const attributes=[
@@ -103,11 +107,38 @@ let stat_boxes = [
 ]
 let total_funds = 0
 class FemaDisasters extends React.Component {
-
+    FemaCombinedEventsLayer = FemaDisastersCombinedEventsLayerFactory({active:true})
+    constructor(props) {
+        super(props);
+        this.state= {
+            select: {
+                domain: [...years, 'allTime'],
+                value: []
+            },
+            hazard: 'riverine',
+            year: 'allTime',
+        }
+        this.handleChange = this.handleChange.bind(this)
+    }
     componentDidMount(){
         document.body.classList.add("overflow-y-hidden")
     }
 
+    setHazard = (hazard) =>{
+        if (this.state.hazard !== hazard) {
+            this.setState({hazard})
+        }
+    }
+
+    setYear = (year) => {
+        if (this.state.year !== year) {
+            this.setState({year})
+        }
+    }
+
+    handleChange(e) {
+        this.setState({ year: e })
+    }
 
     fetchFalcorDeps() {
         return this.props.falcor.get(['fema','disasters','length'])
@@ -156,7 +187,7 @@ class FemaDisasters extends React.Component {
         let data = this.processData();
         return (
             <div className="md:max-h-full overflow-auto">
-                <div className="container max-w-7xl mx-auto">
+                <div className="container max-w-7xl mx-auto max-h-full">
                     <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-5">
                         {stat_boxes.map((stat_box,i) =>{
                             return(
@@ -216,7 +247,68 @@ class FemaDisasters extends React.Component {
                             type={'count'}
                         />
                     </div>
+                    <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
+                        <div className='flex-auto order-last lg:order-none overflow-hidden'>
+                            {/*<div className='h-full'>
+                            <div className="relative top-0 right-auto h-8 w-2/6">
+
+                            </div>
+
+                        </div>*/}
+                            <div className='h-full'>
+                                <AvlMap
+                                    layers={[
+                                        this.FemaCombinedEventsLayer
+                                    ]}
+                                    height={'100%'}
+                                    center={[0, 0]}
+                                    zoom={4}
+                                    year={2018}
+                                    //hazards={this.props.hazards}
+                                    fips={''}
+                                    styles={[
+                                        {name: 'Blank', style: 'mapbox://styles/am3081/ckaml4r1e1uip1ipgtx5vm9zk'}
+                                    ]}
+                                    sidebar={false}
+                                    attributes={false}
+                                    layerProps={{
+                                        /*[this.StormEventsLayer.name]: {
+                                            year: this.state.year,
+                                            hazard : this.state.hazard,
+                                            fips : this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : null,
+                                            geography : this.state.geography_filter
+                                        }*/
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
+                            <div className='text-3xl'>
+                                <Select
+                                    multi={false}
+                                    placeholder={"Select a year.."}
+                                    domain={this.state.select.domain}
+                                    value={this.state.year}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                            <FemaDisastersCombinedHazardListTable
+                                geoid = {[""]}
+                                year = {this.state.year}
+                                hazard = {['riverine']}
+                                attributes={[
+                                    "name",
+                                    "year",
+                                    "total_cost",
+                                    "disaster_type"
+                                ]}
+                                setHazard={this.setHazard.bind(this)}
+                                activeHazard={this.state.hazard}
+                            />
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
 

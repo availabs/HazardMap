@@ -127,7 +127,6 @@ class FemaDisastersStackedBarGraph extends React.Component{
 
     render(){
         let data = this.props.type === 'disasters' ? this.transformData() : this.calculateCountDisastersByYear()
-        console.log('data',data)
         if(!this.state.isLoading){
             return(
                 <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>

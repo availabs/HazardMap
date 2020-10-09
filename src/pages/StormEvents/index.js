@@ -276,7 +276,8 @@ class NationalLanding extends React.Component {
                                         value = {this.state.geography_filter}
                                         id = 'geography_filter'
                                     >
-                                        {this.state.geography.map((geo,i) =>{
+                                        {
+                                            this.state.geography.map((geo,i) =>{
                                             return(
                                                 <option key={i} value={geo.value}>{geo.name}</option>
                                             )
