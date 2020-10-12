@@ -11,6 +11,7 @@ import FemaDisastersCombinedEventsLayerFactory from './layers/femaDisastersCombi
 import {Link} from 'react-router-dom';
 import Select from "../../components/avl-components/components/Inputs/select";
 import AvlMap from "../../components/AvlMap";
+import {setActiveStateGeoid} from "store/stormEvents";
 var format =  d3.format(".2s")
 var _ = require('lodash')
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -120,9 +121,6 @@ class FemaDisasters extends React.Component {
         }
         this.handleChange = this.handleChange.bind(this)
     }
-    componentDidMount(){
-        document.body.classList.add("overflow-y-hidden")
-    }
 
     setHazard = (hazard) =>{
         if (this.state.hazard !== hazard) {
@@ -186,8 +184,8 @@ class FemaDisasters extends React.Component {
     render() {
         let data = this.processData();
         return (
-            <div className="md:max-h-full overflow-auto">
-                <div className="container max-w-7xl mx-auto max-h-full">
+            <div className="overflow-auto focus:outline-none h-full">
+                <div className="container max-w-7xl mx-auto h-auto">
                     <div className="mt-5 grid grid-cols-8 gap-5 sm:grid-cols-8 py-5">
                         {stat_boxes.map((stat_box,i) =>{
                             return(
@@ -228,11 +226,11 @@ class FemaDisasters extends React.Component {
                     <div>
                         <FemaDisastersStackedBarGraph
                             attributes={[
-                            "name",
-                            "year",
-                            "total_cost",
-                            "disaster_type"
-                        ]}
+                                "name",
+                                "year",
+                                "total_cost",
+                                "disaster_type"
+                            ]}
                             type={'disasters'}
                         />
                     </div>
@@ -247,65 +245,83 @@ class FemaDisasters extends React.Component {
                             type={'count'}
                         />
                     </div>
-                    <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
-                        <div className='flex-auto order-last lg:order-none overflow-hidden'>
-                            {/*<div className='h-full'>
-                            <div className="relative top-0 right-auto h-8 w-2/6">
-
-                            </div>
-
-                        </div>*/}
-                            <div className='h-full'>
-                                <AvlMap
-                                    layers={[
-                                        this.FemaCombinedEventsLayer
-                                    ]}
-                                    height={'100%'}
-                                    center={[0, 0]}
-                                    zoom={4}
-                                    year={2018}
-                                    //hazards={this.props.hazards}
-                                    fips={''}
-                                    styles={[
-                                        {name: 'Blank', style: 'mapbox://styles/am3081/ckaml4r1e1uip1ipgtx5vm9zk'}
-                                    ]}
-                                    sidebar={false}
-                                    attributes={false}
-                                    layerProps={{
-                                        /*[this.StormEventsLayer.name]: {
-                                            year: this.state.year,
-                                            hazard : this.state.hazard,
-                                            fips : this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : null,
-                                            geography : this.state.geography_filter
-                                        }*/
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
-                            <div className='text-3xl'>
-                                <Select
-                                    multi={false}
-                                    placeholder={"Select a year.."}
-                                    domain={this.state.select.domain}
-                                    value={this.state.year}
-                                    onChange={this.handleChange}
-                                />
-                            </div>
-                            <FemaDisastersCombinedHazardListTable
-                                geoid = {[""]}
-                                year = {this.state.year}
-                                hazard = {['riverine']}
-                                attributes={[
-                                    "name",
-                                    "year",
-                                    "total_cost",
-                                    "disaster_type"
+                </div>
+                <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
+                    <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
+                        <div className='h-full'>
+                            <AvlMap
+                                layers={[
+                                    this.FemaCombinedEventsLayer
                                 ]}
-                                setHazard={this.setHazard.bind(this)}
-                                activeHazard={this.state.hazard}
+                                height={'90%'}
+                                center={[0, 0]}
+                                zoom={4}
+                                year={2018}
+                                //hazards={this.props.hazards}
+                                fips={''}
+                                styles={[
+                                    {name: 'Blank', style: 'mapbox://styles/am3081/ckaml4r1e1uip1ipgtx5vm9zk'}
+                                ]}
+                                sidebar={false}
+                                attributes={false}
+                                layerProps={{
+                                    [this.FemaCombinedEventsLayer.name]: {
+                                        year: this.state.year,
+                                        hazard : this.state.hazard,
+                                        fips : this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : null,
+                                        geography : this.state.geography_filter
+                                    }
+                                }}
                             />
                         </div>
+                    </div>
+                    <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
+                        {
+                            this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== "" ?
+                                <div>
+                                    <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">
+                                        <span className="block sm:inline">{this.props.activeStateGeoid.map(d => d.state_fips)}-{this.props.activeStateGeoid.map(d => d.state_name)}</span>
+                                        <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                                        <svg className="fill-current h-6 w-6 text-blue-500"
+                                             role="button"
+                                             xmlns="http://www.w3.org/2000/svg"
+                                             viewBox="0 0 20 20"
+                                             onClick={(e) =>{
+                                                 e.target.closest(`#closeMe`).style.display = 'none'
+                                                 this.props.setActiveStateGeoid([{state_fips:"",state_name:""}])
+                                                 window.history.pushState({state : '1'},"state","/stormevents/")
+                                             }}>
+                                            <title>Close</title>
+                                            <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+                                        </svg>
+                                    </span>
+                                    </div>
+                                </div>
+                                :null
+                        }
+                        <div className='text-3xl'>
+                            <Select
+                                multi={false}
+                                placeholder={"Select a year.."}
+                                domain={this.state.select.domain}
+                                value={this.state.year}
+                                onChange={this.handleChange}
+                            />
+                        </div>
+                        <FemaDisastersCombinedHazardListTable
+                            geoid = {[""]}
+                            year = {this.state.year}
+                            hazard = {['riverine']}
+                            attributes={[
+                                "name",
+                                "year",
+                                "total_cost",
+                                "disaster_type"
+                            ]}
+                            setHazard={this.setHazard.bind(this)}
+                            activeHazard={this.state.hazard}
+                        />
+
                     </div>
                 </div>
 
@@ -325,7 +341,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-
+    setActiveStateGeoid
 };
 
 export default [
