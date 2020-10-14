@@ -12,6 +12,8 @@ import {Link} from 'react-router-dom';
 import Select from "../../components/avl-components/components/Inputs/select";
 import AvlMap from "../../components/AvlMap";
 import {setActiveStateGeoid} from "store/stormEvents";
+import {shmp} from 'pages/components/shmp-theme.js'
+
 var format =  d3.format(".2s")
 var _ = require('lodash')
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -246,7 +248,7 @@ class FemaDisasters extends React.Component {
                         />
                     </div>
                 </div>
-                <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
+                <div className='flex flex-col lg:flex-row h-screen box-border overflow-hidden'>
                     <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
                         <div className='h-full'>
                             <AvlMap
@@ -355,7 +357,7 @@ export default [
             maxWidth: '',//'max-w-7xl',
             headerBar: false,
             nav: 'top',
-            theme: 'flat',
+            theme: shmp,
         },
         component: {
             type: 'div',

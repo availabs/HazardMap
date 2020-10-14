@@ -12,10 +12,12 @@ import {setActiveStateGeoid} from "store/stormEvents";
 import {CSVLink} from 'react-csv';
 import SBAEventsLayer from "./SBAEventsLayer";
 import Select from "../../components/avl-components/components/Inputs/select.js";
-import HazardListTable from "../components /listTable/hazardListTable";
-import StackedBarGraph from "../components /bar /stackedBarGraph";
+import HazardListTable from "../components/listTable/hazardListTable";
+import StackedBarGraph from "../components/bar /stackedBarGraph";
 import Table from "../../components/avl-components/components/Table";
 import Modal from "../../components/avl-components/components/Modal/avl-modal";
+import {shmp} from 'pages/components/shmp-theme.js'
+
 
 import {falcorGraph} from "../../store/falcorGraphNew";
 
@@ -233,10 +235,10 @@ class SBAHazardLoans extends React.Component {
 
     render() {
         return (
-            <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
+           <div className='flex flex-col lg:flex-row h-screen box-border overflow-hidden'>
                 <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
                     <div className='h-full'>
-                        <div className="relative top-0 right-auto h-8 w-2/6">
+                        <div className="relative top-0 right-auto h-8 w-2/6 pt-20">
                             <Legend
                                 title = {'Total Loss'}
                                 type = {"threshold"}
@@ -270,7 +272,7 @@ class SBAHazardLoans extends React.Component {
                                 }
                             }}
                         />
-                        <div className='relative bottom-40 h-40 z-90 w-full'>
+                        <div className='relative bottom h-40 z-90 w-full'>
                             <StackedBarGraph
                                 height={200}
                                 data={{storm_event:"sba",
@@ -285,7 +287,7 @@ class SBAHazardLoans extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
+                <div className='h-56 lg:h-auto lg:w-1/5 p-2 lg:min-w-64 overflow-auto'>
                     {this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== ""?
                         <div>
                             <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">
@@ -427,7 +429,7 @@ export default [
             maxWidth: '',//'max-w-7xl',
             headerBar: false,
             nav: 'top',
-            theme: 'flat',
+            theme: shmp,
         },
         component: {
             type: 'div',

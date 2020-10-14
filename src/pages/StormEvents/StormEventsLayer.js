@@ -190,8 +190,9 @@ class StormEventsLayer extends MapLayer {
             },{})
         let lossDomain = Object.values(lossByFilteredGeoids).sort((a, b) => a - b)
 
-        let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
-            d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]
+        // let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
+        //     d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]
+        let domain = [150000,500000,1000000,5000000]
 
         let range = ["#F1EFEF", ...hazardcolors[this.filters.hazard.value + '_range']]
 
@@ -445,8 +446,8 @@ export default (props = {}) =>
                     "fill-outline-color": [
                         "case",
                         ["boolean", ["feature-state", "hover"], false],
-                        "hsl(0, 4%, 85%)",
-                        "hsl(0, 4%, 85%)"
+                        "rgba(0,0,0,100)",//"hsl(0, 0%, 100%)",
+                        "rgba(0,0,0,0)"
                     ],
                 }
             },
@@ -515,7 +516,7 @@ export default (props = {}) =>
                 "source-layer": "albersusa",
                 "filter": ["match", ["get", "type"], ["state"], true, false],
                 "layout": {},
-                "paint": {"line-color": "hsl(0, 0%, 34%)", "line-width": 0.5}
+                "paint": {"line-color": "hsl(0, 0%, 72%)", "line-width": 0.5}
             },
             {
                 "id": "county-points",
@@ -543,10 +544,10 @@ export default (props = {}) =>
                 "filter": ["match", ["get", "type"], ["state"], true, false],
                 "layout": {
                     "text-field": ["to-string", ["get", "state_abbrev"]],
-                    "text-font": ["Overpass Mono Bold", "Arial Unicode MS Regular"],
+                    "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
                 },
                 "paint": {
-                    "text-color": "hsl(0, 0%, 0%)",
+                    "text-color": "hsl(0, 0%, 25%)",
                     "text-opacity": ["step", ["zoom"], 1, 6, 0],
                     "text-halo-color": "hsl(0, 0%, 100%)",
                     "text-halo-width": 1

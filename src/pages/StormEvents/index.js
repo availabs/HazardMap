@@ -4,11 +4,11 @@ import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import AvlMap from "components/AvlMap";
 import StormEventsLayerFactory from "./StormEventsLayer"
-import StackedBarGraph from "../components /bar /stackedBarGraph";
+import StackedBarGraph from "../components/bar /stackedBarGraph";
 //import HazardStatBox from "./components /statbox/hazardStatBox";
 import Legend from "components/AvlMap/components/legend/Legend"
 import { fnum } from "utils/sheldusUtils"
-import HazardListTable from "../components /listTable/hazardListTable";
+import HazardListTable from "../components/listTable/hazardListTable";
 import Select from "components/avl-components/components/Inputs/select";
 import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
@@ -16,6 +16,7 @@ import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
 import {setActiveStateGeoid} from "store/stormEvents";
 import {CSVLink} from 'react-csv';
+import {shmp} from 'pages/components/shmp-theme.js'
 
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -197,10 +198,10 @@ class NationalLanding extends React.Component {
 
     render() {
         return (
-            <div className='flex flex-col lg:flex-row h-full box-border overflow-hidden'>
-                <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
+            <div className='flex flex-col lg:flex-row h-screen box-border w-screen'>
+                <div className='flex-auto h-full order-last lg:order-none'>
                     <div className='h-full'>
-                        <div className="relative top-0 right-auto h-8 w-2/6">
+                        <div className="relative top-0 right-auto h-8 w-2/6 pt-20">
                             <Legend
                                 title = {'Total Damage'}
                                 type = {"threshold"}
@@ -248,7 +249,7 @@ class NationalLanding extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className='h-56 lg:h-auto lg:w-1/4 p-2 lg:min-w-64 overflow-auto'>
+                <div className='h-56 lg:h-auto lg:w-1/5 p-2 lg:min-w-64 overflow-auto pt-20'>
                         {
                         this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== "" ?
                             <div>
@@ -395,7 +396,7 @@ export default [
         maxWidth: '',//'max-w-7xl',
         headerBar: false,
         nav: 'top',
-        theme: 'flat',
+        theme: shmp,
     },
     component: {
         type: 'div',
@@ -419,7 +420,7 @@ export default [
             maxWidth: '',//'max-w-7xl',
             headerBar: false,
             nav: 'top',
-            theme: 'flat',
+            theme: shmp,
         },
         component: {
             type: 'div',

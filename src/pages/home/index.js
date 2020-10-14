@@ -1,4 +1,6 @@
 import React from "react"
+import {shmp} from 'pages/components/shmp-theme.js'
+
 
 const HomePage = () => (
 	<div className="bg-gray-50">
@@ -83,9 +85,7 @@ const HomePage = () => (
             <span className="text-indigo-600 text-2xl sm:text-3xl  md:text-5xl">for Understanding Risk</span>
           </h2>
           <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui
-            lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat
-            fugiat aliqua.
+            This website offers a variety of datasets about losses associated with natural hazard events including datasets from National Centers for Environmental Information (NCEI), Small Business Administration Loan programs, and the Federal Emergency Management Agency's (FEMA) Public Assistance and Individual Assistance programs.
           </p>
         </div>
       </div>
@@ -161,6 +161,6 @@ export default {
     fixed: false,
     headerBar: false,
     nav: 'top',
-    theme: 'light'
+    theme: shmp
   }
 }

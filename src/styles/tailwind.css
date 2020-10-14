@@ -415,7 +415,7 @@ ul {
  */
 
 html {
-  font-family: Inter var, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* 1 */
+  font-family: Proxima Nova W01, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* 1 */
   line-height: 1.5; /* 2 */
 }
 
@@ -7709,7 +7709,7 @@ DRAFT JS
 }
 
 .font-sans {
-  font-family: Inter var, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: Proxima Nova W01, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 .font-serif {
@@ -39001,6 +39001,122 @@ DRAFT JS
   background-color: #f0f7f9;
 }
 
+@font-face{
+  font-family:'Proxima Nova W01';
+
+  src:url(/fonts/ProximaNova-Light-webfont.eot);
+
+  src:url(/fonts/ProximaNova-Light-webfont.eot?#iefix) format("embedded-opentype"),
+      url(/fonts/ProximaNova-Light-webfont.woff) format("woff"),
+      url(/fonts/ProximaNova-Light-webfont.ttf) format("truetype");
+
+  font-weight:300;
+
+  font-style:normal
+}
+
+@font-face{
+  font-family:'Proxima Nova W01';
+
+  src:url(/fonts/ProximaNova-Reg-webfont.eot);
+
+  src:url(/fonts/ProximaNova-Reg-webfont.eot?#iefix) format("embedded-opentype"),
+      url(/fonts/ProximaNova-Reg-webfont.woff) format("woff"),
+      url(/fonts/ProximaNova-Reg-webfont.ttf) format("truetype");
+
+  font-weight:400;
+
+  font-style:normal
+}
+
+@font-face{
+  font-family:'Proxima Nova W01';
+
+  src:url(/fonts/ProximaNova-Sbold-webfont.eot);
+
+  src:url(/fonts/ProximaNova-Sbold-webfont.eot?#iefix) format("embedded-opentype"),
+      url(/fonts/ProximaNova-Sbold-webfont.woff) format("woff"),
+      url(/fonts/ProximaNova-Sbold-webfont.ttf) format("truetype");
+
+  font-weight:500;
+
+  font-style:normal
+}
+
+@font-face{
+  font-family:'Proxima Nova W01';
+
+  src:url(/fonts/ProximaNova-Bold-webfont.eot);
+
+  src:url(/fonts/ProximaNova-Bold-webfont.eot?#iefix) format("embedded-opentype"),
+      url(/fonts/ProximaNova-Bold-webfont.woff) format("woff"),
+      url(/fonts/ProximaNova-Bold-webfont.ttf) format("truetype");
+
+  font-weight:700;
+
+  font-style:normal
+}
+
+@font-face{
+  font-family:'Proxima Nova W01';
+
+  src:url(/fonts/ProximaNova-Xbold-webfont.eot);
+
+  src:url(/fonts/ProximaNova-Xbold-webfont.eot?#iefix) format("embedded-opentype"),
+      url(/fonts/ProximaNova-Xbold-webfont.woff) format("woff"),
+      url(/fonts/ProximaNova-Xbold-webfont.ttf) format("truetype");
+
+  font-weight:900;
+
+  font-style:normal
+}
+
+@font-face{
+  font-family:'Oswald';
+
+  src:url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-light-webfont.eot);
+
+  src:url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-light-webfont.eot?#iefix) format("embedded-opentype"),
+      url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-light-webfont.woff) format("woff"),
+      url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-light-webfont.ttf) format("truetype"),
+      url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-light-webfont.svg#oswaldlight) format("svg");
+
+  font-weight:100;
+
+  font-style:normal
+}
+
+@font-face{
+  font-family:'Oswald';
+
+  src:url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-bold-webfont.eot);
+
+  src:url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-bold-webfont.eot?#iefix) format("embedded-opentype"),
+      url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-bold-webfont.woff) format("woff"),
+      url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-bold-webfont.ttf) format("truetype"),
+      url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-bold-webfont.svg#oswaldbold) format("svg");
+
+  font-weight:700;
+
+  font-style:normal
+}
+
+@font-face{
+  font-family:'Oswald';
+
+  src:url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-regular-webfont.eot);
+
+  src:url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-regular-webfont.eot?#iefix) format("embedded-opentype"),
+      url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-regular-webfont.woff) format("woff"),
+      url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-regular-webfont.ttf) format("truetype"),
+
+      url(https://www.ny.gov/sites/all/themes/ny_gov/fonts/oswald-regular-webfont.svg#oswaldbook) format("svg");
+
+  font-weight:400;
+
+  font-style:normal
+}
+
 @media (min-width: 640px) {
   .sm\:sr-only {
     position: absolute;
@@ -45773,7 +45889,7 @@ DRAFT JS
   }
 
   .sm\:font-sans {
-    font-family: Inter var, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-family: Proxima Nova W01, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 
   .sm\:font-serif {
@@ -83834,7 +83950,7 @@ DRAFT JS
   }
 
   .md\:font-sans {
-    font-family: Inter var, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-family: Proxima Nova W01, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 
   .md\:font-serif {
@@ -121895,7 +122011,7 @@ DRAFT JS
   }
 
   .lg\:font-sans {
-    font-family: Inter var, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-family: Proxima Nova W01, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 
   .lg\:font-serif {
@@ -159956,7 +160072,7 @@ DRAFT JS
   }
 
   .xl\:font-sans {
-    font-family: Inter var, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-family: Proxima Nova W01, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 
   .xl\:font-serif {

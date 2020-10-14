@@ -11,6 +11,8 @@ import {
 import viewConfig from './view'
 import DmsComponents from "components/dms"
 import DmsWrappers from "components/dms/wrappers"
+import {shmp} from 'pages/components/shmp-theme.js'
+
 
 addComponents(DmsComponents)
 addWrappers(DmsWrappers)
@@ -67,14 +69,14 @@ let editorConfig = {
 }
 
 const Documentation = (props) => (
-    <div>
+    <div className='mt-20'>
         <h4> NPMRDS Documentation </h4>
         <ComponentFactory config={ viewConfig }/>
     </div>
 )
 
 const DocsEditor= (props) => (
-    <div>
+    <div className='mt-20'>
         <h4> NPMRDS Documentation </h4>
         <ComponentFactory config={ editorConfig }/>
     </div>
@@ -93,7 +95,7 @@ export default [{
         maxWidth: '',//'max-w-7xl',
         headerBar: false,
         nav: 'top',
-        theme: 'flat',
+        theme: shmp,
     },
     component: Documentation
 },
@@ -109,7 +111,7 @@ export default [{
             maxWidth: '',//'max-w-7xl',
             headerBar: false,
             nav: 'top',
-            theme: 'flat',
+            theme: shmp,
         },
         component: DocsEditor
     }

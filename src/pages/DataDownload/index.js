@@ -1,5 +1,6 @@
 import React from 'react'
 import DataDownload from "./DataDownload";
+import {shmp} from 'pages/components/shmp-theme.js'
 
 const MetaData = () => (
 <div className="bg-gray-50 mt-16 min-h-screen">
@@ -41,10 +42,21 @@ const MetaData = () => (
         <h3 className="text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10">
           Download Data for Planning.
         </h3>
-      </div>
-      <div className="mt-10 sm:grid sm:grid-cols-2 sm:col-gap-8 sm:row-gap-10 lg:col-span-2 lg:mt-0">
-        <div>
-          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+        <div className="mt-10 sm:grid sm:grid-cols-2 sm:col-gap-8 sm:row-gap-10 lg:col-span-2 lg:mt-0">
+        <div className="mt-10 sm:mt-0 col-span-2">
+          
+          <div className="mt-5">
+            <h4 className="text-lg leading-6 font-medium text-gray-900">
+             
+            </h4>
+            <p className="mt-2 text-base leading-6 text-gray-500">
+             This page allows users to download natural hazard loss data at a variety of geographies including the NCEI Storm Events Data, the SBA Disaster Loans, and the FEMA Public Assistance and Individual Assistance datasets. Below you can find instructions for setting specific parameters to download the data that works for you.
+
+            </p>
+          </div>
+        </div>
+        <div className='col-span-2'>
+          {/*<div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
             <svg
               className="h-6 w-6"
               fill="none"
@@ -58,19 +70,18 @@ const MetaData = () => (
                 d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
               />
             </svg>
-          </div>
+          </div>*/}
           <div className="mt-5">
             <h4 className="text-lg leading-6 font-medium text-gray-900">
               National Data
             </h4>
             <p className="mt-2 text-base leading-6 text-gray-500">
-              Consequuntur omnis dicta cumque, inventore atque ab dolores
-              aspernatur tempora ab doloremque.
+              To download national data simply the select the dataset of your choice and leave all filters unselected. Click export data.
             </p>
           </div>
         </div>
-        <div className="mt-10 sm:mt-0">
-          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+        <div className="mt-10 sm:mt-0 col-span-2">
+          {/*<div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
             <svg
               className="h-6 w-6"
               fill="none"
@@ -84,19 +95,19 @@ const MetaData = () => (
                 d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
               />
             </svg>
-          </div>
-          <div className="mt-5">
+          </div>*/}
+          <div className="mt-5 col">
             <h4 className="text-lg leading-6 font-medium text-gray-900">
               County Data
             </h4>
             <p className="mt-2 text-base leading-6 text-gray-500">
-              Corporis quisquam nostrum nulla veniam recusandae temporibus
-              aperiam officia incidunt at distinctio ratione.
+              You can pull any of the three datasets for any state or county the United States and Puerto Rico by using the State filter to select the state or county. You can also select the state first and the use the County filter to select all of the counties or a single county within that state.
+
             </p>
           </div>
         </div>
-        <div className="mt-10 sm:mt-0">
-          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+        <div className="mt-10 sm:mt-0 col-span-2">
+          {/*<div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
             <svg
               className="h-6 w-6"
               fill="none"
@@ -110,43 +121,20 @@ const MetaData = () => (
                 d="M13 10V3L4 14h7v7l9-11h-7z"
               />
             </svg>
-          </div>
+          </div>*/}
           <div className="mt-5">
             <h4 className="text-lg leading-6 font-medium text-gray-900">
               Local Data
             </h4>
             <p className="mt-2 text-base leading-6 text-gray-500">
-              Omnis, illo delectus? Libero, possimus nulla nemo tenetur adipisci
-              repellat dolore eligendi velit doloribus mollitia.
+              To download data at the municipal or census tract level, you must first select a county, then use the Geo Level filter to select Municipality or Tracts
             </p>
           </div>
         </div>
-        <div className="mt-10 sm:mt-0">
-          <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <div className="mt-5">
-            <h4 className="text-lg leading-6 font-medium text-gray-900">
-              Specific Events
-            </h4>
-            <p className="mt-2 text-base leading-6 text-gray-500">
-              Veniam necessitatibus reiciendis fugit explicabo dolorem nihil et
-              omnis assumenda odit? Quisquam unde accusantium.
-            </p>
-          </div>
         </div>
+      </div>
+      <div className="mt-10 sm:grid sm:grid-cols-2 sm:col-gap-8 sm:row-gap-10 lg:col-span-2 lg:mt-0">
+        
         <div className="w-full sm:grid sm:col-gap-8 sm:row-gap-10 lg:col-span-2 lg:mt-0">
           <DataDownload/>
         </div>
@@ -169,7 +157,7 @@ export default {
     fixed: true,
     headerBar: false,
     nav: 'top',
-    theme: 'light'
+    theme: shmp
   }
 }
 
