@@ -82,12 +82,12 @@ class FemaDisastersStackedBarGraph extends React.Component{
                 })
                 return a
             }, [])
-            graph_data.map(d =>{
+            graph_data.forEach(d =>{
                 hazards.forEach(hazard =>{
                     d[hazard.value] = 0
                 })
             })
-            graph_data.map(d =>{
+            graph_data.forEach(d =>{
                 hazards.forEach(hazard =>{
                     Object.values(graph).filter(d => d !== '$__path').forEach(item =>{
                         if(item.year && get(item,['year','value'],0).toString() === d.year && get(item,['disaster_type','value'],'') === hazard.value){
@@ -112,7 +112,7 @@ class FemaDisastersStackedBarGraph extends React.Component{
                 })
                 return a
             }, [])
-            graph_data.map(d =>{
+            graph_data.forEach(d =>{
                 let count = 0
                 Object.values(graph).filter(d => d !== '$__path').forEach(item =>{
                     if(item.year && get(item,['year','value'],0).toString() === d.year){

@@ -2,7 +2,6 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
-import { falcorGraph } from "store/falcorGraphNew"
 import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
@@ -74,9 +73,12 @@ class FemaDisastersCombinedHazardListTable extends React.Component{
     }
 
     fetchFalcorDeps(){
+
+
         this.setState({
             isLoading : true
         });
+
         return this.props.falcor.get(['fema','disasters','length'])
             .then(response =>{
                 let length = get(response.json,['fema','disasters','length'],null)
@@ -87,12 +89,17 @@ class FemaDisastersCombinedHazardListTable extends React.Component{
                             this.setState({
                                 isLoading : false
                             })
+                            console.time("result")
                             result = await this.props.falcor.get(['fema','disasters',[""],this.state.hazards,[this.props.year],FEMA_COUNTY_ATTRIBUTES])
+                            console.timeEnd("result")
                             return response
                         })
+
                 return result
                 }else { return Promise.resolve({}) }
+
             })
+
     }
 
     processByIdData(){
@@ -106,7 +113,7 @@ class FemaDisastersCombinedHazardListTable extends React.Component{
                 })
                 return a
             }, [])
-            graph_data.map(d =>{
+            graph_data.forEach(d =>{
                 let count = 0
                 Object.values(graph).filter(d => d !== '$__path').forEach(item =>{
                     if(this.props.year === 'allTime') {
@@ -151,7 +158,7 @@ class FemaDisastersCombinedHazardListTable extends React.Component{
 
             })
             declarationsData.forEach(dd =>{
-                data.map(d =>{
+                data.forEach(d =>{
                     if(d.value === dd.hazard){
                         d['count'] = dd.count
                     }
