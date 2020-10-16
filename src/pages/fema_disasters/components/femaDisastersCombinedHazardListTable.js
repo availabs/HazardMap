@@ -114,17 +114,17 @@ class FemaDisastersCombinedHazardListTable extends React.Component{
                 return a
             }, [])
             graph_data.forEach(d =>{
-                let count = 0
+                let sum = 0
                 Object.values(graph).filter(d => d !== '$__path').forEach(item =>{
                     if(this.props.year === 'allTime') {
                         if(get(item,['disaster_type','value'],'').toString() === d.hazard) {
-                            count += 1
-                            d['count'] = count.toString()
+                            sum += +get(item,['total_cost','value'],0)
+                            d['total_cost_summaries'] = sum
                         }
                     }else{
                         if(get(item,['disaster_type','value'],'').toString() === d.hazard && get(item,['year','value'],'').toString() === this.props.year.toString()){
-                            count += 1
-                            d['count'] = count.toString()
+                            sum += +get(item,['total_cost','value'],0)
+                            d['total_cost_summaries'] = sum
                         }
                     }
 
@@ -138,7 +138,7 @@ class FemaDisastersCombinedHazardListTable extends React.Component{
     processFemaCountyData(){
         let graph = get(this.props.falcorCache,['fema','disasters',this.props.geoid],null)
         let data = []
-        let header_columns = ["name","value","total_cost","total_disasters"]
+        let header_columns = ["name","value","total_cost","total_cost_summaries"]
         let declarationsData = this.processByIdData()
         if(graph){
             data = Object.keys(graph).map(hazard =>{
@@ -160,7 +160,7 @@ class FemaDisastersCombinedHazardListTable extends React.Component{
             declarationsData.forEach(dd =>{
                 data.forEach(d =>{
                     if(d.value === dd.hazard){
-                        d['count'] = dd.count
+                        d['total_cost_summaries'] = dd.total_cost_summaries || 0
                     }
                 })
             })
@@ -188,12 +188,7 @@ class FemaDisastersCombinedHazardListTable extends React.Component{
                         <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase "
 
                         >
-                            # Num Disasters
-                        </th>
-                        <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase "
-
-                        >
-                            # Num Disasters - Declarations
+                            $ Total Cost Summaries - {this.props.year}
                         </th>
                     </tr>
                     </thead>
@@ -227,10 +222,7 @@ class FemaDisastersCombinedHazardListTable extends React.Component{
                                             {fnum(hazard.total_cost)}
                                         </td>
                                         <td>
-                                            {fmt(hazard.total_disasters)}
-                                        </td>
-                                        <td>
-                                            {fmt(hazard.count)}
+                                            {fnum(hazard.total_cost_summaries)}
                                         </td>
                                     </tr>
                                 )
