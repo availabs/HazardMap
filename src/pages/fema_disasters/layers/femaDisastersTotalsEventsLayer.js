@@ -95,7 +95,6 @@ class FemaDisastersTotalsEventsLayer extends MapLayer {
 
     onAdd(map) {
         this.map = map
-        console.log('check',window.location.pathname.split("/")[3])
         falcorGraph.get(
             ['geo',fips, 'counties', 'geoid']
         )
@@ -116,10 +115,9 @@ class FemaDisastersTotalsEventsLayer extends MapLayer {
 
     fetchData(){
         let amount = this.filters.amount.value
-        let disaster_number = window.location.pathname.split("/")[3]
         if(IA_ATTRIBUTES.includes(amount)){
             return falcorGraph.get(
-                ['fema','disasters','byId',window.location.pathname.split("/")[3],'ia','zipCodes'],
+                ['fema','disasters','byId',this.filters.disaster_number.value,'ia','zipCodes'],
 
             )
                 .then(response => {
@@ -231,6 +229,7 @@ class FemaDisastersTotalsEventsLayer extends MapLayer {
                     a[c] = colorScale(filteredData[c])
                     return a
                 }, {})
+            console.log('colors',colors)
             map.setLayoutProperty('zipcodes', 'visibility', 'visible');
             map.setFilter('zipcodes', [
                 "all",
