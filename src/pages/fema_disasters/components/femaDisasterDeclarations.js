@@ -2,8 +2,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
-import Table from "../../../components/avl-components/components/Table";
-import Header from "../../../components/avl-components/components/Header/Header";
+import Table from "components/avl-components/components/Table";
+import Header from "components/avl-components/components/Header/Header";
 import FemaDisastersIATotalsStatBoxes from "./FemaDisastersIATotalsStatBoxes";
 import FemaDisastersTotalsEventsLayer from '../layers/femaDisastersTotalsEventsLayer'
 import FemaDisastersPATotalsStatBoxes from "./FemaDisastersPATotalsStatBoxes";
@@ -12,6 +12,7 @@ import FemaDisastersHMAMitigatedProjectsTotalsStatBoxes from "./femaDisastersHMA
 import {fnum} from "../../../utils/sheldusUtils";
 import * as d3 from "d3";
 import AvlMap from "../../../components/AvlMap";
+import {shmp} from 'pages/components/shmp-theme.js'
 var format =  d3.format("~s")
 var _ = require("lodash")
 const fmt = (d) => d < 1000 ? d : format(d)
@@ -261,7 +262,7 @@ export default [
             maxWidth: '',//'max-w-7xl',
             headerBar: false,
             nav: 'top',
-            theme: 'flat',
+            theme: shmp,
         },
         component: connect(mapStateToProps,mapDispatchToProps)(reduxFalcor(FemaDisasterDeclarations))
             
