@@ -12,6 +12,8 @@ import FemaDisasterDeclaration from "./pages/fema_disasters/components/femaDisas
 import SBAHazardLoans from './pages/SBAEvents/index'
 import FemaHmapV1 from './pages/femaHmapV1/index'
 import FemaDisasters from './pages/fema_disasters/index'
+import Overview from './pages/Overview/index'
+
 export default [
 	// -- public
 	...StormEvents,
@@ -24,6 +26,7 @@ export default [
 	DataDownload,
 	...Methodology,
 	...FemaDisasterDeclaration,
+	...Overview,
 	// -- util
 	NoMatch
 ];
