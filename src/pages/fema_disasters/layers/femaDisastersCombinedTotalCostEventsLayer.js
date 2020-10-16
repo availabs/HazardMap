@@ -113,8 +113,10 @@ class femaDisastersCombinedTotalCostEventsLayer extends MapLayer {
                         return out
                     }, [])
                 if(this.filtered_geographies.length > 0){
+                    console.time('response')
                     return falcorGraph.get(['fema','disasters',this.filtered_geographies,this.filters.hazard.value,this.filters.year.value,FEMA_COUNTY_ATTRIBUTES])
                         .then(response =>{
+                            console.timeEnd('response')
                             return response
                         })
                 }
