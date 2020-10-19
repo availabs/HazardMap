@@ -93,7 +93,7 @@
   "devDependencies": {
     "autoprefixer": "^9.7.6",
     "husky": "^4.2.5",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "postcss-cli": "^7.1.0",
     "source-map-explorer": "^2.4.2",
     "tailwindcss": "^1.2.0"
