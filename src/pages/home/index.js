@@ -1,12 +1,16 @@
 import React from "react"
 import {shmp} from 'pages/components/shmp-theme.js'
-
+import Search from "./Search";
 
 const HomePage = () => (
+
 	<div className="bg-gray-50">
+
   <div className="relative">
     <div className="block absolute inset-y-0 h-full w-full">
+
       <div className="relative h-full">
+
         <svg
           className="absolute right-full transform translate-y-1/3 translate-x-1/4 md:translate-y-1/2 sm:translate-x-1/2 lg:translate-x-full"
           width={404}
@@ -73,10 +77,8 @@ const HomePage = () => (
         </svg>
       </div>
     </div>
+
     <div className="relative pt-6 pb-12 lg:pb-20">
-      
-     
-      
       <div className="mt-10 mx-auto max-w-screen-xl px-4 sm:px-6 md:mt-16 lg:mt-20">
         <div className="text-center">
           <h2 className="text-4xl tracking-tight leading-10 font-extrabold text-gray-900 sm:text-5xl sm:leading-none md:text-6xl">
@@ -89,12 +91,16 @@ const HomePage = () => (
           </p>
         </div>
       </div>
+      <Search/>
     </div>
+
     <div className="relative">
       <div className="absolute inset-0 flex flex-col">
         <div className="flex-1" />
         <div className="flex-1 w-full bg-gray-800" />
       </div>
+
+
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
         <img
           className="relative rounded-lg shadow-lg"
