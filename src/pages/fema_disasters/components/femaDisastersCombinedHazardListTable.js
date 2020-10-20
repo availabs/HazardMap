@@ -4,9 +4,6 @@ import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
-import * as d3 from "d3";
-var format =  d3.format("~s")
-const fmt = (d) => d < 1000 ? d : format(d)
 
 let years = []
 const start_year = 1953
