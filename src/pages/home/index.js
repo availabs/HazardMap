@@ -91,16 +91,15 @@ const HomePage = () => (
           </p>
         </div>
       </div>
+      <div>
+      </div>
       <Search/>
     </div>
-
-    <div className="relative">
+    <div className="relative z-10">
       <div className="absolute inset-0 flex flex-col">
         <div className="flex-1" />
         <div className="flex-1 w-full bg-gray-800" />
       </div>
-
-
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
         <img
           className="relative rounded-lg shadow-lg"

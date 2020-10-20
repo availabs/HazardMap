@@ -46,14 +46,14 @@ class Search extends React.Component{
             this.filtered_geographies.forEach(geoid =>{
                 data.push({
                     geoid: geoid,
-                    name: get(graph,[geoid,'name'],''),
+                    name: `${get(graph,[geoid,'name'],'')},${get(graph,[geoid.slice(0,2),'state_abbr'],'')}`,
                     fips: get(graph,[geoid.slice(0,2),'state_abbr'],'')
                 })
             })
-            let geoData = _.filter(data, _.method('name.match', new RegExp(text, 'i')))
+            let geoData = _.filter(data, _.method('name.match', new RegExp(`${text}.*`,'i')))
             this.setState({
                 isLoading: false,
-                options: geoData ? geoData : []
+                options: geoData ? geoData : data.filter(d => d.includes(text))
             })
         }
     }
@@ -72,16 +72,16 @@ class Search extends React.Component{
                 <AsyncTypeahead
                     isLoading={this.state.isLoading}
                     onSearch={this.handleSearch}
-                    minLength = {3}
+                    minLength = {2}
                     id="my-typeahead-id"
                     placeholder="Search for a County..."
-                    options={this.state.options.map(d => d)}
-                    labelKey={(option) => `${option.name} ${option.fips}`}
+                    options={this.state.options}
+                    labelKey={(option) => `${option.name}`}
                     onChange = {this.onChangeFilter.bind(this)}
                     renderMenuItemChildren={(option, props) => (
                         <Fragment>
                             <ul>
-                                <span>{option.name}-{option.fips}</span>
+                                <span>{option.name}</span>
                             </ul>
                         </Fragment>
                     )}

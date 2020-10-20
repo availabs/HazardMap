@@ -14,3 +14,16 @@
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 
 }
+.rbt-menu.dropdown-menu.show{
+    z-index: 50;
+    background-color: white;
+    position: absolute;
+    display: block;
+    max-height: 300px;
+    overflow: auto;
+    will-change: transform;
+    width: 793px;
+    top: 0px;
+    left: 0px;
+    transform: translate3d(0px, 38px, 0px);
+}
