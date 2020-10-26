@@ -82,9 +82,7 @@ class FemaHmapV1 extends React.Component {
         };
         this.handleChange = this.handleChange.bind(this)
     }
-    componentDidMount(){
-        document.body.classList.add("overflow-y-hidden")
-    }
+    
     componentWillUnmount(){
         this.setState = (state,callback)=>{
             return;
