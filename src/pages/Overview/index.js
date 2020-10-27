@@ -53,9 +53,7 @@ class Overview extends React.Component {
 
         };
     }
-    componentDidMount(){
-        document.body.classList.add("overflow-y-hidden")
-    }
+   
     componentWillUnmount(){
         this.setState = (state,callback)=>{
             return;

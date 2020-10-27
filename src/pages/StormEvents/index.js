@@ -110,9 +110,7 @@ class NationalLanding extends React.Component {
         };
         this.handleChange = this.handleChange.bind(this)
     }
-    componentDidMount(){
-        document.body.classList.add("overflow-y-hidden")
-    }
+
     componentWillUnmount(){
         this.setState = (state,callback)=>{
             return;
@@ -390,7 +388,7 @@ export default [
     path: '/stormevents/',
     mainNav: true,
     exact: true,
-    name: 'NCDC Storm Events',
+    name: 'Storm Events',
     layoutSettings: {
         fixed: true,
         maxWidth: '',//'max-w-7xl',
