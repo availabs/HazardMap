@@ -55,7 +55,7 @@
     "simple-statistics": "^7.1.0",
     "styled-components": "^5.2.0",
     "tlds": "^1.207.0",
-    "uplot": "^1.0.8"
+    "uplot": "^1.2.2"
   },
   "eslintConfig": {
     "extends": "react-app"

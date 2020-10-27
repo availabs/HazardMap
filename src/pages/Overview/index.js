@@ -5,12 +5,12 @@ import get from 'lodash.get';
 import StackedBarGraph from "./StackedBarGraph";
 import {setActiveStateGeoid} from "store/stormEvents";
 import Header from "../../components/avl-components/components/Header/Header";
-let years = []
-const start_year = 1996
-const end_year = 2019
-for (let i = start_year; i <= end_year; i++) {
-    years.push(i)
-}
+    let years = []
+    const start_year = 1996
+    const end_year = 2019
+    for (let i = start_year; i <= end_year; i++) {
+        years.push(i)
+    }
 const FEMA_COUNTY_ATTRIBUTES =[
     'ia_ihp_amount',
     'ia_ihp_count',

@@ -12,7 +12,9 @@ import FemaDisasterDeclaration from "./pages/fema_disasters/components/femaDisas
 import SBAHazardLoans from './pages/SBAEvents/index'
 import FemaHmapV1 from './pages/femaHmapV1/index'
 import FemaDisasters from './pages/fema_disasters/index'
-import Overview from './pages/Overview/index'
+//import Overview from './pages/Overview/index'
+//import Test from "./pages/Overview/test_bar";
+import Test from "./pages/Overview/test_log"
 
 export default [
 	// -- public
@@ -26,7 +28,8 @@ export default [
 	DataDownload,
 	...Methodology,
 	...FemaDisasterDeclaration,
-	...Overview,
+	//...Overview,
+	...Test,
 	// -- util
 	NoMatch
 ];
