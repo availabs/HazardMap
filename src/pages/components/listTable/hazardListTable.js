@@ -95,6 +95,7 @@ class HazardListTable extends React.Component{
 
     render(){
         let listTableData = this.processData()
+        console.log('listTableData', listTableData)
         return(
                 <div className="align-middle inline-block min-w-full overflow-hidden"
                     key={0}>
@@ -131,11 +132,11 @@ class HazardListTable extends React.Component{
                             .sort((a,b) => b[this.props.data.sort] - a[this.props.data.sort])
                             .map((hazard,i) =>{
                                 return(
-                                    <tr className={`bg-white  ${this.props.activeHazard === hazard.value ? 'border-b-4 border-blue-300' : 'border-b border-gray-200' }` }
+                                    <tr className={`bg-white  ${this.props.activeHazard === hazard.value ? 'border-b-2 border-blue-500' : 'border-b border-gray-200' }` }
                                         key={i} id={hazard.value}>
-                                        <td style={{backgroundColor:hazardcolors[hazard.value]}} className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-100" key={i}>
+                                        <td className="px-4 py-2 whitespace-no-wrap text-md leading-5 font-base text-gray-900" key={i}>
                                             <div
-                                                className="hover:text-blue-100 cursor-pointer"
+                                                className="hover:text-blue-600 cursor-pointer"
                                                 
                                                 onClick={(e) =>{
                                                     e.persist()
@@ -150,13 +151,13 @@ class HazardListTable extends React.Component{
 
                                                 }}
                                                 >
-                                                {hazard.name}
+                                                <div style={{backgroundColor:hazardcolors[hazard.value]}} className='w-3 h-3 mr-2 inline-block' />{hazard.name}
                                             </div>
                                         </td>
                                         {this.props.data.columns.map((column,i) =>{
                                             return (
-                                                <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 text-right" key={i}>
-                                                    {!column.includes("num") ? fnum(hazard[column]) : fmt(hazard[column])}
+                                                <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-base text-gray-900 text-right" key={i}>
+                                                    {!column.includes("num") ? fnum(hazard[column]) : hazard[column].toLocaleString()}
                                                 </td>
                                             )
                                         })}

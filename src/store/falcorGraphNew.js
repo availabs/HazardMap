@@ -5,9 +5,9 @@ import HttpDataSource from 'falcor-http-datasource'
 
 import throttle from "lodash.throttle"
 
-let host = "http://localhost:4444/graph/"
-//let host = 'https://graph.availabs.org/'
-// let host = process.env.NODE_ENV === 'production' ? 'https://graph.availabs.org/' : '"http://localhost:4444/graph/';
+// let local_host = "http://localhost:4444/graph/"
+let local_host = 'https://graph.availabs.org/'
+let host = process.env.NODE_ENV === 'production' ? 'https://graph.availabs.org/' : local_host;
 
 /**/
 class CustomSource extends HttpDataSource {
@@ -23,7 +23,7 @@ class CustomSource extends HttpDataSource {
 
 function cacheFromStorage () {
     let falcorCache = {}
-    if (localStorage && localStorage.getItem('falcorCache') && process.env.NODE_ENV === 'production' ) {
+    if (localStorage && localStorage.getItem('falcorCache')/* && process.env.NODE_ENV === 'production' */) {
         //let token = localStorage.getItem('token')
         //let user = localStorage.getItem('currentUser')
         //if (token && user) {

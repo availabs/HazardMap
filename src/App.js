@@ -38,7 +38,6 @@ class App extends Component {
                 authed={ this.props.user.authed }
                 isAuthenticating={ this.state.isAuthenticating }
                 menus={ Routes.filter(r => r.mainNav) }
-                
                 user={ this.props.user }
               />
             );

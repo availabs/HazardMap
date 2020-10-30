@@ -1,18 +1,22 @@
 import React from "react"
 import MapLayer from "components/AvlMap/MapLayer"
+import {MapSources,MapStyles} from './components/mapLayers'
 import {falcorGraph} from "store/falcorGraphNew"
 import get from "lodash.get"
 import hazardcolors from "../../constants/hazardColors";
 import * as d3scale from 'd3-scale'
 import * as d3 from 'd3'
-import { fnum } from "utils/sheldusUtils"
+import { fnum, fnumClean} from "utils/sheldusUtils"
 import { extent } from "d3-array"
 import * as turf from '@turf/turf'
 import { connect } from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import {setActiveStateGeoid} from "store/stormEvents";
 
+
 var format =  d3.format("~s")
+
+
 const fmt = (d) => d < 1000 ? d : format(d)
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 const hazards = [
@@ -46,23 +50,23 @@ let hazard = null
 let state_fips = null
 let onLoadBounds = {}
 class StormEventsLayer extends MapLayer {
-    receiveProps(oldProps, newProps) {
-        if (this.filters.year.value !== newProps.year) {
-            this.filters.year.value = newProps.year ?
-                [newProps.year] : newProps.year ? newProps.year : null;
-        }
-        if (oldProps.hazard !== newProps.hazard) {
-            hazard = newProps.hazard
-            this.filters.hazard.value = newProps.hazard
-        }
-        if (oldProps.fips !== newProps.fips) {
-            state_fips = newProps.fips
-        }
-        if(oldProps.geography !== newProps.geography){
-            this.filters.geography.value = newProps.geography
-        }
+    // receiveProps(oldProps, newProps) {
+    //     if (this.filters.year.value !== newProps.year) {
+    //         this.filters.year.value = newProps.year ?
+    //             [newProps.year] : newProps.year ? newProps.year : null;
+    //     }
+    //     if (oldProps.hazard !== newProps.hazard) {
+    //         hazard = newProps.hazard
+    //         this.filters.hazard.value = newProps.hazard
+    //     }
+    //     if (oldProps.fips !== newProps.fips) {
+    //         state_fips = newProps.fips
+    //     }
+    //     if(oldProps.geography !== newProps.geography){
+    //         this.filters.geography.value = newProps.geography
+    //     }
 
-    }
+    // }
 
 
     onPropsChange(oldProps, newProps) {
@@ -192,10 +196,11 @@ class StormEventsLayer extends MapLayer {
 
         // let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
         //     d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]
-        let domain = [150000,500000,1000000,5000000]
+        let domain = [1000000,5000000,10000000,100000000,1000000000,10000000000]
 
         let range = ["#F1EFEF", ...hazardcolors[this.filters.hazard.value + '_range']]
 
+        
         this.legend.domain = domain
         this.legend.range = range
 
@@ -209,6 +214,7 @@ class StormEventsLayer extends MapLayer {
                 a[c] = colorScale(lossByFilteredGeoids[c])
                 return a
             }, {})
+
         if(geography === "cousubs" && Object.keys(lossByFilteredGeoids).length > 0){
             map.setLayoutProperty('counties', 'visibility', 'none');
             map.setLayoutProperty('tracts', 'visibility', 'none');
@@ -270,7 +276,7 @@ class StormEventsLayer extends MapLayer {
                 }, '')
                 this.state_fips = state_fips
                 this.state_name = state_name
-                this.infoBoxes.overview.show = true
+                //this.infoBoxes.overview.show = true
                 window.history.pushState({state: '2'}, "state", `/stormevents/state/${state_fips}`);
                 map.setFilter("states",["all",
                     ["match", ["get", "state_fips"],[state_fips],true,false]
@@ -280,6 +286,7 @@ class StormEventsLayer extends MapLayer {
                 this.forceUpdate()
             }
         })
+
         if(state_fips && state_fips.includes("")){
             this.state_fips = ""
             this.state_name = ""
@@ -305,8 +312,6 @@ class StormEventsLayer extends MapLayer {
 export default (props = {}) =>
     new StormEventsLayer("Storm Events", {
         ...props,
-        selectedStations: new Map(),
-        stationFeatures: [],
         popover: {
             layers: ["states","counties","cousubs","tracts"],
             pinned:false,
@@ -377,39 +382,11 @@ export default (props = {}) =>
             range: [],
             active: false,
             domain: [],
-            format: fnum
+            
         },
-        sources: [
-            {
-                id: "composite",
-                source: {
-                    "url": "mapbox://lobenichou.albersusa,lobenichou.albersusa-points",
-                    "type": "vector"
-                }
-            },
-            {
-                id: "albersusa",
-                source: {
-                    "url": "mapbox://lobenichou.albersusa",
-                    "type": "vector"
-                }
-            },
-            {
-                id:'albersusa_cousubs',
-                source:{
-                    "url":"mapbox://am3081.8xwbxcmy",
-                    "type":"vector"
-                }
-            },
-            {
-                id:'albersusa_tracts',
-                source:{
-                    "url":"mapbox://am3081.2n3as7pn",
-                    "type":"vector"
-                }
-            }
-
-        ],
+        sources: MapSources,
+        layers: MapStyles,
+    
         filters: {
             'year': {
                 type: 'dropdown',
@@ -427,188 +404,25 @@ export default (props = {}) =>
                 domain : []
             }
         },
-        layers: [
-            {
-                "id": "counties",
-                "type": "fill",
-                "source": "albersusa",
-                "source-layer": "albersusa",
-                "filter": ["match", ["get", "type"], ["county"], true, false],
-                "layout": {},
-                "paint": {
-                    "fill-color": "hsl(0, 3%, 94%)",
-                    "fill-opacity": [
-                        "case",
-                        ["boolean", ["feature-state", "hover"], false],
-                        0,
-                        1
-                    ],
-                    "fill-outline-color": [
-                        "case",
-                        ["boolean", ["feature-state", "hover"], false],
-                        "rgba(0,0,0,100)",//"hsl(0, 0%, 100%)",
-                        "rgba(0,0,0,0)"
-                    ],
-                }
-            },
-            {
-                "id": "cousubs",
-                "type": "fill",
-                "source": "albersusa_cousubs",
-                "source-layer": "albersusa_cousubs",
-                "filter": ["match", ["get", "type"],["geoid"],true, false],
-                "layout": {},
-                "paint": {
-                    "fill-color": "hsl(0, 3%, 94%)",
-                    "fill-opacity": [
-                        "case",
-                        ["boolean", ["feature-state", "hover"], false],
-                        0,
-                        1
-                    ],
-                    "fill-outline-color": [
-                        "case",
-                        ["boolean", ["feature-state", "hover"], false],
-                        "hsl(0, 4%, 85%)",
-                        "hsl(0, 4%, 85%)"
-                    ],
-                }
-            },
-            {
-                "id": "tracts",
-                "type": "fill",
-                "source": "albersusa_tracts",
-                "source-layer": "albersusa_tracts",
-                "filter": ["match", ["get", "type"],["geoid"],true, false],
-                "layout": {},
-                "paint": {
-                    "fill-color": "hsl(0, 3%, 94%)",
-                    "fill-opacity": [
-                        "case",
-                        ["boolean", ["feature-state", "hover"], false],
-                        0,
-                        1
-                    ],
-                    "fill-outline-color": [
-                        "case",
-                        ["boolean", ["feature-state", "hover"], false],
-                        "hsl(0, 4%, 85%)",
-                        "hsl(0, 4%, 85%)"
-                    ],
-                }
-            },
-            {
-                "id": "states",
-                "type": "fill",
-                "source": "albersusa",
-                "source-layer": "albersusa",
-                    "filter": ["match", ["get", "type"], ["state"], true, false],
-                "layout": {
-                },
-                "paint": {
-                    "fill-color": "rgba(0,0,0,0)",
-                }
-            },
-            {
-                "id": "state-boundaries",
-                "type": "line",
-                "source": "composite",
-                "source-layer": "albersusa",
-                "filter": ["match", ["get", "type"], ["state"], true, false],
-                "layout": {},
-                "paint": {"line-color": "hsl(0, 0%, 72%)", "line-width": 0.5}
-            },
-            {
-                "id": "county-points",
-                "type": "symbol",
-                "source": "composite",
-                "source-layer": "albersusa-points",
-                "filter": ["match", ["get", "type"], ["county"], true, false],
-                "layout": {
-                    "text-field": ["to-string", ["get", "county_fips"]],
-                    "text-font": ["Overpass Mono Bold", "Arial Unicode MS Regular"],
-                    "visibility": "none"
-                },
-                "paint": {
-                    "text-color": "hsl(0, 0%, 100%)",
-                    "text-halo-color": "hsl(0, 0%, 6%)",
-                    "text-halo-width": 1,
-                    "text-opacity": ["step", ["zoom"], 0, 6, 1]
-                }
-            },
-            {
-                "id": "state-points",
-                "type": "symbol",
-                "source": "composite",
-                "source-layer": "albersusa-points",
-                "filter": ["match", ["get", "type"], ["state"], true, false],
-                "layout": {
-                    "text-field": ["to-string", ["get", "state_abbrev"]],
-                    "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
-                },
-                "paint": {
-                    "text-color": "hsl(0, 0%, 25%)",
-                    "text-opacity": ["step", ["zoom"], 1, 6, 0],
-                    "text-halo-color": "hsl(0, 0%, 100%)",
-                    "text-halo-width": 1
-                }
-            }
-        ],
-        infoBoxes:{
-            overview:{
-                title:"",
-                comp:(props)  =>{
-                    return (
-                        <ControlBase
-                            layer={props}
-                            state_fips = {props.layer.state_fips}
-                            state_name = {props.layer.state_name}
-                        />
-                    )
-                },
-                show:true
-            }
-        },
+       
+        // infoBoxes:{
+        //     overview:{
+        //         title:"",
+        //         comp:(props)  =>{
+        //             return (
+        //                 <ControlBase
+        //                     layer={props}
+        //                     state_fips = {props.layer.state_fips}
+        //                     state_name = {props.layer.state_name}
+        //                 />
+        //             )
+        //         },
+        //         show:true
+        //     }
+        // },
         state_fips: null,
         state_name : null,
 
     })
 
-class NationalLandingControlBase extends React.Component{
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            current_state_name : props.state_name,
-            current_state_fips : props.state_fips
-        }
-    }
-
-    componentDidUpdate(prevProps){
-        if(this.props.state_fips !== prevProps.state_fips && this.props.state_name !== prevProps.state_name){
-            this.props.setActiveStateGeoid([{state_fips: this.props.state_fips,state_name:this.props.state_name}])
-        }
-
-
-    }
-
-    render(){
-        return(
-            <div>
-
-            </div>
-        )
-
-    }
-
-}
-
-const mapStateToProps = (state, { id }) =>
-    ({
-        activeStateGeoid : state.stormEvents.activeStateGeoid
-    });
-const mapDispatchToProps = {
-    setActiveStateGeoid,
-};
-
-const ControlBase = connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLandingControlBase))
