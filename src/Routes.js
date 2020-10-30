@@ -14,6 +14,10 @@ import FemaHmapV1 from './pages/femaHmapV1/index'
 import FemaDisasters from './pages/fema_disasters/index'
 import Overview from './pages/Overview/index'
 
+// these two files below are just for testing the uplots bars and log graphs
+// import Test from "./pages/Overview/test_bar";
+// import Test from "./pages/Overview/test_log"
+
 export default [
 	// -- public
 	...StormEvents,
@@ -27,6 +31,8 @@ export default [
 	...Methodology,
 	...FemaDisasterDeclaration,
 	...Overview,
+
+	//...Test,
 	// -- util
 	NoMatch
 ];
