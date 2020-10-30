@@ -14,7 +14,7 @@ import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
-import {setActiveStateGeoid} from "store/stormEvents";
+import {setActiveStateGeoid} from "store/modules/stormEvents";
 import {CSVLink} from 'react-csv';
 import {shmp} from 'pages/components/shmp-theme.js'
 

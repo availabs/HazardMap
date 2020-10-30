@@ -9,11 +9,11 @@ import { fnum } from "utils/sheldusUtils"
 import * as turf from '@turf/turf'
 import { connect } from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
-import {setActiveStateGeoid} from "../../../store/stormEvents";
+import {setActiveStateGeoid} from "../../../store/modules/stormEvents";
 
 
-/*var format =  d3.format("~s")
-const fmt = (d) => d < 1000 ? d : format(d)*/
+var format =  d3.format("~s")
+const fmt = (d) => d < 1000 ? d : format(d)
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 let onLoadBounds = {}
 let hazard = null
@@ -227,80 +227,81 @@ export default (props = {}) =>
         ...props,
         selectedStations: new Map(),
         stationFeatures: [],
-        /*popover: {
+        popover: {
             layers: ["states","counties"],
             pinned:false,
             dataFunc: function (d) {
-                const {properties} = d
-                let fips = null
-                let fips_name = ''
-                let total_cost = 0
-                let total_disasters = 0
-                if(state_fips){
-                    if(!state_fips.includes("")){
-                        if(this.filters.geography.value === 'counties'){
-                            fips = properties.county_fips ? properties.county_fips : ''
-                            fips_name = properties.county_name ? properties.county_name : ''
-                        }else{
-                            fips = properties.geoid ? properties.geoid : ''
-                            fips_name = ''
-                        }
-                    }else{
-                        fips = properties.state_fips ? properties.state_fips : ''
-                        fips_name = properties.state_name ? properties.state_name : ''
-                    }
-                }else{
-                    fips = properties.state_fips ? properties.state_fips : ''
-                    fips_name = properties.state_name ? properties.state_name : ''
-                }
-                if(fips){
-                    falcorGraph.get(
-                        ['geo', fips,'counties', 'geoid'],
-                        ['geo',fips,'name']
-                        //['fema','disasters',fips,this.filters.hazard.value, this.filters.year.value,FEMA_COUNTY_ATTRIBUTES],
-                    )
-                        .then(response =>{
-                            this.popover_geographies = Object.values(response.json.geo)
-                                .reduce((out, state) => {
-                                    if (state.counties) {
-                                        out = [...out, ...state.counties]
-                                    }
-                                    return out
-                                }, [])
-                            if(this.popover_geographies.length > 0){
-                                falcorGraph.get(['fema','disasters',this.popover_geographies,this.filters.hazard.value, this.filters.year.value,FEMA_COUNTY_ATTRIBUTES])
-                                    .then(response =>{
-                                        return response
-                                    })
-                            }
-                            return response
-                        })
-                }
-                total_cost = Object.keys(get(falcorGraph.getCache(),['fema','disasters'],{})).reduce((a,geoid) =>{
-                    a += parseFloat(get(falcorGraph.getCache(),['fema','disasters',geoid,this.filters.hazard.value,this.filters.year.value,'total_cost','value'],0))
-                    return a
-                },0)
-                total_disasters = Object.keys(get(falcorGraph.getCache(),['fema','disasters'],{})).reduce((a,geoid) =>{
-                    a += parseFloat(get(falcorGraph.getCache(),['fema','disasters',geoid,this.filters.hazard.value,this.filters.year.value,'total_disasters','value'],0))
-                    return a
-                },0)
+                console.log('check',falcorGraph.getCache())
+                // const {properties} = d
+                // let fips = null
+                // let fips_name = ''
+                // let total_cost = 0
+                // let total_disasters = 0
+                // if(state_fips){
+                //     if(!state_fips.includes("")){
+                //         if(this.filters.geography.value === 'counties'){
+                //             fips = properties.county_fips ? properties.county_fips : ''
+                //             fips_name = properties.county_name ? properties.county_name : ''
+                //         }else{
+                //             fips = properties.geoid ? properties.geoid : ''
+                //             fips_name = ''
+                //         }
+                //     }else{
+                //         fips = properties.state_fips ? properties.state_fips : ''
+                //         fips_name = properties.state_name ? properties.state_name : ''
+                //     }
+                // }else{
+                //     fips = properties.state_fips ? properties.state_fips : ''
+                //     fips_name = properties.state_name ? properties.state_name : ''
+                // }
+                // if(fips){
+                //     falcorGraph.get(
+                //         ['geo', fips,'counties', 'geoid'],
+                //         ['geo',fips,'name']
+                //         //['fema','disasters',fips,this.filters.hazard.value, this.filters.year.value,FEMA_COUNTY_ATTRIBUTES],
+                //     )
+                //         .then(response =>{
+                //             this.popover_geographies = Object.values(response.json.geo)
+                //                 .reduce((out, state) => {
+                //                     if (state.counties) {
+                //                         out = [...out, ...state.counties]
+                //                     }
+                //                     return out
+                //                 }, [])
+                //             if(this.popover_geographies.length > 0){
+                //                 falcorGraph.get(['fema','disasters',this.popover_geographies,this.filters.hazard.value, this.filters.year.value,FEMA_COUNTY_ATTRIBUTES])
+                //                     .then(response =>{
+                //                         return response
+                //                     })
+                //             }
+                //             return response
+                //         })
+                // }
+                // total_cost = Object.keys(get(falcorGraph.getCache(),['fema','disasters'],{})).reduce((a,geoid) =>{
+                //     a += parseFloat(get(falcorGraph.getCache(),['fema','disasters',geoid,this.filters.hazard.value,this.filters.year.value,'total_cost','value'],0))
+                //     return a
+                // },0)
+                // total_disasters = Object.keys(get(falcorGraph.getCache(),['fema','disasters'],{})).reduce((a,geoid) =>{
+                //     a += parseFloat(get(falcorGraph.getCache(),['fema','disasters',geoid,this.filters.hazard.value,this.filters.year.value,'total_disasters','value'],0))
+                //     return a
+                // },0)
                 return [
                     [   (<div className='text-lg text-bold bg-white'>
-                        {fips_name !== '' ? fips_name : get(falcorGraph.getCache(),['geo',fips,'name'],'')} - {this.filters.year.value}
+                        {/*{fips_name !== '' ? fips_name : get(falcorGraph.getCache(),['geo',fips,'name'],'')} - {this.filters.year.value}*/}
                         </div>)
                     ],
                     [   (<div className='text-sm bg-white'>
-                        $ Total Cost: {fnum(total_cost)}
+                        {/*$ Total Cost: {fnum(total_cost)}*/}
                         </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                            # Episodes : {fmt(total_disasters)}
+                            {/*# Episodes : {fmt(total_disasters)}*/}
                         </div>)
                     ]
                 ]
             }
-        },*/
+        },
         showAttributesModal: false,
         legend: {
             title: 'Total Damage',
