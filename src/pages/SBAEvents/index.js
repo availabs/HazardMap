@@ -102,9 +102,7 @@ class SBAHazardLoans extends React.Component {
         };
         this.handleChange = this.handleChange.bind(this)
     }
-    componentDidMount(){
-        document.body.classList.add("overflow-y-hidden")
-    }
+   
 
     componentDidUpdate(prevProps){
         if(this.props.activeStateGeoid !== prevProps.activeStateGeoid){
