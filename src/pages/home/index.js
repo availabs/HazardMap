@@ -1,6 +1,6 @@
 import React from "react"
 import {shmp} from 'pages/components/shmp-theme.js'
-import Search from "./Search";
+// import Search from "./Search";
 
 const HomePage = () => (
 
@@ -93,7 +93,7 @@ const HomePage = () => (
       </div>
       <div>
       </div>
-      <Search/>
+      {/*<Search/>*/}
     </div>
     <div className="relative z-10">
       <div className="absolute inset-0 flex flex-col">

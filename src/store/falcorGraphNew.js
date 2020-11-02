@@ -5,8 +5,8 @@ import HttpDataSource from 'falcor-http-datasource'
 
 import throttle from "lodash.throttle"
 
-// const host = "https://graph.availabs.org/graph/"
-const host = "http://localhost:4444/"
+let local_host = "http://localhost:4444/"
+const host = process.env.NODE_ENV === 'production' ? 'https://graph.availabs.org/' : local_host;
 export const API_HOST = host;
 
 class CustomSource extends HttpDataSource {
