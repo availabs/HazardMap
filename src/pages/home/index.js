@@ -103,7 +103,7 @@ const HomePage = () => (
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
         <img
           className="relative rounded-lg shadow-lg"
-          src="/img/landing_2.png"
+          src="/img/landing_3.png"
           alt="App screenshot"
         />
       </div>

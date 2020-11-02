@@ -1,5 +1,5 @@
 import React  from "react"
-import {SideNav} from 'components/avl-components/components'
+// import {SideNav} from 'components/avl-components/components'
 import {useTheme} from "components/avl-components/wrappers/with-theme"
 
 const AdminLayout = ({children}) => {

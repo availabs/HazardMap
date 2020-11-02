@@ -5,7 +5,7 @@ import {TopNav} from 'components/avl-components/components'
 //import AuthMenu from 'pages/Auth/AuthMenu'
 import SectionView from './SectionView'
 
-import logo from './Logo.js'
+// import logo from './Logo.js'
 
 const View = ({item, dataItems, ...props}) => {
     dataItems = dataItems.sort((a, b) => a.data.index - b.data.index)
@@ -30,9 +30,9 @@ const View = ({item, dataItems, ...props}) => {
                 rest: props
             }
         })
-    let activePage = props['doc-page'] || item
-    let subNav = data.sectionLanding ? get(navItems.filter((data) => (data.id === get(activePage, `id`))), `[0].children`, []) :
-        get(navItems.filter((data) => (data.children.map(c => c.id).includes(get(activePage, `id`)))), `[0].children`, [])
+    // let activePage = props['doc-page'] || item
+    // let subNav = data.sectionLanding ? get(navItems.filter((data) => (data.id === get(activePage, `id`))), `[0].children`, []) :
+    //     get(navItems.filter((data) => (data.children.map(c => c.id).includes(get(activePage, `id`)))), `[0].children`, [])
 
     return (
         <div className={`flex items-start flex-col min-h-screen`}>

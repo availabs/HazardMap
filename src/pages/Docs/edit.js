@@ -1,7 +1,7 @@
 import {shmpDoc} from './docs.type'
 import PageManager from './components/PageManager'
 import PageEdit from './components/PageEdit'
-import PageView from './components/PageView'
+// import PageView from './components/PageView'
 
 
 let config = {

@@ -6,10 +6,10 @@ import get from "lodash.get"
 import hazardcolors from "../../constants/hazardColors";
 import * as d3scale from 'd3-scale'
 import * as d3 from 'd3'
-import { fnum, fnumClean} from "utils/sheldusUtils"
+import { fnum, /*fnumClean*/} from "utils/sheldusUtils"
 import { extent } from "d3-array"
 import * as turf from '@turf/turf'
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import {setActiveStateGeoid} from "store/stormEvents";
 

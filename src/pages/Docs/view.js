@@ -31,7 +31,7 @@ export default
   mainNav: true,
   exact: false,
   auth: false,
-  name: 'Documentation',
+  name: 'Methodology',
   icon: '',
   //layout: 'Simple',
   component: config,

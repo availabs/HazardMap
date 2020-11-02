@@ -4,9 +4,9 @@ import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import { falcorGraph } from "store/falcorGraphNew"
 import { fnum } from "utils/sheldusUtils"
-import * as d3 from "d3";
+// import * as d3 from "d3";
 import hazardcolors from "constants/hazardColors";
-var format =  d3.format("~s")
+// var format =  d3.format("~s")
 // const fmt = (d) => d < 1000 ? d : format(d)
 const hazards = [
     {value:'wind', name:'Wind'},

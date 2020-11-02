@@ -13,7 +13,7 @@ import HazardListTable from "../components/listTable/hazardListTable";
 import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";
-import * as d3 from "d3";
+// import * as d3 from "d3";
 import {setActiveStateGeoid} from "store/stormEvents";
 import {CSVLink} from 'react-csv';
 import {shmp} from 'pages/components/shmp-theme.js'
@@ -61,8 +61,8 @@ const tableCols = [
         disableFilters: true
     },
 ];
-var format =  d3.format("~s")
-const fmt = (d) => d < 1000 ? d : format(d)
+// var format =  d3.format("~s")
+// const fmt = (d) => d < 1000 ? d : format(d)
 let years = []
 const start_year = 1996
 const end_year = 2019
@@ -172,16 +172,16 @@ class NationalLanding extends React.Component {
                                 num_episodes : get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_episodes'}`, 0).toLocaleString()
                             })
                         })
-                        let lossByCounty = Object.keys(sw)
-                            .reduce((a, c) => {
-                                if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)) {
-                                    a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)
-                                }
-                                return a
-                            }, {})
-                        let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
-                        let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
-                            d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
+                        // let lossByCounty = Object.keys(sw)
+                        //     .reduce((a, c) => {
+                        //         if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)) {
+                        //             a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)
+                        //         }
+                        //         return a
+                        //     }, {})
+                        //let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
+                        // let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
+                        //     d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
                         this.setState({
                             domain : [1000000,5000000,10000000,100000000,1000000000],//domain,
                             data :data

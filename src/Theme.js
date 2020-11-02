@@ -3,7 +3,6 @@ import {handler} from 'components/avl-components/components/Themes'
 const light_base = {
     shadow: 'shadow',
     ySpace: 'py-4',
-    sidebarBorder: '',
     text: 'text-gray-800',
     textContrast: "text-white",
     border: "broder-gray-400",

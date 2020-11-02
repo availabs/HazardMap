@@ -45,6 +45,7 @@ class App extends Component {
           { Routes.map((route, i) =>
               <Layout key={ i }
                 { ...route }
+                logo={(<div className='px-12'>HazardData.org</div>)}
                 isAuthenticating={ this.props.user.isAuthenticating }
                 menus={ Routes.filter(r => r.mainNav) }
                 router={ this.props.router }

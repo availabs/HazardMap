@@ -1,5 +1,5 @@
 import React from "react"
-import get from 'lodash.get'
+// import get from 'lodash.get'
 import {useTheme} from "components/avl-components/wrappers/with-theme"
 
 import {DmsButton} from "components/dms/components/dms-button"
@@ -7,8 +7,8 @@ import {DmsButton} from "components/dms/components/dms-button"
 import {TopNav} from 'components/avl-components/components'
 
 import SectionManager from './SectionManager'
-import SectionView from './SectionView'
-import SectionEdit from './SectionEdit'
+//import SectionView from './SectionView'
+// import SectionEdit from './SectionEdit'
 // import AuthMenu from 'pages/Auth/AuthMenu'
 
 import logo from './Logo.js'
@@ -23,7 +23,7 @@ export const Create = ({createState, setValues, item, dataItems, ...props}) => {
     }
     if (!item || !item.data) return null
 
-    const {data} = item
+    // const {data} = item
     let navItems = dataItems
         .filter(d => d.data.sectionLanding)
         .map((d) => {
@@ -39,9 +39,9 @@ export const Create = ({createState, setValues, item, dataItems, ...props}) => {
                 rest: props
             }
         })
-    let activePage = props['doc-page'] || item
-    let subNav = data.sectionLanding ? get(navItems.filter((data) => (data.id === get(activePage, `id`))), `[0].children`, []) :
-        get(navItems.filter((data) => (data.children.map(c => c.id).includes(get(activePage, `id`)))), `[0].children`, [])
+   // let activePage = props['doc-page'] || item
+   /* let subNav = data.sectionLanding ? get(navItems.filter((data) => (data.id === get(activePage, `id`))), `[0].children`, []) :
+        get(navItems.filter((data) => (data.children.map(c => c.id).includes(get(activePage, `id`)))), `[0].children`, [])*/
 
 
     let Title = createState.sections[0].attributes.filter(a => a.key === 'title').pop()
