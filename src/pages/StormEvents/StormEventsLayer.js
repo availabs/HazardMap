@@ -15,8 +15,6 @@ import {setActiveStateGeoid} from "store/stormEvents";
 
 
 var format =  d3.format("~s")
-
-
 const fmt = (d) => d < 1000 ? d : format(d)
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 const hazards = [
@@ -50,48 +48,34 @@ let hazard = null
 let state_fips = null
 let onLoadBounds = {}
 class StormEventsLayer extends MapLayer {
-    // receiveProps(oldProps, newProps) {
-    //     if (this.filters.year.value !== newProps.year) {
-    //         this.filters.year.value = newProps.year ?
-    //             [newProps.year] : newProps.year ? newProps.year : null;
-    //     }
-    //     if (oldProps.hazard !== newProps.hazard) {
-    //         hazard = newProps.hazard
-    //         this.filters.hazard.value = newProps.hazard
-    //     }
-    //     if (oldProps.fips !== newProps.fips) {
-    //         state_fips = newProps.fips
-    //     }
-    //     if(oldProps.geography !== newProps.geography){
-    //         this.filters.geography.value = newProps.geography
-    //     }
-
-    // }
 
 
     onPropsChange(oldProps, newProps) {
+
         if (this.filters.year.value !== newProps.year) {
             this.filters.year.value = newProps.year ?
                 [newProps.year] : newProps.year ? newProps.year : null
+            console.log('map year update',newProps.year)
             this.doAction(["fetchLayerData"]);
         }
         if (oldProps.hazard !== newProps.hazard) {
             hazard = newProps.hazard
             this.filters.hazard.value = newProps.hazard || 'riverine'
+            console.log('map hazard update',newProps.hazard)
             this.doAction(["fetchLayerData"]);
         }
         if(oldProps.fips !== newProps.fips){
             state_fips = newProps.fips
+            console.log('map fips update',newProps.fips)
             this.doAction(["fetchLayerData"]);
         }
         if(oldProps.geography !== newProps.geography){
             this.filters.geography.value = newProps.geography
+            console.log('map fips update',newProps.geography)
             this.doAction(["fetchLayerData"]);
         }
 
     }
-
-
 
     onAdd(map) {
         this.map = map
@@ -141,8 +125,6 @@ class StormEventsLayer extends MapLayer {
                     })
                 }
             })
-
-
     }
 
     getColorScale(domain) {
@@ -345,29 +327,30 @@ export default (props = {}) =>
                         })
                 }
 
+                let full_data = falcorGraph.getCache()
 
                 return [
                     [   (<div className='text-lg text-bold bg-white'>
-                        {fips_name !== '' ? fips_name : get(falcorGraph.getCache(),['geo',fips,'name'],'')} - {this.filters.year.value}
+                        {fips_name !== '' ? fips_name : get(full_data,['geo',fips,'name'],'')} - {this.filters.year.value}
                         </div>)
                     ],
                     [   (<div className='text-sm bg-white'>
-                        Total Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'total_damage'],0))}
+                        Total Damage : {fnum(get(full_data,['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'total_damage'],0))}
                         </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                        Property Damage : {fnum(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],0))}
+                        Property Damage : {fnum(get(full_data,['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],0))}
                         </div>)
                     ],
                     [
                         (<div className='text-sm bg-white'>
-                            # Episodes : {fmt(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'num_episodes'],0))}
+                            # Episodes : {fmt(get(full_data,['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'num_episodes'],0))}
                         </div>)
                     ],
                     [
                     (<div className='text-sm bg-white'>
-                        # Deaths : {fmt(get(falcorGraph.getCache(),['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],0))}
+                        # Deaths : {fmt(get(full_data,['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],0))}
                     </div>)
                     ]
                 ]

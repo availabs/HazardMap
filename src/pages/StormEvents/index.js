@@ -6,7 +6,7 @@ import AvlMap from "components/AvlMap";
 import StormEventsLayerFactory from "./StormEventsLayer"
 import StackedBarGraph from "../components/bar /stackedBarGraph";
 //import HazardStatBox from "./components /statbox/hazardStatBox";
-import Legend from "components/AvlMap/components/legend/Legend"
+import Legend from "./components/Legend"
 import { fnum, fnumClean } from "utils/sheldusUtils"
 import HazardListTable from "../components/listTable/hazardListTable";
 import Select from "components/avl-components/components/Inputs/select";

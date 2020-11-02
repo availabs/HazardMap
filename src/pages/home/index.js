@@ -160,7 +160,7 @@ export default {
   path: "/",
   exact: true,
   auth: false,
-  name: 'Home',
+  name: 'Methodology',
   component: HomePage,
   layoutSettings: {
     fixed: false,
