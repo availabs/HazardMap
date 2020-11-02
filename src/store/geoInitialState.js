@@ -58,6 +58,7 @@ fips.forEach((fip) =>{
         }
     }
 })
-let json = {...result,...merge,...mesh}
-module.exports = json
+let InitialStateJSON = {}
+InitialStateJSON = {...result,...merge,...mesh}
+export default InitialStateJSON
 
