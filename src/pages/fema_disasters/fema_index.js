@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
-import { fnum } from "utils/sheldusUtils"
+import {fnum, fnumClean} from "utils/sheldusUtils"
 import * as d3 from "d3";
 import FemaDisastersCombinedHazardListTable from "./components/femaDisastersCombinedHazardListTable";
 import FemaDisastersCombinedEventsLayerFactory from './layers/femaDisastersCombinedTotalCostEventsLayer'
@@ -10,6 +10,8 @@ import AvlMap from "../../components/AvlMap";
 import Select from "../../components/avl-components/components/Inputs/select";
 import {setActiveStateGeoid} from "../../store/modules/stormEvents";
 import {shmp} from "../components/shmp-theme";
+import Legend from "../StormEvents/components/Legend";
+import hazardcolors from "../../constants/hazardColors";
 
 var format =  d3.format(".2s")
 var _ = require('lodash')
@@ -20,6 +22,10 @@ const end_year = 2020
 for(let i = start_year; i <= end_year; i++) {
     years.push(i)
 }
+
+const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
+
+
 const attributes=[
     "disaster_number",
     "name",
@@ -37,6 +43,27 @@ const attributes=[
     'ia_load_date',
     'total_obligated_amount_hmgp',
     'last_refresh'
+]
+
+const hazards = [
+    {value:'wind', name:'Wind'},
+    {value:'wildfire', name:'Wildfire'},
+    {value:'tsunami', name:'Tsunami/Seiche'},
+    {value:'tornado', name:'Tornado'},
+    {value:'riverine', name:'Flooding'},
+    {value:'lightning', name:'Lightning'},
+    {value:'landslide', name:'Landslide'},
+    {value:'icestorm', name:'Ice Storm'},
+    {value:'hurricane', name:'Hurricane'},
+    {value:'heatwave', name:'Heat Wave'},
+    {value:'hail', name:'Hail'},
+    {value:'earthquake', name:'Earthquake'},
+    {value:'drought', name:'Drought'},
+    {value:'avalanche', name:'Avalanche'},
+    {value:'coldwave', name:'Coldwave'},
+    {value:'winterweat', name:'Snow Storm'},
+    {value:'volcano', name:'Volcano'},
+    {value:'coastal', name:'Coastal Hazards'}
 ]
 
 class NewFemaDisasters extends React.Component{
@@ -79,7 +106,9 @@ class NewFemaDisasters extends React.Component{
                         .then(response =>{
                             return response
                         })
-
+                this.setState({
+                    domain : [1000000,5000000,10000000,100000000,1000000000]
+                })
                 }else { return Promise.resolve({}) }
             })
     }
@@ -106,11 +135,18 @@ class NewFemaDisasters extends React.Component{
         let data = this.processData();
         return (
             <div className="overflow-auto focus:outline-none h-full">
-                <div className="container max-w-7xl mx-auto h-auto">
-                </div>
                 <div className='flex flex-col lg:flex-row h-screen box-border overflow-hidden'>
                     <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
                         <div className='h-full'>
+                            <div className="mx-auto h-8 w-2/6 pt-5 z-90">
+                                <Legend
+                                    title = {`Losses in each County from ${hazards.filter(d => d.value === this.state.hazard)[0].name}, ${this.state.year.replace('allTime', '1996-2019')}`}
+                                    type = {"threshold"}
+                                    range= {["#F1EFEF",...hazardcolors[this.state.hazard + '_range']]}
+                                    domain = {this.state.domain}
+                                    format= {fnumClean}
+                                />
+                            </div>
                             <AvlMap
                                 layers={[
                                     this.FemaCombinedEventsLayer
