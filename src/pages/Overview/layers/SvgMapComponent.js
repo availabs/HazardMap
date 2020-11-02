@@ -29,7 +29,7 @@ class SvgMapComponent extends React.Component{
         let geojson = null,
             counties = null,
             activeCounty = null;
-        if(newProps.geo["merge"][activeGeoid.slice(0, 2)]['counties'].features.length > 0){
+        if(newProps.geo["merge"] && newProps.geo["merge"][activeGeoid.slice(0, 2)]['counties'].features.length > 0){
             switch (geoLevel) {
                 case 'counties':
                     geojson = newProps.geo['merge'][activeGeoid.slice(0, 2)]['counties']

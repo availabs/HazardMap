@@ -1,7 +1,7 @@
 import geoApi from 'store/data-adapters/geoApi'
 import {falcorGraph} from "../falcorGraphNew";
 import get from "lodash.get";
-
+import InitialStateJSON from '../geoInitialState'
 let geoData = new geoApi();
 // ------------------------------------
 // Constants
@@ -80,7 +80,7 @@ function callGetAllGeo(allGeo, parentGeo) {
 // -------------------------------------
 // Initial State
 // -------------------------------------
-let initialState = require('../geoInitialState.js')
+let initialState = InitialStateJSON
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
