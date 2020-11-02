@@ -11,7 +11,7 @@ import FemaDisastersCombinedEventsLayerFactory from './layers/femaDisastersCombi
 import {Link} from 'react-router-dom';
 import Select from "../../components/avl-components/components/Inputs/select";
 import AvlMap from "../../components/AvlMap";
-import {setActiveStateGeoid} from "store/stormEvents";
+import {setActiveStateGeoid} from "store/modules/stormEvents";
 import {shmp} from 'pages/components/shmp-theme.js'
 
 var format =  d3.format(".2s")

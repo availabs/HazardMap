@@ -2,15 +2,19 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
-import StackedBarGraph from "./StackedBarGraph";
-import {setActiveStateGeoid} from "store/stormEvents";
+import StackedBarGraph from "./components/StackedBarGraph";
+import {setActiveStateGeoid} from "store/modules/stormEvents";
 import Header from "../../components/avl-components/components/Header/Header";
-    let years = []
-    const start_year = 1996
-    const end_year = 2019
-    for (let i = start_year; i <= end_year; i++) {
-        years.push(i)
-    }
+import SvgMapComponent from "./layers/SvgMapComponent";
+import CountyTable from "./components/CountyTable";
+import He from "styled-components/dist/styled-components.browser.esm";
+
+let years = []
+const start_year = 1996
+const end_year = 2019
+for (let i = start_year; i <= end_year; i++) {
+    years.push(i)
+}
 const FEMA_COUNTY_ATTRIBUTES =[
     'ia_ihp_amount',
     'ia_ihp_count',
@@ -187,11 +191,18 @@ class Overview extends React.Component {
 
         return (
             <div className="max-h-full overflow-y-auto">
-                <Header title={window.location.pathname.split("/")[2] + '-'+ get(this.props.falcorCache,['geo',window.location.pathname.split("/")[2],'name'],'')}/>
+                <div className="flex-initial">
+                    <SvgMapComponent/>
+                </div>
                 <div>
                     <Header title = {'Severe Weather Data'}/>
                     <StackedBarGraph
                         data={this.processSevereWeatherData()}
+                    />
+                </div>
+                <div>
+                    <CountyTable
+                        geoid ={window.location.pathname.split("/")[2]}
                     />
                 </div>
                 <div>
@@ -212,6 +223,8 @@ class Overview extends React.Component {
                         data={this.processFemaDisastersCombined()}
                     />
                 </div>
+
+
             </div>
         )
     }

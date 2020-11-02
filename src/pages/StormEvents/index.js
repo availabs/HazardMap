@@ -13,8 +13,8 @@ import HazardListTable from "../components/listTable/hazardListTable";
 import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";
-// import * as d3 from "d3";
 import {setActiveStateGeoid} from "store/stormEvents";
+
 import {CSVLink} from 'react-csv';
 import {shmp} from 'pages/components/shmp-theme.js'
 import SlideOver from './components/SlideOver'

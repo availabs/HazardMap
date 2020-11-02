@@ -7,7 +7,7 @@ import Legend from "components/AvlMap/components/legend/Legend"
 import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
-import {setActiveStateGeoid} from "store/stormEvents";
+import {setActiveStateGeoid} from "store/modules/stormEvents";
 import {CSVLink,/* CSVDownload*/} from 'react-csv';
 import Select from "../../components/avl-components/components/Inputs/select.js";
 import HazardListTable from "../components/listTable/hazardListTable";

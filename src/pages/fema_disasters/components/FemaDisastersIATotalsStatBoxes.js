@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
-import {setActiveAmount} from "../../../store/femaDisasterDeclarations";
+import {setActiveAmount} from "../../../store/modules/femaDisasterDeclarations";
 import {fnum} from "../../../utils/sheldusUtils";
 
 

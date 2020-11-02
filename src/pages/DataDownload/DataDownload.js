@@ -2,7 +2,7 @@ import React from "react";
 import {connect} from "react-redux";
 import {reduxFalcor} from "../../utils/redux-falcor-new";
 import get from "lodash.get";
-import {setActiveStateGeoid} from "../../store/stormEvents";
+import {setActiveStateGeoid} from "../../store/modules/stormEvents";
 import {CSVLink} from "react-csv";
 import PromptModal from "./PromptModal";
 

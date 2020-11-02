@@ -11,7 +11,7 @@ import { extent } from "d3-array"
 import * as turf from '@turf/turf'
 // import { connect } from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
-import {setActiveStateGeoid} from "store/stormEvents";
+import {setActiveStateGeoid} from "store/modules/stormEvents";
 
 
 var format =  d3.format("~s")

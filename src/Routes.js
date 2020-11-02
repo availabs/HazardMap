@@ -34,8 +34,8 @@ import Auth from "pages/Auth"
 import NoMatch from 'pages/404';
 
 // these two files below are just for testing the uplots bars and log graphs
-// import Test from "./pages/Overview/test_bar";
-// import Test from "./pages/Overview/test_log"
+// import Test from "./pages/Overview/uPlots/test_bar";
+// import Test from "./pages/Overview/uPlots/test_log"
 
 export default [
 	// -- public

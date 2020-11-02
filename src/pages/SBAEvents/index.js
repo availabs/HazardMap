@@ -8,7 +8,7 @@ import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
 
-import {setActiveStateGeoid} from "store/stormEvents";
+import {setActiveStateGeoid} from "store/modules/stormEvents";
 import {CSVLink} from 'react-csv';
 import SBAEventsLayer from "./SBAEventsLayer";
 import Select from "../../components/avl-components/components/Inputs/select.js";

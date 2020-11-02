@@ -1,0 +1,70 @@
+.map-test-table-div {
+	position: absolute;
+	z-index: 900;
+	background-color: rgba(255, 255, 255, 0.85);
+	color: #3E4B5B; /*rgba(0, 0, 0, 0.75);*/
+	border-radius: 3px ;
+	padding: 2px 10px;
+}
+.map-test-table {
+	border-collapse: collapse;
+	border: 0;
+}
+.map-test-table th, td {
+	padding: 3px 5px;
+	border: none;
+}
+.map-test-table th {
+	font-size: 1.25em;
+	border-bottom: 2px solid #000;
+}
+.map-test-table tr.no-border-bottom th,
+.map-test-table th.no-border-bottom {
+	border-bottom: none;
+}
+
+.map-test-table-div.top-left {
+	top: 10px;
+	left: -20px;
+}
+.map-test-table-div.top-right {
+	top: 10px;
+	right: -40px
+}
+.map-test-table-div.bottom-left {
+	bottom: -20px;
+	left: 10px
+}
+.map-test-table-div.bottom-right {
+	bottom: 10px;
+	right: 10px;
+}
+.map-test-table-div.top-center {
+	top: 10px;
+	right: 0px;
+	left: 0px;
+}
+
+.map-test-button {
+	background-color: rgba(0, 0, 0, 0);
+	border-color: (0,0,0,1);
+	color: #3E4B5B;
+	border-radius: 3px;
+	padding: 0px 15px;
+	border: none;
+	text-decoration: none;
+	width: 100%;
+}
+.map-test-button:focus {
+	outline: none;
+	color: rgba(0, 0, 0, 0.5);
+}
+.map-test-button:hover {
+	color: rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+}
+.map-test-button:disabled {
+	outline: none;
+	color: rgba(0, 0, 0, 0.1);
+	cursor: not-allowed;
+}
