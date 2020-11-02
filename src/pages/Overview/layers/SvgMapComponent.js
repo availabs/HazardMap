@@ -69,8 +69,8 @@ class SvgMapComponent extends React.Component{
 
     render(){
         return(
-            <div style={{height: '100%', width: '20%'}} className="flex justify-center">
-                <div className="text-4xl py-14 whitespace-no-wrap">{get(this.props.falcorCache,['geo',window.location.pathname.split("/")[2],'name'],'')}</div>
+            <div style={{height: '100%', width: '100%'}} className="flex justify-center">
+                <div className="text-5xl font-bold px-6 py-14 whitespace-no-wrap">{get(this.props.falcorCache,['geo',window.location.pathname.split("/")[2],'name'],'')}</div>
                 <SvgMap layers={ this.generateLayers() }
                         height={ this.props.height }
                         viewport={ Viewport() }

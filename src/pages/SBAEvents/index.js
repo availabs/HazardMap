@@ -276,7 +276,7 @@ class SBAHazardLoans extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className='h-56 lg:h-auto lg:w-1/5 p-2 lg:min-w-64 overflow-auto'>
+                <div className='h-56 lg:h-auto lg:w-1/5 p-2 lg:min-w-64 overflow-auto mt-8'>
                     {this.props.activeStateGeoid.length > 0 && this.props.activeStateGeoid[0].state_fips !== ""?
                         <div>
                             <div id={`closeMe`} className="bg-white border border-blue-500 font-bold text-lg px-4 py-3 rounded relative">

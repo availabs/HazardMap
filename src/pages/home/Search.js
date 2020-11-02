@@ -68,7 +68,7 @@ class Search extends React.Component{
     }
     render(){
         return(
-            <div className="max-w-lg mx-auto py-4 lg:px-4 h-10 px-5 pr-16">
+            <div className="max-w-3xl mx-auto py-4 lg:px-4 h-10 px-5 pr-16 text-3xl">
                 <AsyncTypeahead
                     isLoading={this.state.isLoading}
                     onSearch={this.handleSearch}
@@ -81,7 +81,7 @@ class Search extends React.Component{
                     renderMenuItemChildren={(option, props) => (
                         <Fragment>
                             <ul>
-                                <span>{option.name}</span>
+                                <span className='text-xl tracking-wide' >{option.name}</span>
                             </ul>
                         </Fragment>
                     )}

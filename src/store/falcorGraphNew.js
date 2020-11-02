@@ -21,15 +21,11 @@ class CustomSource extends HttpDataSource {
 }
 
 function cacheFromStorage () {
- let falcorCache = {}
- // if (localStorage && localStorage.getItem('falcorCache')) {
- //   let token = localStorage.getItem('token')
- //   let user = localStorage.getItem('currentUser')
- //   if (token && user) {
- //     falcorCache = JSON.parse(localStorage.getItem('falcorCache'))
- //   }
- // }
- return falcorCache;
+  let falcorCache = {}
+  if (localStorage && localStorage.getItem('falcorCache')/* && process.env.NODE_ENV === 'production' */) {
+    falcorCache = JSON.parse(localStorage.getItem('falcorCache'))
+  }
+  return falcorCache;
 }
 
 export const chunker = (values, request, options = {}) => {

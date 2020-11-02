@@ -190,41 +190,38 @@ class Overview extends React.Component {
     render() {
 
         return (
-            <div className="max-h-full overflow-y-auto">
-                <div className="flex-initial">
-                    <SvgMapComponent/>
-                </div>
-                <div>
-                    <Header title = {'Severe Weather Data'}/>
-                    <StackedBarGraph
-                        data={this.processSevereWeatherData()}
-                    />
-                </div>
-                <div>
-                    <CountyTable
-                        geoid ={window.location.pathname.split("/")[2]}
-                    />
-                </div>
-                <div>
-                    <Header title = {'SBA ALL Data'}/>
-                    <StackedBarGraph
-                        data={this.processSbaData()}
-                    />
-                </div>
-                <div>
-                    <Header title = {'Fema Disaster Summaries Data'}/>
-                    <StackedBarGraph
-                        data={this.processFemaDisasterData()}
-                    />
-                </div>
-                <div>
-                    <Header title = {'Fema Disaster Combined Data'}/>
-                    <StackedBarGraph
-                        data={this.processFemaDisastersCombined()}
-                    />
-                </div>
+            <div className='w-full h-full overflow-y-scroll overflow-x-hidden'>
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex-initial">
+                        <SvgMapComponent/>
+                    </div>
+                    <div>
+                        <Header title = {'Severe Weather Data'}/>
+                        <StackedBarGraph
+                            data={this.processSevereWeatherData()}
+                        />
+                    </div>
+                    <div>
+                        <CountyTable
+                            geoid ={window.location.pathname.split("/")[2]}
+                        />
+                    </div>
+                    <div>
+                        <Header title = {'SBA ALL Data'}/>
+                        <StackedBarGraph
+                            data={this.processSbaData()}
+                        />
+                    </div>
+                    
+                    <div>
+                        <Header title = {'Fema Disaster Combined Data'}/>
+                        <StackedBarGraph
+                            data={this.processFemaDisastersCombined()}
+                        />
+                    </div>
 
 
+                </div>
             </div>
         )
     }
