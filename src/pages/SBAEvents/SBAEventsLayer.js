@@ -215,8 +215,9 @@ class SBAEventsLayer extends MapLayer {
             },{})
         let lossDomain = Object.values(lossByFilteredGeoids).sort((a, b) => a - b)
 
-        let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
-            d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]
+        let domain =[100000,1000000,1000000,10000000,100000000]
+         // [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
+         //    d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]
 
         let range = ["#F1EFEF", ...hazardcolors[this.filters.hazard.value + '_range']]
 

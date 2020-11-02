@@ -3,8 +3,9 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import AvlMap from "components/AvlMap";
-import Legend from "components/AvlMap/components/legend/Legend"
-import { fnum } from "utils/sheldusUtils"
+import Legend from "pages/StormEvents/components/Legend"
+import SlideOver from 'pages/StormEvents/components/SlideOver'
+import { fnum, fnumClean } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import * as d3 from "d3";
 
@@ -17,6 +18,7 @@ import StackedBarGraph from "../components/bar /stackedBarGraph";
 import Table from "../../components/avl-components/components/Table";
 import Modal from "../../components/avl-components/components/Modal/avl-modal";
 import {shmp} from 'pages/components/shmp-theme.js'
+
 
 
 import {falcorGraph} from "../../store/falcorGraphNew";
@@ -159,19 +161,9 @@ class SBAHazardLoans extends React.Component {
                                         num_loans : fmt(get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_loans'}`, 0))
                                     })
                                 })
-                                let lossByCounty= Object.keys(sw)
-                                    .reduce((a, c) => {
-                                        if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)) {
-                                            a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_loss'}`, false)
-                                        }
-                                        return a
-                                    }, {})
-                                let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
-                                let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
-                                    d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
-                                this.setState({
-                                    domain : domain,
-                                    data : data
+                               this.setState({
+                                    domain : [100000,1000000,1000000,10000000,100000000],//domain,
+                                    data :data
                                 })
                                 return response
                             })
@@ -233,17 +225,16 @@ class SBAHazardLoans extends React.Component {
 
     render() {
         return (
-           <div className='flex flex-col lg:flex-row h-screen box-border overflow-hidden'>
-                <div className='flex-auto h-full order-last lg:order-none overflow-hidden'>
+            <div className='flex flex-col lg:flex-row h-screen box-border w-full -mt-8'>
+                <div className='flex-auto h-full order-last lg:order-none'>
                     <div className='h-full'>
-                        <div className="relative top-0 right-auto h-8 w-2/6 pt-20">
+                        <div className="mx-auto h-8 w-2/6 pt-20 z-90">
                             <Legend
-                                title = {'Total Loss'}
+                                title = {`Losses in each County from ${hazards.filter(d => d.value === this.state.hazard)[0].name}, ${this.state.year.replace('allTime', '1996-2019')}`}
                                 type = {"threshold"}
-                                vertical= {false}
                                 range= {["#F1EFEF",...hazardcolors[this.state.hazard + '_range']]}
                                 domain = {this.state.domain}
-                                format= {fnum}
+                                format= {fnumClean}
                             />
                         </div>
                         <AvlMap
@@ -270,7 +261,7 @@ class SBAHazardLoans extends React.Component {
                                 }
                             }}
                         />
-                        <div className='relative bottom h-40 z-90 w-full'>
+                        <div className='relative bottom-40 h-40 z-30 w-full md:px-24'>
                             <StackedBarGraph
                                 height={200}
                                 data={{storm_event:"sba",
@@ -429,15 +420,6 @@ export default [
             nav: 'top',
             theme: shmp,
         },
-        component: {
-            type: 'div',
-            props: {
-                className: 'w-full overflow-hidden pt-16 focus:outline-none',
-                style: {height: 'calc(100vh)'}
-            },
-            children: [
-                connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(SBAHazardLoans))
-            ]
-        }
+        component:connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(SBAHazardLoans))
     },
 ]
