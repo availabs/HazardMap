@@ -27,7 +27,7 @@ import SBAHazardLoans from './pages/SBAEvents/index'
 import FemaHmapV1 from './pages/femaHmapV1/index'
 //import FemaDisasters from './pages/fema_disasters/index'
 import NewFemaDisasters from './pages/fema_disasters/fema_index'
-import Overview from './pages/Overview/index'
+//import Overview from './pages/Overview/index'
 import DocsView from './pages/Docs/view'
 import DocsEdit from './pages/Docs/edit'
 
@@ -48,7 +48,7 @@ export default [
 	Home,
 	DataDownload,
 	...FemaDisasterDeclaration,
-	...Overview,
+	//...Overview,
 	DocsView,
 	DocsEdit,
 

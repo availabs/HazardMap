@@ -11,14 +11,14 @@ import reducers from "components/ams/reducers"
 
 import stormEvents from "./modules/stormEvents";
 import femaDisasterDeclarations from "./modules/femaDisasterDeclarations";
-import geo from "./modules/geo";
+//import geo from "./modules/geo";
 
 
 const reducer = combineReducers({
   ...reducers,
   stormEvents,
   femaDisasterDeclarations,
-  geo,
+  //geo,
   messages,
   // graph
   falcorCache
