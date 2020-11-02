@@ -4,7 +4,7 @@ import Search from "./Search";
 
 const HomePage = () => (
 
-	<div className="bg-gray-50">
+	<div className="bg-gray-50 overflow-x-hidden overflow-y-auto">
 
   <div className="relative">
     <div className="block absolute inset-y-0 h-full w-full">
@@ -163,7 +163,7 @@ export default {
   name: 'Methodology',
   component: HomePage,
   layoutSettings: {
-    fixed: false,
+    fixed: true,
     headerBar: false,
     nav: 'top',
     theme: shmp

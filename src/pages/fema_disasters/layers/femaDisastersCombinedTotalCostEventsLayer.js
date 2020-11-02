@@ -143,8 +143,9 @@ class femaDisastersCombinedTotalCostEventsLayer extends MapLayer {
             },{})
         let lossDomain = Object.values(lossByFilteredGeoids).sort((a, b) => a - b)
 
-        let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
-            d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]
+        /*let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
+            d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]*/
+        let domain = [1000000,5000000,10000000,100000000,1000000000,10000000000]
 
         let range = ["#F1EFEF", ...hazardcolors[this.filters.hazard.value + '_range']]
 
@@ -307,7 +308,7 @@ export default (props = {}) =>
             range: [],
             active: false,
             domain: [],
-            format: fnum
+
         },
         sources: [
             {
