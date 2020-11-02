@@ -4,7 +4,7 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
   theme: {
     extend: {
-     fontFamily: {
+      fontFamily: {
         sans: ['Proxima Nova W01', ...defaultTheme.fontFamily.sans],
         serif: [...defaultTheme.fontFamily.serif],
         mono: [...defaultTheme.fontFamily.mono]
@@ -13,7 +13,6 @@ module.exports = {
   },
   variants: {
     borderRadius: ['responsive', 'first', 'last'],
-    borderColor: ['responsive', 'hover', 'focus', 'disabled'],
     margin: ['responsive', 'first', 'last'],
     padding: ['responsive', 'first', 'last'],
     backgroundColor: ['responsive', 'hover', 'focus', 'first', 'last', 'odd', 'even', 'disabled'],

@@ -11,8 +11,7 @@ let config = {
         "dms-provider",
         "dms-router",
         "show-loading",
-        "dms-falcor",
-        "with-auth"
+        "dms-falcor"
     ],
     props: {
         format: shmpDoc,
@@ -39,18 +38,15 @@ let config = {
 
 export default {
     path: "/cms",
-    mainNav: true,
+    mainNav: false,
     // exact: true,
     auth: false,
     name: 'CMS',
     icon: '',
-    layout: 'Simple',
     layoutSettings: {
-        fixed: true,
-        nav: 'side',
-        maxWidth: '',
+        fixed: false,
         headerBar: false,
-        
+        nav: 'top',
     },
     component: config
 }

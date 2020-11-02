@@ -11,17 +11,16 @@ const FalcorContext = React.createContext();
 class FalcorProviderBase extends React.Component {
   constructor(...args) {
     super(...args);
-    this.debounced = debounce(this.props.updateCache, 250);
+    this.debounced = debounce(this.updateCache, 250);
   }
   componentDidMount() {
-    this.props.falcor.onChange(this, this.updateCache);
+    this.props.falcor.onChange(this, this.debounced);
   }
   componentWillUnmount() {
     this.props.falcor.remove(this);
   }
   updateCache() {
-    // this.props.updateCache(this.props.falcor.getCache());
-    this.debounced(this.props.falcor.getCache());
+    this.props.updateCache(this.props.falcor.getCache());
   }
   render() {
     return (

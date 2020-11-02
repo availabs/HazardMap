@@ -7,9 +7,9 @@ import StormEventsLayerFactory from "./StormEventsLayer"
 import StackedBarGraph from "../components/bar /stackedBarGraph";
 //import HazardStatBox from "./components /statbox/hazardStatBox";
 import Legend from "./components/Legend"
-import { fnum, fnumClean } from "utils/sheldusUtils"
+import {fnumClean } from "utils/sheldusUtils"
 import HazardListTable from "../components/listTable/hazardListTable";
-import Select from "components/avl-components/components/Inputs/select";
+// import Select from "components/avl-components/components/Inputs/select";
 import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";

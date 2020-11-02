@@ -1,4 +1,14 @@
-export const AUTH_PROJECT_NAME = 'NPMRDS';
-export const HOST = 'https://graph.availabs.org';
-export const AUTH_HOST = 'https://availauth.availabs.org';
+export const PROJECT_NAME = 'hazard_mitigation';
 
+export const PROJECT_THEME = 'TEST_THEME';
+
+let API_HOST = 'https://graph.availabs.org';
+let AUTH_HOST = 'https://availauth.availabs.org';
+let CLIENT_HOST = 'https://mitigatny.org';
+
+if (process.env.NODE_ENV === 'development') {
+  API_HOST = 'http://localhost:4444';
+  // AUTH_HOST = 'http://localhost:3457';
+  CLIENT_HOST = 'http://localhost:3000';
+}
+export { API_HOST, AUTH_HOST, CLIENT_HOST };

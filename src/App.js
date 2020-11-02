@@ -1,48 +1,58 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// import { Switch } from "react-router"
-import { BrowserRouter, Switch} from 'react-router-dom';
+import { BrowserRouter, Switch } from 'react-router-dom';
 import ScrollToTop from 'utils/ScrollToTop'
 
 import Routes from 'Routes';
+
 import Layout from 'components/avl-components/DefaultLayout'
+import Messages from "components/avl-components/messages"
 
-import { auth } from 'store/user';
+import DmsComponents from "components/dms"
+import DmsWrappers from "components/dms/wrappers"
 
+import { auth } from 'components/ams/api/auth';
+import AmsComponents from "components/ams"
+import AmsWrappers from "components/ams/wrappers"
 
+import {
+  addComponents,
+  addWrappers
+} from "components/avl-components/ComponentFactory"
+
+addComponents(DmsComponents);
+addWrappers(DmsWrappers);
+
+addComponents(AmsComponents);
+addWrappers(AmsWrappers);
 
 class App extends Component {
-  state = {
-    isAuthenticating: true
-  }
   componentDidMount() {
     this.props.auth();
   }
-  componentDidUpdate(prevProps) {
-    if (this.state.isAuthenticating && this.props.user.attempts) {
-      this.setState({ isAuthenticating: false });
-    }
-  }
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   return (nextProps.user.authed !== this.props.user.authed) ||
+  //     (nextProps.user.authLevel !== this.props.user.authLevel) ||
+  //     (nextProps.user.attempts !== this.props.user.attempts) ||
+  //     (nextProps.user.isAuthenticating !== this.props.user.isAuthenticating);
+  // }
 
   render() {
     return (
       <BrowserRouter>
         <ScrollToTop />
         <Switch>
-          {Routes.map((route, i) => {
-            return (
-              <Layout 
-                logo={(<div className='px-12'>HHD</div>)}
-                key={ i }
+          { Routes.map((route, i) =>
+              <Layout key={ i }
                 { ...route }
-                authed={ this.props.user.authed }
-                isAuthenticating={ this.state.isAuthenticating }
+                isAuthenticating={ this.props.user.isAuthenticating }
                 menus={ Routes.filter(r => r.mainNav) }
-                user={ this.props.user }
-              />
-            );
-          })}
+                router={ this.props.router }
+                user={ this.props.user }/>
+            )
+          }
         </Switch>
+        <Messages />
       </BrowserRouter>
     );
   }
@@ -50,6 +60,4 @@ class App extends Component {
 
 const mapStateToProps = state => ({ user: state.user });
 
-const mapDispatchToProps = { auth };
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps, { auth })(App);

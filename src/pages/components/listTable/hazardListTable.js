@@ -7,7 +7,7 @@ import { fnum } from "utils/sheldusUtils"
 import * as d3 from "d3";
 import hazardcolors from "constants/hazardColors";
 var format =  d3.format("~s")
-const fmt = (d) => d < 1000 ? d : format(d)
+// const fmt = (d) => d < 1000 ? d : format(d)
 const hazards = [
     {value:'wind', name:'Wind'},
     {value:'wildfire', name:'Wildfire'},
@@ -95,7 +95,6 @@ class HazardListTable extends React.Component{
 
     render(){
         let listTableData = this.processData()
-        console.log('listTableData', listTableData)
         return(
                 <div className="align-middle inline-block min-w-full overflow-hidden"
                     key={0}>

@@ -48,7 +48,7 @@ const shmpDoc = {
     {
       key: 'sections',
         type: "dms-format",
-        format: "shmp+page-section",
+        format: "shmp+method-section",
       isArray: true,
       editInPlace: true,
     }

@@ -21,7 +21,7 @@ const View = ({item, dataItems, ...props}) => {
             return {
                 name: d.data.section,
                 id: d.id,
-                path: `/p/view/${d.id}`, // d.data['url-slug'],
+                path: `/methods/view/${d.id}`, // d.data['url-slug'],
                 sectionClass: 'mb-4',
                 itemClass: 'font-bold',
                 children: dataItems
