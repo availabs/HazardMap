@@ -7,7 +7,7 @@ import {setActiveStateGeoid} from "store/modules/stormEvents";
 import Header from "../../components/avl-components/components/Header/Header";
 import SvgMapComponent from "./layers/SvgMapComponent";
 import CountyTable from "./components/CountyTable";
-import He from "styled-components/dist/styled-components.browser.esm";
+//import He from "styled-components/dist/styled-components.browser.esm";
 
 let years = []
 const start_year = 1996
