@@ -5,6 +5,7 @@ import get from 'lodash.get';
 import Table from '../../../components/avl-components/components/Table/index'
 import {fnum} from "../../../utils/sheldusUtils";
 
+var _ = require('lodash')
 const hazards = [
     {value:'wind', name:'Wind'},
     {value:'wildfire', name:'Wildfire'},
@@ -46,6 +47,37 @@ class CountyTable extends React.Component{
         }
     }
 
+
+    processCousubData(){
+        let graph = get(this.props.falcorCache,['geo'],null)
+        let severeWeather = get(this.props.falcorCache,['severeWeather'],null)
+        let data = []
+        let wide_total = []
+        if(graph && severeWeather){
+            Object.keys(severeWeather).forEach(geo =>{
+                let value = hazards.reduce((a,c) =>{
+                    a[c.value] = get(severeWeather,[geo,c.value,'allTime','total_damage'],0)
+                    return a
+                },{})
+                data.push({
+                    'cousub' : get(graph,[geo,'name'],''),
+                    ...value
+                })
+            })
+            let total = hazards.reduce((a,c) =>{
+                a[c.value] = _.sumBy(data,c.value)
+                return a
+            },{})
+            wide_total.push({
+                'cousub' : 'Total Damage',
+                ...total
+            })
+            return [...wide_total,...data]
+
+        }
+
+    }
+
     processTableCols(){
         let tableCols = [{
             'Header' : (<div style={{fontSize: 12}}>Area</div>),
@@ -65,29 +97,14 @@ class CountyTable extends React.Component{
         return tableCols
     }
 
-    processCousubData(){
-        let graph = get(this.props.falcorCache,['geo'],null)
-        let severeWeather = get(this.props.falcorCache,['severeWeather'],null)
-        let data = []
-        if(graph && severeWeather){
-            Object.keys(severeWeather).forEach(geo =>{
-                let value = hazards.reduce((a,c) =>{
-                    a[c.value] = get(severeWeather,[geo,c.value,'allTime','total_damage'],0)
-                    return a
-                },{})
-                data.push({
-                    'cousub' : get(graph,[geo,'name'],''),
-                    ...value
-                })
-            })
-            return data
-        }
-
-    }
-
     render(){
         let tableCols = this.processTableCols()
         let data = this.processCousubData() ? this.processCousubData() : []
+        data.forEach(d =>{
+            if(d.cousub === 'Total Damage'){
+                tableCols = tableCols.filter(col => d[col.accessor] !== 0)
+            }
+        })
         return (
             <div>
                 {
@@ -99,7 +116,8 @@ class CountyTable extends React.Component{
                             data = {data}
                             initialPageSize={50}
                             minRows={data.length}
-                            sortBy={'cousub'}
+                            sortBy={'wind'}
+                            sortOrder={'desc'}
                         />
                         : null
                 }
