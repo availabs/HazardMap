@@ -72,7 +72,12 @@ class CountyTable extends React.Component{
                 'cousub' : 'Total Damage',
                 ...total
             })
-            return [...wide_total,...data]
+            let result = [...data,...wide_total]
+            hazards.forEach((hazard =>{
+                result = result.sort((a,b) => b[hazard.value] - a[hazard.value])
+            }))
+
+            return result
 
         }
 
@@ -90,6 +95,7 @@ class CountyTable extends React.Component{
                 'accessor':hazard.value,
                 disableFilters: true,
                 Cell: (data) => {
+                    //let d = data.data.sort((a,b) => b[hazard.value] - a[hazard.value])
                     return <div style = {{ textAlign: 'right'}}>{fnum(get(data,`row.values.${hazard.value}`, ''))}</div>
                 }
             })
