@@ -6,8 +6,8 @@ import StackedBarGraph from "./components/StackedBarGraph";
 import {setActiveStateGeoid} from "store/modules/stormEvents";
 import Header from "../../components/avl-components/components/Header/Header";
 import SvgMapComponent from "./layers/SvgMapComponent";
-import CountyTable from "./components/CountyTable";
-//import He from "styled-components/dist/styled-components.browser.esm";
+import SevereWeatherCountyTable from "./components/SevereWeatherCountyTable";
+import FemaDisastersCountyTable from "./components/FemaDisastersCountyTable";
 
 let years = []
 const start_year = 1996
@@ -202,7 +202,7 @@ class Overview extends React.Component {
                         />
                     </div>
                     <div>
-                        <CountyTable
+                        <SevereWeatherCountyTable
                             geoid ={window.location.pathname.split("/")[2]}
                         />
                     </div>
@@ -217,6 +217,11 @@ class Overview extends React.Component {
                         <Header title = {'Fema Disaster Combined Data'}/>
                         <StackedBarGraph
                             data={this.processFemaDisastersCombined()}
+                        />
+                    </div>
+                    <div>
+                        <FemaDisastersCountyTable
+                            geoid ={window.location.pathname.split("/")[2]}
                         />
                     </div>
 

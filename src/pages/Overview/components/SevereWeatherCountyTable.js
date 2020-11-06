@@ -26,7 +26,7 @@ const hazards = [
     {value:'volcano', name:'Volcano'},
     {value:'coastal', name:'Coastal Hazards'}
 ]
-class CountyTable extends React.Component{
+class SevereWeatherCountyTable extends React.Component{
     constructor(props) {
         super(props);
     }
@@ -144,4 +144,4 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(reduxFalcor(CountyTable))
+export default connect(mapStateToProps,mapDispatchToProps)(reduxFalcor(SevereWeatherCountyTable))
