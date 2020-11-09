@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import Table from '../../../components/avl-components/components/Table/index'
+import {fnum} from "../../../utils/sheldusUtils";
 
 var _ = require('lodash')
 const DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES = [
@@ -15,13 +16,13 @@ const DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES = [
 
 const  tableCols = [
     {
-    'Header' : 'County',
-    'accessor': 'geoid',
-    disableFilters: true
-},
-    {
         'Header' : 'Name',
         'accessor': 'name',
+        disableFilters: true
+    },
+    {
+        'Header' : 'Disaster Number',
+        'accessor': 'disaster_number',
         disableFilters: true
     },
     {
@@ -33,8 +34,27 @@ const  tableCols = [
         disableFilters: true
     },
     {
-        'Header' : 'Disaster Number',
-        'accessor': 'disaster_number',
+        'Header' : 'IHP TOTAL',
+        'accessor': 'ihp_total',
+        Cell : (data) =>{
+            return <div style = {{ textAlign: 'center'}}>{fnum(get(data,`row.values.ihp_total`, ''))}</div>
+        },
+        disableFilters: true
+    },
+    {
+        'Header' : 'PA TOTAL',
+        'accessor': 'pa_total',
+        Cell : (data) =>{
+            return <div style = {{ textAlign: 'center'}}>{fnum(get(data,`row.values.pa_total`, ''))}</div>
+        },
+        disableFilters: true
+    },
+    {
+        'Header' : 'HMGP TOTAL',
+        'accessor': 'hmgp_total',
+        Cell : (data) =>{
+            return <div style = {{ textAlign: 'center'}}>{fnum(get(data,`row.values.hmgp_total`, ''))}</div>
+        },
         disableFilters: true
     },
 
@@ -47,11 +67,25 @@ class FemaDisastersCountyTable extends React.Component{
     async fetchFalcorDeps(){
        const data  = await this.props.falcor.get(['fema','disasters','declarations','byGeoid',this.props.geoid,'length'])
         let length = get(data ,['json','fema','disasters','declarations','byGeoid',this.props.geoid,'length'],null)
+        let ihpData = {},
+            paData = {},
+            hmgpData = {}
         if(length){
             let to = length > 1 ? length-1 : 1
             const dataByIndex = await this.props.falcor.get(['fema','disasters','declarations','byGeoid',this.props.geoid,'byIndex',[{from:0,to:to}],DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES])
             const geoName = await this.props.falcor.get(['geo',this.props.geoid,'name'])
-            return {dataByIndex,geoName}
+            let graph = get(dataByIndex,['json','fema','disasters','declarations','byGeoid',this.props.geoid,'byIndex'],null)
+            if(graph){
+                let disaster_numbers = Object.keys(graph).filter(d => d!=='$__path').reduce((a,c) =>{
+                    a.push(graph[c].disaster_number)
+                    return a
+                },[])
+                ihpData = await this.props.falcor.get(['fema','disasters','declarations','byGeoid',this.props.geoid,'byId',disaster_numbers,'ihp_total'])
+                paData = await this.props.falcor.get(['fema','disasters','declarations','byGeoid',this.props.geoid,'byId',disaster_numbers,'pa_total'])
+                hmgpData = await this.props.falcor.get(['fema','disasters','declarations','byGeoid',this.props.geoid,'byId',disaster_numbers,'hmgp_total'])
+            }
+
+            return {dataByIndex,geoName,ihpData,paData,hmgpData}
         }
         else { return Promise.resolve({}) }
     }
@@ -59,13 +93,18 @@ class FemaDisastersCountyTable extends React.Component{
     processData(){
         let graph = get(this.props.falcorCache,['fema','disasters','declarations','byGeoid','byId'],null)
         let geo = get(this.props.falcorCache,['geo',this.props.geoid,'name'])
+        let totals = get(this.props.falcorCache,['fema','disasters','declarations','byGeoid',this.props.geoid,'byId'],null)
         let data = []
-        if(graph){
+
+        if(graph && totals && !Object.keys(totals).map(d => totals[d].ihp_total && totals[d].pa_total && totals[d].hmgp_total).includes(undefined)){
            Object.keys(graph).forEach(id =>{
                let value  = DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES.reduce((a,c) =>{
                    if(c === 'geoid'){
                        a[c] = geo
                    }else{
+                       a['ihp_total'] = get(totals,[graph[id]['disaster_number'].value,'ihp_total','value'],0)
+                       a['pa_total'] = get(totals,[graph[id]['disaster_number'].value,'pa_total','value'],0)
+                       a['hmgp_total'] = get(totals,[graph[id]['disaster_number'].value,'hmgp_total','value'],0)
                        a[c] = get(graph,[id,c,'value'],'')
                    }
 
@@ -93,7 +132,7 @@ class FemaDisastersCountyTable extends React.Component{
                             sortBy={'declaration_date'}
                             sortOrder={'desc'}
                         />
-                        : null
+                        : <div>Loading...</div>
                 }
             </div>
         )
