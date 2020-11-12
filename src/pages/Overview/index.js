@@ -7,8 +7,8 @@ import {setActiveStateGeoid} from "store/modules/stormEvents";
 import Header from "../../components/avl-components/components/Header/Header";
 import SvgMapComponent from "./layers/SvgMapComponent";
 import SevereWeatherCountyTable from "./components/SevereWeatherCountyTable";
-import FemaDisastersCountyTable from "./components/FemaDisastersCountyTable";
-
+import FemaDisastersTotalCountyTable from "./components/FemaDisastersTotalCountyTable";
+import FemaDisastersIndividualCountyTable from "./components/FemaDisastersIndividualCountyTable";
 let years = []
 const start_year = 1996
 const end_year = 2019
@@ -220,11 +220,22 @@ class Overview extends React.Component {
                         />
                     </div>
                     <div>
-                        <FemaDisastersCountyTable
+                        <FemaDisastersTotalCountyTable
                             geoid ={window.location.pathname.split("/")[2]}
                         />
                     </div>
-
+                    <div>
+                        <FemaDisastersIndividualCountyTable
+                            type={'ia'}
+                            geoid ={window.location.pathname.split("/")[2]}
+                        />
+                    </div>
+                    <div>
+                        <FemaDisastersIndividualCountyTable
+                            type={'pa'}
+                            geoid ={window.location.pathname.split("/")[2]}
+                        />
+                    </div>
 
                 </div>
             </div>

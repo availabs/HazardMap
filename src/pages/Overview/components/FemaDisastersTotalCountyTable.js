@@ -59,13 +59,13 @@ const  tableCols = [
     },
 
 ]
-class FemaDisastersCountyTable extends React.Component{
+class FemaDisastersTotalCountyTable extends React.Component{
     constructor(props) {
         super(props);
     }
 
     async fetchFalcorDeps(){
-       const data  = await this.props.falcor.get(['fema','disasters','declarations','byGeoid',this.props.geoid,'length'])
+        const data  = await this.props.falcor.get(['fema','disasters','declarations','byGeoid',this.props.geoid,'length'])
         let length = get(data ,['json','fema','disasters','declarations','byGeoid',this.props.geoid,'length'],null)
         let ihpData = {},
             paData = {},
@@ -97,21 +97,21 @@ class FemaDisastersCountyTable extends React.Component{
         let data = []
 
         if(graph && totals && !Object.keys(totals).map(d => totals[d].ihp_total && totals[d].pa_total && totals[d].hmgp_total).includes(undefined)){
-           Object.keys(graph).forEach(id =>{
-               let value  = DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES.reduce((a,c) =>{
-                   if(c === 'geoid'){
-                       a[c] = geo
-                   }else{
-                       a['ihp_total'] = get(totals,[graph[id]['disaster_number'].value,'ihp_total','value'],0)
-                       a['pa_total'] = get(totals,[graph[id]['disaster_number'].value,'pa_total','value'],0)
-                       a['hmgp_total'] = get(totals,[graph[id]['disaster_number'].value,'hmgp_total','value'],0)
-                       a[c] = get(graph,[id,c,'value'],'')
-                   }
+            Object.keys(graph).forEach(id =>{
+                let value  = DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES.reduce((a,c) =>{
+                    if(c === 'geoid'){
+                        a[c] = geo
+                    }else{
+                        a['ihp_total'] = get(totals,[graph[id]['disaster_number'].value,'ihp_total','value'],0)
+                        a['pa_total'] = get(totals,[graph[id]['disaster_number'].value,'pa_total','value'],0)
+                        a['hmgp_total'] = get(totals,[graph[id]['disaster_number'].value,'hmgp_total','value'],0)
+                        a[c] = get(graph,[id,c,'value'],'')
+                    }
 
-                   return a
-               },{})
-               data.push(value)
-           })
+                    return a
+                },{})
+                data.push(value)
+            })
         }
         return data
     }
@@ -151,4 +151,4 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(reduxFalcor(FemaDisastersCountyTable))
+export default connect(mapStateToProps,mapDispatchToProps)(reduxFalcor(FemaDisastersTotalCountyTable))
