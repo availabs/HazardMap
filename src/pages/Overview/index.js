@@ -236,6 +236,18 @@ class Overview extends React.Component {
                             geoid ={window.location.pathname.split("/")[2]}
                         />
                     </div>
+                    <div>
+                        <FemaDisastersIndividualCountyTable
+                            type={'hmgp_projects'}
+                            geoid ={window.location.pathname.split("/")[2]}
+                        />
+                    </div>
+                    <div>
+                        <FemaDisastersIndividualCountyTable
+                            type={'hmgp_properties'}
+                            geoid ={window.location.pathname.split("/")[2]}
+                        />
+                    </div>
 
                 </div>
             </div>
