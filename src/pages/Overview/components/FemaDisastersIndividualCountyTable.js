@@ -282,7 +282,7 @@ class FemaDisastersIndividualCountyTable extends React.Component{
         return(
             <div>
                 {
-                    data ?
+                    data.length > 0 ?
                         <Table
                             defaultPageSize={15}
                             showPagination={true}
