@@ -214,35 +214,40 @@ class Overview extends React.Component {
                     </div>
                     
                     <div>
-                        <Header title = {'Fema Disaster Combined Data'}/>
+                        <Header title = {'Fema Disaster Summaries'}/>
                         <StackedBarGraph
                             data={this.processFemaDisastersCombined()}
                         />
                     </div>
                     <div>
+                        <div className="text-sm">Disaster Declaration Summaries V2 & Fema Web Disaster Summaries</div>
                         <FemaDisastersTotalCountyTable
                             geoid ={window.location.pathname.split("/")[2]}
                         />
                     </div>
                     <div>
+                        <div className="text-sm">Individual and Households Programs Valid Registration</div>
                         <FemaDisastersIndividualCountyTable
                             type={'ia'}
                             geoid ={window.location.pathname.split("/")[2]}
                         />
                     </div>
                     <div>
+                        <div className="text-sm">Public Assistance Applicants V1 & Public Assistance Funded Projects Details V1</div>
                         <FemaDisastersIndividualCountyTable
                             type={'pa'}
                             geoid ={window.location.pathname.split("/")[2]}
                         />
                     </div>
                     <div>
+                        <div className="text-sm">Hazard Mitigation Assistance Projects V2</div>
                         <FemaDisastersIndividualCountyTable
                             type={'hmgp_projects'}
                             geoid ={window.location.pathname.split("/")[2]}
                         />
                     </div>
                     <div>
+                        <div className="text-sm">Hazard Mitigation Assistance Mitigated Properties V2</div>
                         <FemaDisastersIndividualCountyTable
                             type={'hmgp_properties'}
                             geoid ={window.location.pathname.split("/")[2]}
