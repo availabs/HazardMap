@@ -310,21 +310,15 @@ export default (props = {}) =>
                         </div>)
                     ],
                     [   (<div className='text-xs text-gray-500 text-left'>
-                        {this.filters.year.value.replace('allTime','1996-2019')}
+                        {this.filters.year.value.toString().replace('allTime','1996-2019')}
                         </div>)
                     ],
                     [
                         (
                             <table className="min-w-full divide-y divide-gray-200">
-                                <thead>
-                                    <tr>
-                                        <th className="px-6 py-3 bg-gray-50 text-sm leading-4 font-medium text-gray-500 tracking-wider">Attribute</th>
-                                        <th className="px-6 py-3 bg-gray-50 text-sm leading-4 font-medium text-gray-500 tracking-wider">Value</th>
-                                    </tr>
-                                </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                 <tr className="bg-white">
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 font-medium text-gray-900">
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs text-left leading-5 font-medium text-gray-900">
                                         Property Damage
                                     </td>
                                     <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
@@ -332,7 +326,7 @@ export default (props = {}) =>
                                     </td>
                                 </tr>
                                 <tr className="bg-gray-50">
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 font-medium text-gray-900">
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs text-left leading-5 font-medium text-gray-900">
                                         Crop Damage
                                     </td>
                                     <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
@@ -340,7 +334,7 @@ export default (props = {}) =>
                                     </td>
                                 </tr>
                                 <tr className="bg-white">
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 font-medium text-gray-900">
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs text-left leading-5 font-medium text-gray-900">
                                         Injuries
                                     </td>
                                     <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
@@ -348,7 +342,7 @@ export default (props = {}) =>
                                     </td>
                                 </tr>
                                 <tr className="bg-gray-50">
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 font-medium text-gray-900">
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs text-left leading-5 font-medium text-gray-900">
                                         Fatalities
                                     </td>
                                     <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
