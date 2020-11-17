@@ -32,11 +32,11 @@ export const MapStyles = [{
                 "type": "fill",
                 "source": "albersusa",
                 "source-layer": "albersusa",
-                "filter": ["match", ["get", "type"], ["county"], true, false],
+                "filter": ["match", ["get", "type"], ["county_fips"], true, false],
                 "layout": {},
                 "paint": {
                     "fill-color": "hsl(0, 3%, 94%)",
-                    "fill-opacity": [
+                    /*"fill-opacity": [
                         "case",
                         ["boolean", ["feature-state", "hover"], false],
                         0,
@@ -47,8 +47,20 @@ export const MapStyles = [{
                         ["boolean", ["feature-state", "hover"], false],
                         "rgba(0,0,0,100)",//"hsl(0, 0%, 100%)",
                         "rgba(0,0,0,0)"
-                    ],
+                    ],*/
                 }
+            },
+            {
+                "id": "county-boundaries",
+                "type": "line",
+                "source": "albersusa",
+                "source-layer": "albersusa",
+                "layout": {},
+                "paint": {
+                    "line-color": 'rgba(0,0,0,0)',
+                    'line-opacity':0.7,
+                    'line-width':3
+                    }
             },
             {
                 "id": "cousubs",

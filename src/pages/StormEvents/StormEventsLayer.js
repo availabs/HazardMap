@@ -91,6 +91,9 @@ class StormEventsLayer extends MapLayer {
                         }
                         return out
                     }, [])
+                if(this.filtered_geographies.length){
+                    falcorGraph.get(['geo',this.filtered_geographies,['name']])
+                }
                 onLoadBounds = map.getBounds()
                 this.fetchData().then(d => this.render(this.map))
             })
@@ -118,7 +121,8 @@ class StormEventsLayer extends MapLayer {
                     }, [])
                 if(this.filtered_geographies.length > 0){
                     falcorGraph.get(
-                        ['severeWeather', this.filtered_geographies, this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips']],
+                        ['severeWeather', this.filtered_geographies, this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes','property_damage','crop_damage',
+                            'num_episodes','num_events','state','state_fips','injuries', 'fatalities']],
 
                     ).then(response =>{
                         this.render(this.map)
@@ -295,65 +299,92 @@ export default (props = {}) =>
     new StormEventsLayer("Storm Events", {
         ...props,
         popover: {
-            layers: ["states","counties","cousubs","tracts"],
+            layers: ['counties','state'],
             pinned:false,
             dataFunc: function (d) {
                 const {properties} = d
-                let fips = ''
-                let fips_name = ''
-                if(state_fips){
-                    if(!state_fips.includes("")){
-                        if(this.filters.geography.value === 'counties'){
-                            fips = properties.county_fips ? properties.county_fips : ''
-                            fips_name = properties.county_name ? properties.county_name : ''
-                        }else{
-                            fips = properties.geoid ? properties.geoid : ''
-                            fips_name = ''
-                        }
-                    }else{
-                        fips = properties.state_fips ? properties.state_fips : ''
-                        fips_name = properties.state_name ? properties.state_name : ''
-                    }
-                }else{
-                    fips = properties.state_fips ? properties.state_fips : ''
-                    fips_name = properties.state_name ? properties.state_name : ''
-                }
-                if(fips){
-                    falcorGraph.get(['severeWeather',fips,this.filters.hazard.value, this.filters.year.value, ['total_damage', 'num_episodes','property_damage','fatalities']],
-                            ['geo',fips,'name']
-                        )
-                        .then(response =>{
-                            return response
-                        })
-                }
-
-                let full_data = falcorGraph.getCache()
-
+                let graph = falcorGraph.getCache()
                 return [
-                    [   (<div className='text-lg text-bold bg-white'>
-                        {fips_name !== '' ? fips_name : get(full_data,['geo',fips,'name'],'')} - {this.filters.year.value}
+                    [   (<div className='text-sm text-bold text-left'>
+                        {`${get(graph,['geo',d.properties.county_fips,'name'],'')},${get(properties,['state_abbrev'],'')}`}
                         </div>)
                     ],
-                    [   (<div className='text-sm bg-white'>
-                        Total Damage : {fnum(get(full_data,['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'total_damage'],0))}
-                        </div>)
-                    ],
-                    [
-                        (<div className='text-sm bg-white'>
-                        Property Damage : {fnum(get(full_data,['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],0))}
+                    [   (<div className='text-xs text-gray-500 text-left'>
+                        {this.filters.year.value.replace('allTime','1996-2019')}
                         </div>)
                     ],
                     [
-                        (<div className='text-sm bg-white'>
-                            # Episodes : {fmt(get(full_data,['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'num_episodes'],0))}
-                        </div>)
-                    ],
-                    [
-                    (<div className='text-sm bg-white'>
-                        # Deaths : {fmt(get(full_data,['severeWeather',fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],0))}
-                    </div>)
+                        (
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th className="px-6 py-3 bg-gray-50 text-sm leading-4 font-medium text-gray-500 tracking-wider">Attribute</th>
+                                        <th className="px-6 py-3 bg-gray-50 text-sm leading-4 font-medium text-gray-500 tracking-wider">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tr className="bg-white">
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 font-medium text-gray-900">
+                                        Property Damage
+                                    </td>
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
+                                        {fnum(get(graph,['severeWeather',d.properties.county_fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],'0'))}
+                                    </td>
+                                </tr>
+                                <tr className="bg-gray-50">
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 font-medium text-gray-900">
+                                        Crop Damage
+                                    </td>
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
+                                        {fnum(get(graph,['severeWeather',d.properties.county_fips,this.filters.hazard.value,this.filters.year.value,'crop_damage'],'0'))}
+                                    </td>
+                                </tr>
+                                <tr className="bg-white">
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 font-medium text-gray-900">
+                                        Injuries
+                                    </td>
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
+                                        {fmt(get(graph,['severeWeather',d.properties.county_fips,this.filters.hazard.value,this.filters.year.value,'injuries'],'0'))}
+                                    </td>
+                                </tr>
+                                <tr className="bg-gray-50">
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 font-medium text-gray-900">
+                                        Fatalities
+                                    </td>
+                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
+                                        {fmt(get(graph,['severeWeather',d.properties.county_fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],'0'))}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        )
                     ]
                 ]
+            }
+        },
+        onHover: {
+            layers: ['counties'],
+            dataFunc: function(d) {
+                let map = this.map
+                map.on('mousemove', 'county-boundaries', () =>{
+                    map.setPaintProperty(
+                        'county-boundaries',
+                        'line-color',
+                        ["case",
+                            ["==", ['get', 'county_fips'], d[0].properties.county_fips || null],
+                            'rgba(0,0,0,100)',
+                            'rgba(0,0,0,0)'
+                        ]
+                    );
+                })
+                map.on('mouseleave', 'county-boundaries', () => {
+                    map.setPaintProperty(
+                        'county-boundaries',
+                        'line-color',
+                        'rgba(0,0,0,0)'
+                    );
+                })
             }
         },
         showAttributesModal: false,
