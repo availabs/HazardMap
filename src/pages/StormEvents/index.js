@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
@@ -9,7 +9,7 @@ import StackedBarGraph from "../components/bar /stackedBarGraph";
 import Legend from "./components/Legend"
 import {fnumClean } from "utils/sheldusUtils"
 import HazardListTable from "../components/listTable/hazardListTable";
-// import Select from "components/avl-components/components/Inputs/select";
+import Select from "components/avl-components/components/Inputs/select";
 import Modal from "components/avl-components/components/Modal/avl-modal"
 import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";
@@ -105,9 +105,9 @@ class NationalLanding extends React.Component {
                 value: []
             },
             geography : [{name : 'County',value : 'counties'},{name:'Municipality',value:'cousubs'},{name:'Tracts',value:'tracts'}],
-            geography_filter : 'counties',
+            geography_filter : 'County',
             data : [],
-            current_fips : [],
+            fips_value : null,
             current_fips_name : "us",
             showModal : false
         };
@@ -142,15 +142,38 @@ class NationalLanding extends React.Component {
     }
 
     fetchFalcorDeps() {
-        let geo_fips = this.props.activeStateGeoid.length === 0 ? fips : this.props.activeStateGeoid[0].state_fips
-        let geography = this.state.geography_filter === 'counties' ? 'counties' : this.state.geography_filter
+        let geo_fips = this.state.fips_value ? this.fips_domain.reduce((a,c) =>{
+            if(c.name.includes(this.state.fips_value)){
+                a = c.fips
+            }
+            return a
+        },'') : fips
+        let geography = this.state.geography_filter === 'County' ?  'counties': this.state.geography.reduce((a,c) => {
+            if(c.name === this.state.geography_filter){
+                a = c.value
+            }
+            return a
+        },'')
         return this.props.falcor.get(
-            ['geo',geo_fips,geography, 'geoid'])
+            ['geo',geo_fips,geography, 'geoid'],
+            ['geo',fips,['name']]
+        )
             .then(response =>{
-                this.filtered_geographies = Object.values(response.json.geo)
+                let graph = get(response,['json','geo'],{})
+                this.filtered_geographies = Object.values(graph)
                     .reduce((out, state) => {
                         if (state[geography]) {
                             out = [...out, ...state[geography]]
+                        }
+                        return out
+                    }, [])
+                this.fips_domain = Object.keys(graph)
+                    .reduce((out, state) => {
+                        if(fips.includes(state)){
+                            out.push({
+                                'fips':state,
+                                'name': graph[state].name || ''
+                            })
                         }
                         return out
                     }, [])
@@ -172,16 +195,6 @@ class NationalLanding extends React.Component {
                                 num_episodes : get(sw, `${item}.${this.state.hazard}.${this.state.year}.${'num_episodes'}`, 0).toLocaleString()
                             })
                         })
-                        // let lossByCounty = Object.keys(sw)
-                        //     .reduce((a, c) => {
-                        //         if (get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)) {
-                        //             a[c] = get(sw[c], `${this.state.hazard}.${this.state.year}.${'total_damage'}`, false)
-                        //         }
-                        //         return a
-                        //     }, {})
-                        //let lossDomain = Object.values(lossByCounty).sort((a, b) => a-b)
-                        // let domain =  [0,d3.quantile(lossDomain, 0),d3.quantile(lossDomain, 0.25),d3.quantile(lossDomain, 0.5),
-                        //     d3.quantile(lossDomain, 0.75),d3.quantile(lossDomain, 1)]
                         this.setState({
                             domain : [1000000,5000000,10000000,100000000,1000000000],//domain,
                             data :data
@@ -194,8 +207,8 @@ class NationalLanding extends React.Component {
         this.setState({ year: e })
     }
 
-
     render() {
+
         return (
             <div className='flex flex-col lg:flex-row h-screen box-border w-full -mt-8'>
                 <div className='flex-auto h-full order-last lg:order-none'>
@@ -227,12 +240,23 @@ class NationalLanding extends React.Component {
                                 [this.StormEventsLayer.name]: {
                                     year: this.state.year,
                                     hazard : this.state.hazard,
-                                    fips : this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : null,
-                                    geography : this.state.geography_filter
+                                    fips : this.fips_domain ? this.fips_domain.reduce((a,c) =>{
+                                        if(c.name.includes(this.state.fips_value)){
+                                            a = c.fips
+                                        }
+                                        return a
+                                    },'') : '',
+                                    geography : this.state.geography.reduce((a,c) =>{
+                                        if(c.name === this.state.geography_filter){
+                                            a = c.value
+                                        }
+                                        return a
+                                    },'')
                                 }
                             }}
                         />
                         <div className='relative bottom-40 h-40 z-30 w-full md:px-24'>
+                            <div className="text-xs absolute pt-8">Click on a bar to filter the data by year</div>
                             <StackedBarGraph
                                 height={200}
                                 data={{
@@ -245,6 +269,12 @@ class NationalLanding extends React.Component {
                                 setYear={this.setYear.bind(this)}
                                 initialLoad={this.state.initialLoad}
                                 hazard={this.state.hazard}
+                                geoid={this.state.fips_value? this.fips_domain.reduce((a,c) =>{
+                                    if(c.name.includes(this.state.fips_value)){
+                                        a = c.fips
+                                    }
+                                    return a
+                                },'') : [""]}
                             />
                         </div>
                     </div>
@@ -252,13 +282,46 @@ class NationalLanding extends React.Component {
                 <SlideOver
                     HeaderTitle={<div>Storm Events Losses</div>}
                 >
+                    <label className="text-sm">Select a State</label>
+                    <Select
+                        domain={this.fips_domain ? this.fips_domain.map(d => d.name.replace('State','')) : []}
+                        value = {this.state.fips_value}
+                        multi={false}
+                        onChange={(e) =>{
+                            this.setState({
+                                fips_value: e
+                            })
+                        }}
+                        placeholder={"Select a State..."}
+                    />
+                    {this.state.fips_value ?
+                        <div className="w-full">
+                            <label className="text-sm">Select a State</label>
+                            <Select
+                                domain={this.state.geography.map(d => d.name)}
+                                value={this.state.geography_filter}
+                                multi={false}
+                                onChange = {(e) =>{
+                                    this.setState({
+                                        geography_filter: e
+                                    })
+                                }}
+                                placeholder={"Select a Geography..."}
+                            />
+                        </div>
+                        : null}
                     <HazardListTable
                         data={
                             {storm_event:"severeWeather",category:[""],
                             columns:['total_damage', 'annualized_damage', 'num_episodes'],
                             header:['Damage','Yearly Avg Damage','# Episodes'],
                             sort:"annualized_damage"}}
-                        geoid={this.props.activeStateGeoid.length > 0 ? this.props.activeStateGeoid.map(d => d.state_fips) : [""]}
+                        geoid={this.state.fips_value? this.fips_domain.reduce((a,c) =>{
+                            if(c.name.includes(this.state.fips_value)){
+                                a = c.fips
+                            }
+                            return a
+                        },'') : [""]}
                         year={this.state.year}
                         setHazard={this.setHazard.bind(this)}
                         activeHazard={this.state.hazard}

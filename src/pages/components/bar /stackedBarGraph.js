@@ -89,7 +89,7 @@ class StackedBarGraph extends React.Component{
                         return response
                     })
                 }else{
-                    return this.props.falcor.get([this.props.data.storm_event,"",this.hazards,years,this.props.data.columns]) // "" is for the whole country
+                    return this.props.falcor.get([this.props.data.storm_event,this.props.geoid,this.hazards,years,this.props.data.columns]) // "" is for the whole country
                         .then(response =>{
                             this.setState({
                                 isLoading : false
@@ -106,7 +106,7 @@ class StackedBarGraph extends React.Component{
         if(this.props.data.storm_event === 'sba'){
             graph = get(falcorGraph.getCache(),[this.props.data.storm_event,this.props.data.category,""],null)
         }else{
-            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,""],null)
+            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,this.props.geoid],null)
         }
         let graph_data = []
         if(graph) {

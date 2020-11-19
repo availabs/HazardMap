@@ -15,6 +15,8 @@ import {setActiveStateGeoid} from "store/modules/stormEvents";
 
 
 var format =  d3.format("~s")
+var d3Geo = require('d3-geo')
+var R = 6378137.0 // radius of Earth in meters
 const fmt = (d) => d < 1000 ? d : format(d)
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 const hazards = [
@@ -46,7 +48,16 @@ for (let i = start_year; i <= end_year; i++) {
 }
 let hazard = null
 let state_fips = null
-let onLoadBounds = {}
+const projections = {
+    'albersUsa': d3Geo.geoAlbersUsa().translate([0, 0]).scale(R),
+    'mercator' : d3Geo.geoMercator().translate([0, 0]).scale(R)
+}
+const point2Albers = (lng, lat) => {
+    let data =  projections['mercator'].invert(projections['albersUsa']([lat,lng]))
+    let out = data ? data : [0,0]
+    return out
+}
+
 class StormEventsLayer extends MapLayer {
 
 
@@ -55,23 +66,19 @@ class StormEventsLayer extends MapLayer {
         if (this.filters.year.value !== newProps.year) {
             this.filters.year.value = newProps.year ?
                 [newProps.year] : newProps.year ? newProps.year : null
-            console.log('map year update',newProps.year)
             this.doAction(["fetchLayerData"]);
         }
         if (oldProps.hazard !== newProps.hazard) {
             hazard = newProps.hazard
             this.filters.hazard.value = newProps.hazard || 'riverine'
-            console.log('map hazard update',newProps.hazard)
             this.doAction(["fetchLayerData"]);
         }
         if(oldProps.fips !== newProps.fips){
-            state_fips = newProps.fips
-            console.log('map fips update',newProps.fips)
+            this.filters.fips.value = newProps.fips || null
             this.doAction(["fetchLayerData"]);
         }
         if(oldProps.geography !== newProps.geography){
             this.filters.geography.value = newProps.geography
-            console.log('map fips update',newProps.geography)
             this.doAction(["fetchLayerData"]);
         }
 
@@ -94,7 +101,7 @@ class StormEventsLayer extends MapLayer {
                 if(this.filtered_geographies.length){
                     falcorGraph.get(['geo',this.filtered_geographies,['name']])
                 }
-                onLoadBounds = map.getBounds()
+                this.onLoadBounds = map.getBounds()
                 this.fetchData().then(d => this.render(this.map))
             })
 
@@ -108,15 +115,16 @@ class StormEventsLayer extends MapLayer {
         if (hazard) {
             this.filters.hazard.value = hazard
         }
-        let geo_fips = state_fips && !state_fips.includes("") ? state_fips : fips
-        let geography = state_fips && !state_fips.includes("") ? this.filters.geography.value : 'counties'
+        let geo_fips = this.filters.fips.value ? this.filters.fips.value : fips
+        let geography = this.filters.geography.value ? this.filters.geography.value : 'counties'
         return falcorGraph.get(['geo',geo_fips,geography,'geoid'])
-            .then(response =>{
-                this.filtered_geographies = Object.values(response.json.geo)
+            .then(async response =>{
+                if(this.filters.fips.value){
+                    await falcorGraph.get(['geo',this.filters.fips.value,'boundingBox'])
+                }
+                this.filtered_geographies = Object.keys(response.json.geo).filter( d => d!== '$__path')
                     .reduce((out, state) => {
-                        if (state[geography]) {
-                            out = [...out, ...state[geography]]
-                        }
+                        out = [...out,...response.json.geo[state][geography]]
                         return out
                     }, [])
                 if(this.filtered_geographies.length > 0){
@@ -126,6 +134,7 @@ class StormEventsLayer extends MapLayer {
 
                     ).then(response =>{
                         this.render(this.map)
+
                     })
                 }
             })
@@ -166,27 +175,27 @@ class StormEventsLayer extends MapLayer {
         let year = this.filters.year.value
         let measure = 'total_damage'
         let sw = get(data, 'severeWeather', {})
-        let geography = state_fips && !state_fips.includes("") ? this.filters.geography.value : 'counties'
+        let geography = this.filters.fips.value ? this.filters.geography.value : 'counties'
         let lossByFilteredGeoids = Object.keys(sw)
-            .reduce((a,c) =>{
-                if(this.filtered_geographies){
-                    this.filtered_geographies.filter(d => d !== '$__path').forEach(geo =>{
-                        if(geo === c && get(sw[c], `${hazard}.${year}.${measure}`, false)){
+            .reduce((a, c) => {
+                if (this.filtered_geographies) {
+                    this.filtered_geographies.filter(d => d !== '$__path').forEach(geo => {
+                        if (geo === c && get(sw[c], `${hazard}.${year}.${measure}`, false)) {
                             a[c] = get(sw[c], `${hazard}.${year}.${measure}`, false)
                         }
                     })
-                }
-                return a
-            },{})
+                    }
+                    return a
+            }, {})
         //let lossDomain = Object.values(lossByFilteredGeoids).sort((a, b) => a - b)
 
         // let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
         //     d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]
-        let domain = [1000000,5000000,10000000,100000000,1000000000,10000000000]
+        let domain = [1000000, 5000000, 10000000, 100000000, 1000000000, 10000000000]
 
         let range = ["#F1EFEF", ...hazardcolors[this.filters.hazard.value + '_range']]
 
-        
+
         this.legend.domain = domain
         this.legend.range = range
 
@@ -195,17 +204,18 @@ class StormEventsLayer extends MapLayer {
             .range(
                 range //["#f2efe9", "#fadaa6", "#f7c475", "#f09a10", "#cf4010"]
             )
+
         let colors = Object.keys(lossByFilteredGeoids)
             .reduce((a, c) => {
                 a[c] = colorScale(lossByFilteredGeoids[c])
                 return a
             }, {})
 
-        if(geography === "cousubs" && Object.keys(lossByFilteredGeoids).length > 0){
+        if (geography === "cousubs" && Object.keys(lossByFilteredGeoids).length > 0) {
             map.setLayoutProperty('counties', 'visibility', 'none');
             map.setLayoutProperty('tracts', 'visibility', 'none');
             map.setLayoutProperty('cousubs', 'visibility', 'visible');
-            map.setFilter('cousubs', ["all", ["match", ["get", "geoid"],this.filtered_geographies, true, false]])
+            map.setFilter('cousubs', ["all", ["match", ["get", "geoid"], this.filtered_geographies, true, false]])
             map.setPaintProperty(
                 'cousubs',
                 'fill-color',
@@ -216,11 +226,11 @@ class StormEventsLayer extends MapLayer {
                 ]
             )
         }
-        if(geography === "tracts" && Object.keys(lossByFilteredGeoids).length > 0){
+        if (geography === "tracts" && Object.keys(lossByFilteredGeoids).length > 0) {
             map.setLayoutProperty('cousubs', 'visibility', 'none');
             map.setLayoutProperty('counties', 'visibility', 'none');
             map.setLayoutProperty('tracts', 'visibility', 'visible');
-            map.setFilter('tracts', ["all", ["match", ["get", "geoid"],this.filtered_geographies, true, false]])
+            map.setFilter('tracts', ["all", ["match", ["get", "geoid"], this.filtered_geographies, true, false]])
             map.setPaintProperty(
                 'tracts',
                 'fill-color',
@@ -231,11 +241,11 @@ class StormEventsLayer extends MapLayer {
                 ]
             )
         }
-        if(geography === "counties" && Object.keys(lossByFilteredGeoids).length > 0){
+        if (geography === "counties" && Object.keys(lossByFilteredGeoids).length > 0) {
             map.setLayoutProperty('cousubs', 'visibility', 'none');
             map.setLayoutProperty('tracts', 'visibility', 'none');
             map.setLayoutProperty('counties', 'visibility', 'visible');
-            map.setFilter('counties', ["all", ["match", ["get", "county_fips"],this.filtered_geographies, true, false]])
+            map.setFilter('counties', ["all", ["match", ["get", "county_fips"], this.filtered_geographies, true, false]])
             map.setPaintProperty(
                 'counties',
                 'fill-color',
@@ -246,36 +256,24 @@ class StormEventsLayer extends MapLayer {
                 ]
             )
         }
-        map.on('click',(e, layer)=> {
-            let relatedFeatures = map.queryRenderedFeatures(e.point, {
-                layers: ['states']
-            });
-            if(relatedFeatures[0]){
-                let state_fips = relatedFeatures.reduce((a, c) => {
-                    a = c.properties.state_fips
 
-                    return a
-                }, '')
-                let state_name = relatedFeatures.reduce((a, c) => {
-                    a = c.properties.state_name
-                    return a
-                }, '')
-                this.state_fips = state_fips
-                this.state_name = state_name
-                //this.infoBoxes.overview.show = true
-                window.history.pushState({state: '2'}, "state", `/stormevents/state/${state_fips}`);
-                map.setFilter("states",["all",
-                    ["match", ["get", "state_fips"],[state_fips],true,false]
-                ])
-                map.setFilter('counties', ["all", ["match", ["get", "county_fips"],this.filtered_geographies, true, false]])
-                map.fitBounds(turf.bbox(relatedFeatures[0].geometry))
-                this.forceUpdate()
+        if (this.filters.fips.value) {
+            let geom = get(falcorGraph.getCache(),['geo',this.filters.fips.value,'boundingBox','value'],null)
+            let initalBbox = geom ?  geom.slice(4, -1).split(",") : null
+            let bbox = initalBbox ? [initalBbox[0].split(" ").map(d => parseFloat(d)),initalBbox[1].split(" ").map(d => parseFloat(d))] : null
+            if(bbox){
+                let a = point2Albers(bbox[0][1], bbox[0][0])
+                let b = point2Albers(bbox[1][1], bbox[1][0])
+                map.fitBounds([a,b])
             }
-        })
+            /*map.setFilter("states",["all",
+                ["match", ["get", "state_fips"],[this.filters.fips.value],true,false]
+            ])
+            map.setFilter('counties', ["all", ["match", ["get", "county_fips"],this.filtered_geographies, true, false]])*/
+            this.forceUpdate()
 
-        if(state_fips && state_fips.includes("")){
-            this.state_fips = ""
-            this.state_name = ""
+        }
+        else{
             map.setFilter('states',undefined)
             map.setLayoutProperty('cousubs', 'visibility', 'none');
             map.setLayoutProperty('tracts', 'visibility', 'none');
@@ -289,10 +287,14 @@ class StormEventsLayer extends MapLayer {
                     "hsl(0, 3%, 94%)"
                 ]
             );
-            map.fitBounds(onLoadBounds)
+            if(this.onLoadBounds){
+                map.fitBounds(this.onLoadBounds)
+            }
+
             this.forceUpdate()
         }
     }
+
 }
 
 export default (props = {}) =>
@@ -410,6 +412,11 @@ export default (props = {}) =>
                 type:'dropdown',
                 value : 'counties',
                 domain : []
+            },
+            'fips':{
+                type:'dropdown',
+                value:null,
+                domain: []
             }
         },
        

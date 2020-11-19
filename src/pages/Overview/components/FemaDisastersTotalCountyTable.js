@@ -57,7 +57,14 @@ const  tableCols = [
         },
         disableFilters: true
     },
-
+    {
+        'Header' : 'TOTAL COST',
+        'accessor': 'total_cost',
+        Cell : (data) =>{
+            return <div style = {{ textAlign: 'center'}}>{fnum(get(data,`row.values.total_cost`, ''))}</div>
+        },
+        disableFilters: true
+    },
 ]
 class FemaDisastersTotalCountyTable extends React.Component{
     constructor(props) {
@@ -112,6 +119,9 @@ class FemaDisastersTotalCountyTable extends React.Component{
                 },{})
                 data.push(value)
             })
+            data.map(d =>{
+                d['total_cost'] = d['ihp_total'] + d['pa_total'] + d['hmgp_total']
+            })
         }
         return data
     }
@@ -129,8 +139,8 @@ class FemaDisastersTotalCountyTable extends React.Component{
                             data = {data}
                             initialPageSize={10}
                             minRows={data.length}
-                            sortBy={'declaration_date'}
-                            sortOrder={'desc'}
+                            sortBy={'total_cost'}
+                            sortOrder={'asc'}
                         />
                         : <div>Loading...</div>
                 }
