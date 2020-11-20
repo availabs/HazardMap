@@ -96,6 +96,7 @@ class NationalLanding extends React.Component {
     constructor(props) {
         super(props);
         // Don't call this.setState() here!
+        console.log('PROPS', props)
         this.state = {
             layer: 'Tracts Layer',
             year: 'allTime',
@@ -374,6 +375,7 @@ class NationalLanding extends React.Component {
     }
 }
 const mapStateToProps = (state, ownProps) => {
+    console.log('state', state)
     return {
         activeStateGeoid : state.stormEvents.activeStateGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
@@ -386,7 +388,7 @@ const mapDispatchToProps = {
 };
 
 export default [{
-    path: '/stormevents/',
+    path: '/maps/stormevents',
     mainNav: true,
     exact: true,
     name: 'Storm Events',
@@ -399,7 +401,7 @@ export default [{
     },
     component: connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
 },{
-    path: '/stormevents/state/:stateId',
+    path: '/maps/:datatype',
     mainNav: false,
     exact: true,
     name: 'Storm Events',
