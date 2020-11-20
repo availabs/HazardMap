@@ -25,7 +25,7 @@ import DataDownload from "pages/DataDownload"
 import FemaDisasterDeclaration from "./pages/fema_disasters/components/femaDisasterDeclarations";
 import SBAHazardLoans from './pages/SBAEvents/index'
 import FemaHmapV1 from './pages/femaHmapV1/index'
-//import FemaDisasters from './pages/fema_disasters/index'
+import FemaDisasters from './pages/fema_disasters/index'
 import NewFemaDisasters from './pages/fema_disasters/fema_index'
 import Overview from './pages/Overview/index'
 import DocsView from './pages/Docs/view'
@@ -43,7 +43,7 @@ export default [
 	...StormEvents,
 	...SBAHazardLoans,
 	...FemaHmapV1,
-	//...FemaDisasters,
+	...FemaDisasters,
 	...NewFemaDisasters,
 	Home,
 	DataDownload,

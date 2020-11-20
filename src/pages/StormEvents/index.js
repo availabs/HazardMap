@@ -280,36 +280,38 @@ class NationalLanding extends React.Component {
                     </div>
                 </div>
                 <SlideOver
-                    HeaderTitle={<div>Storm Events Losses</div>}
-                >
-                    <label className="text-sm">Select a State</label>
-                    <Select
-                        domain={this.fips_domain ? this.fips_domain.map(d => d.name.replace('State','')) : []}
-                        value = {this.state.fips_value}
-                        multi={false}
-                        onChange={(e) =>{
-                            this.setState({
-                                fips_value: e
-                            })
-                        }}
-                        placeholder={"Select a State..."}
-                    />
-                    {this.state.fips_value ?
-                        <div className="w-full">
-                            <label className="text-sm">Select a State</label>
+                    HeaderTitle={<div>
+                        <div>Storm Events Losses</div>
+                         <label className="text-sm">Select a State</label>
                             <Select
-                                domain={this.state.geography.map(d => d.name)}
-                                value={this.state.geography_filter}
+                                domain={this.fips_domain ? this.fips_domain.map(d => d.name.replace('State','')) : []}
+                                value = {this.state.fips_value}
                                 multi={false}
-                                onChange = {(e) =>{
+                                onChange={(e) =>{
                                     this.setState({
-                                        geography_filter: e
+                                        fips_value: e
                                     })
                                 }}
-                                placeholder={"Select a Geography..."}
+                                placeholder={"Select a State..."}
                             />
-                        </div>
-                        : null}
+                            {this.state.fips_value ?
+                                <div className="w-full">
+                                    <label className="text-sm">Select a State</label>
+                                    <Select
+                                        domain={this.state.geography.map(d => d.name)}
+                                        value={this.state.geography_filter}
+                                        multi={false}
+                                        onChange = {(e) =>{
+                                            this.setState({
+                                                geography_filter: e
+                                            })
+                                        }}
+                                        placeholder={"Select a Geography..."}
+                                    />
+                                </div>
+                                : null}
+                    </div>}
+                >
                     <HazardListTable
                         data={
                             {storm_event:"severeWeather",category:[""],
