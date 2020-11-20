@@ -4,6 +4,7 @@ import {reduxFalcor} from "utils/redux-falcor-new";
 import get from "lodash.get";
 import {asyncContainer, Typeahead} from 'react-bootstrap-typeahead';
 import './style.css';
+import {setActiveStateGeoid} from "../../store/modules/stormEvents";
 
 var _ = require('lodash')
 const AsyncTypeahead = asyncContainer(Typeahead);
@@ -63,8 +64,11 @@ class Search extends React.Component{
             return c.geoid
         },'')
 
-        window.location = `/overview/${geoid}`
-
+        if(this.props.page !== 'overview'){
+            window.location = `/overview/${geoid}`
+        }else{
+            this.props.setActiveStateGeoid(geoid)
+        }
     }
     render(){
         return(
@@ -92,7 +96,9 @@ class Search extends React.Component{
     }
 }
 
-const mapDispatchToProps = { };
+const mapDispatchToProps = {
+    setActiveStateGeoid
+};
 
 const mapStateToProps = (state,ownProps) => {
     return {
