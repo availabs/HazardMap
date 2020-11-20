@@ -348,8 +348,8 @@ const mapDispatchToProps = {
 
 export default [
     {
-        path: '/fema_disasters/',
-        mainNav: true,
+        path: '/fema_test/',
+        mainNav: false,
         exact: true,
         name: 'FEMA Disasters',
         layoutSettings: {
