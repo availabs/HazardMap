@@ -64,11 +64,7 @@ class Search extends React.Component{
             return c.geoid
         },'')
 
-        if(this.props.page !== 'overview'){
-            window.location = `/overview/${geoid}`
-        }else{
-            this.props.setActiveStateGeoid(geoid)
-        }
+        window.location = `/overview/${geoid}`
     }
     render(){
         return(

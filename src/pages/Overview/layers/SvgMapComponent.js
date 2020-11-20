@@ -72,7 +72,7 @@ class SvgMapComponent extends React.Component{
         return(
             <div>
                 <div className="max-w-lg h-1/2">
-                    <Search page={'overview'}/>
+                    {/*<Search page={'overview'}/>*/}
                 </div>
                 <div style={{height: '100%', width: '100%'}} className="flex justify-center">
                     <div className="text-5xl font-bold px-6 py-14 whitespace-no-wrap">{get(this.props.falcorCache,['geo',window.location.pathname.split("/")[2],'name'],'')}</div>
