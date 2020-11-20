@@ -8,7 +8,7 @@ import falcorCache from "utils/redux-falcor-new/falcorCache"
 
 import messages from './messages';
 import reducers from "components/ams/reducers"
-
+import overview from "./modules/overview";
 import stormEvents from "./modules/stormEvents";
 import femaDisasterDeclarations from "./modules/femaDisasterDeclarations";
 import geo from "./modules/geo";
@@ -19,6 +19,7 @@ const reducer = combineReducers({
   stormEvents,
   femaDisasterDeclarations,
   geo,
+  overview,
   messages,
   // graph
   falcorCache

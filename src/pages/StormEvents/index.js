@@ -360,7 +360,6 @@ class NationalLanding extends React.Component {
     }
 }
 const mapStateToProps = (state, ownProps) => {
-    console.log('state', state)
     return {
         activeStateGeoid : state.stormEvents.activeStateGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,

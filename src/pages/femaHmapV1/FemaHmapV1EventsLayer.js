@@ -269,7 +269,7 @@ export default (props = {}) =>
         /*onHover: {
             layers: ["states"],
             dataFunc: function ({features,properties}) {
-                //this.infoBoxes.overview.show = true
+                //this.infoBoxes.overview.js.show = true
             }
         },*/
         popover: {

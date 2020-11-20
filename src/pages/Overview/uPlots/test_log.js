@@ -97,7 +97,7 @@ const mapDispatchToProps = {};
 export default [
 
     {
-        path: '/overview/:geoid',
+        path: '/overview.js/:geoid',
         mainNav: false,
         exact: true,
         name: 'Overview',

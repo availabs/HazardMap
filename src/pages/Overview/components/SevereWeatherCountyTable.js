@@ -31,6 +31,12 @@ class SevereWeatherCountyTable extends React.Component{
         super(props);
     }
 
+    componentDidUpdate(prevProps,prevState,s){
+        if(this.props.geoid !== prevProps.geoid){
+            this.fetchFalcorDeps()
+        }
+    }
+
     async fetchFalcorDeps(){
         const cousubs = await this.props.falcor.get(['geo',this.props.geoid,'cousubs'])
         this.cousubs = get(cousubs,['json','geo',this.props.geoid,'cousubs'],null)
@@ -55,14 +61,19 @@ class SevereWeatherCountyTable extends React.Component{
         let wide_total = []
         if(graph && severeWeather){
             Object.keys(severeWeather).forEach(geo =>{
-                let value = hazards.reduce((a,c) =>{
-                    a[c.value] = get(severeWeather,[geo,c.value,'allTime','total_damage'],0)
-                    return a
-                },{})
-                data.push({
-                    'cousub' : get(graph,[geo,'name'],''),
-                    ...value
-                })
+                if(geo.slice(0,2) === this.props.geoid.slice(0,2)){
+                    let value = hazards.reduce((a,c) =>{
+
+                        a[c.value] = get(severeWeather,[geo,c.value,'allTime','total_damage'],0)
+
+                        return a
+                    },{})
+                    data.push({
+                        'cousub' : get(graph,[geo,'name'],''),
+                        ...value
+                    })
+                    }
+
             })
             let total = hazards.reduce((a,c) =>{
                 a[c.value] = _.sumBy(data,c.value)
@@ -76,7 +87,6 @@ class SevereWeatherCountyTable extends React.Component{
             hazards.forEach((hazard =>{
                 result = result.sort((a,b) => b[hazard.value] - a[hazard.value])
             }))
-
             return result
 
         }

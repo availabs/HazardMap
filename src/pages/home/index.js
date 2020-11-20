@@ -95,7 +95,7 @@ const HomePage = () => (
       </div>
       <div>
       </div>
-      <Search/>
+      <Search page={'home'}/>
     </div>
     <div className="relative z-10">
       <div className="absolute inset-0 flex flex-col">

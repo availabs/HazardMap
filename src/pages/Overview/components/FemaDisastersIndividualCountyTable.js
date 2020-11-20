@@ -203,9 +203,12 @@ class FemaDisastersIndividualCountyTable extends React.Component{
         let data = []
         if(graph && totals){
             Object.keys(graph).forEach(id =>{
-                get(totals,[graph[id].disaster_number.value,'ia','value'],[]).forEach(d =>{
-                    data.push(d)
-                })
+                if(graph[id].geoid.value === this.props.geoid){
+                    get(totals,[graph[id].disaster_number.value,'ia','value'],[]).forEach(d =>{
+                        data.push(d)
+                    })
+                }
+
             })
             if(data.length === 0){
                 data.push({})
@@ -220,10 +223,11 @@ class FemaDisastersIndividualCountyTable extends React.Component{
         let data = []
         if(graph && totals){
             Object.keys(graph).forEach(id =>{
+                if(graph[id].geoid.value === this.props.geoid){
                 get(totals,[graph[id].disaster_number.value,'pa','value'],[]).forEach(d =>{
                     data.push(d)
                 })
-
+                }
             })
             if(data.length === 0){
                 data.push({})
@@ -240,10 +244,11 @@ class FemaDisastersIndividualCountyTable extends React.Component{
         let data = []
         if(graph && totals){
             Object.keys(graph).forEach(id =>{
-                get(totals,[graph[id].disaster_number.value,'hmgp_projects','value'],[]).forEach(d =>{
-                    data.push(d)
-                })
-
+                if(graph[id].geoid.value === this.props.geoid) {
+                    get(totals, [graph[id].disaster_number.value, 'hmgp_projects', 'value'], []).forEach(d => {
+                        data.push(d)
+                    })
+                }
             })
             if(data.length === 0){
                 data.push({})
@@ -259,10 +264,11 @@ class FemaDisastersIndividualCountyTable extends React.Component{
         let data = []
         if(graph && totals){
             Object.keys(graph).forEach(id =>{
-                get(totals,[graph[id].disaster_number.value,'hmgp_properties','value'],[]).forEach(d =>{
-                    data.push(d)
-                })
-
+                if(graph[id].geoid.value === this.props.geoid) {
+                    get(totals, [graph[id].disaster_number.value, 'hmgp_properties', 'value'], []).forEach(d => {
+                        data.push(d)
+                    })
+                }
             })
             if(data.length === 0){
                 data.push({})

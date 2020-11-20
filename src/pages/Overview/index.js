@@ -57,16 +57,17 @@ class Overview extends React.Component {
 
         };
     }
-   
-    componentWillUnmount(){
-        this.setState = (state,callback)=>{
-            return;
-        };
+
+
+    componentDidUpdate(prevProps,prevState,s){
+
+        if(this.props.activeCountyGeoid !== prevProps.activeCountyGeoid){
+            this.fetchFalcorDeps()
+        }
     }
 
-
     async fetchFalcorDeps() {
-        let geoid = window.location.pathname.split("/")[2]
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid : window.location.pathname.split("/")[2]
         this.hazards = hazards.reduce((a,c) =>{
             a.push(c.value)
             return a
@@ -95,7 +96,7 @@ class Overview extends React.Component {
     }
 
     processSevereWeatherData(){
-        let geoid = window.location.pathname.split("/")[2]
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid : window.location.pathname.split("/")[2]
         let graph = get(this.props.falcorCache,['severeWeather',geoid],null)
         let graph_data = []
         if(graph) {
@@ -115,7 +116,7 @@ class Overview extends React.Component {
     }
 
     processSbaData(){
-        let geoid = window.location.pathname.split("/")[2]
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]
         let graph = get(this.props.falcorCache,['sba','all',geoid],null)
         let graph_data = []
         if(graph) {
@@ -136,7 +137,7 @@ class Overview extends React.Component {
     }
 
     processFemaDisasterData(){
-        let geoid = window.location.pathname.split("/")[2]
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]
         let graph = get(this.props.falcorCache,['fema','disasters','byId'],null)
         let graph_data = []
         if(graph) {
@@ -168,7 +169,7 @@ class Overview extends React.Component {
     }
 
     processFemaDisastersCombined(){
-        let geoid = window.location.pathname.split("/")[2]
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid : window.location.pathname.split("/")[2]
         let graph = get(this.props.falcorCache,['fema','disasters',geoid],null)
         let graph_data = []
         if(graph) {
@@ -203,7 +204,7 @@ class Overview extends React.Component {
                     </div>
                     <div>
                         <SevereWeatherCountyTable
-                            geoid ={window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid : window.location.pathname.split("/")[2]}
                         />
                     </div>
                     <div>
@@ -222,35 +223,35 @@ class Overview extends React.Component {
                     <div>
                         <div className="text-sm">Disaster Declaration Summaries V2 & Fema Web Disaster Summaries</div>
                         <FemaDisastersTotalCountyTable
-                            geoid ={window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
                         />
                     </div>
                     <div>
                         <div className="text-sm">Individual and Households Programs Valid Registration</div>
                         <FemaDisastersIndividualCountyTable
                             type={'ia'}
-                            geoid ={window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
                         />
                     </div>
                     <div>
                         <div className="text-sm">Public Assistance Applicants V1 & Public Assistance Funded Projects Details V1</div>
                         <FemaDisastersIndividualCountyTable
                             type={'pa'}
-                            geoid ={window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
                         />
                     </div>
                     <div>
                         <div className="text-sm">Hazard Mitigation Assistance Projects V2</div>
                         <FemaDisastersIndividualCountyTable
                             type={'hmgp_projects'}
-                            geoid ={window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
                         />
                     </div>
                     <div>
                         <div className="text-sm">Hazard Mitigation Assistance Mitigated Properties V2</div>
                         <FemaDisastersIndividualCountyTable
                             type={'hmgp_properties'}
-                            geoid ={window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
                         />
                     </div>
 
@@ -261,7 +262,7 @@ class Overview extends React.Component {
 }
 const mapStateToProps = (state, ownProps) => {
     return {
-        activeStateGeoid : state.stormEvents.activeStateGeoid,
+        activeCountyGeoid : state.overview.activeCountyGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
         graph: state.graph,
         hazards: get(state.graph, 'riskIndex.hazards.value', [])

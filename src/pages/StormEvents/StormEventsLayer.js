@@ -421,7 +421,7 @@ export default (props = {}) =>
         },
        
         // infoBoxes:{
-        //     overview:{
+        //     overview.js:{
         //         title:"",
         //         comp:(props)  =>{
         //             return (

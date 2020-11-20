@@ -102,22 +102,24 @@ class FemaDisastersTotalCountyTable extends React.Component{
         let geo = get(this.props.falcorCache,['geo',this.props.geoid,'name'])
         let totals = get(this.props.falcorCache,['fema','disasters','declarations','byGeoid',this.props.geoid,'byId'],null)
         let data = []
-
         if(graph && totals && !Object.keys(totals).map(d => totals[d].ihp_total && totals[d].pa_total && totals[d].hmgp_total).includes(undefined)){
             Object.keys(graph).forEach(id =>{
-                let value  = DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES.reduce((a,c) =>{
-                    if(c === 'geoid'){
-                        a[c] = geo
-                    }else{
-                        a['ihp_total'] = get(totals,[graph[id]['disaster_number'].value,'ihp_total','value'],0)
-                        a['pa_total'] = get(totals,[graph[id]['disaster_number'].value,'pa_total','value'],0)
-                        a['hmgp_total'] = get(totals,[graph[id]['disaster_number'].value,'hmgp_total','value'],0)
-                        a[c] = get(graph,[id,c,'value'],'')
-                    }
+                if(graph[id].geoid.value === this.props.geoid){
+                    let value  = DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES.reduce((a,c) =>{
+                        if(c === 'geoid'){
+                            a[c] = geo
+                        }else{
+                            a['ihp_total'] = get(totals,[graph[id]['disaster_number'].value,'ihp_total','value'],0)
+                            a['pa_total'] = get(totals,[graph[id]['disaster_number'].value,'pa_total','value'],0)
+                            a['hmgp_total'] = get(totals,[graph[id]['disaster_number'].value,'hmgp_total','value'],0)
+                            a[c] = get(graph,[id,c,'value'],'')
+                        }
 
-                    return a
-                },{})
-                data.push(value)
+                        return a
+                    },{})
+                    data.push(value)
+                }
+
             })
             data.map(d =>{
                 d['total_cost'] = d['ihp_total'] + d['pa_total'] + d['hmgp_total']

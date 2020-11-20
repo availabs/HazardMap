@@ -18,38 +18,80 @@ class SvgMapComponent extends React.Component{
     }
 
     componentWillMount() {
-        const activeGeoid = window.location.pathname.split("/")[2]
+        const activeGeoid = this.props.activeCountyGeoid ?
+            this.props.activeCountyGeoid
+            :window.location.pathname.split("/")[2]
         this.props.getChildGeo(activeGeoid.slice(0, 2), 'counties');
         this.props.getGeoMesh(activeGeoid.slice(0, 2), 'counties');
         this.props.getGeoMerge(activeGeoid.slice(0, 2), 'counties');
     }
 
-    componentWillReceiveProps(newProps) {
+    componentWillUpdate(nextProps,nextState,s){
+        if(this.props.activeCountyGeoid !== nextProps.activeCountyGeoid){
+            const activeGeoid = nextProps.activeCountyGeoid
+            this.props.getChildGeo(activeGeoid.slice(0, 2), 'counties');
+            this.props.getGeoMesh(activeGeoid.slice(0, 2), 'counties');
+            this.props.getGeoMerge(activeGeoid.slice(0, 2), 'counties');
+        }
+
+    }
+
+    componentWillReceiveProps(newProps){
         const activeGeoid = window.location.pathname.split("/")[2]
+        let graph = get(this.props.falcorCache,['geo'],null)
         const {geoLevel} = newProps;
         let geojson = null,
             counties = null,
             activeCounty = null;
-        if(newProps.geo["merge"] && newProps.geo["merge"][activeGeoid.slice(0, 2)]['counties'].features.length > 0){
+        if (newProps.geo["merge"] && newProps.geo["merge"][activeGeoid.slice(0, 2)]['counties'].features.length > 0 && graph) {
             switch (geoLevel) {
                 case 'counties':
                     geojson = newProps.geo['merge'][activeGeoid.slice(0, 2)]['counties']
                     counties = newProps.geo['mesh'][activeGeoid.slice(0, 2)]['counties']
-                    activeCounty =  newProps.geo[activeGeoid.slice(0, 2)]['counties'].features
+                    activeCounty = newProps.geo[activeGeoid.slice(0, 2)]['counties'].features
                         .reduce((a, c) => (c.id === activeGeoid) ? c : a, null);
                     break;
             }
             if (!geojson) return;
             Viewport().fitGeojson(geojson)
-            this.setState({bounds: geojson, countiesGeojson: counties, activeCountyGeoJson: activeCounty})
-
+            this.setState({bounds: geojson, countiesGeojson: counties, activeCountyGeoJson: activeCounty,
+                county_name:get(graph,[activeGeoid,'name'],''),
+                state_abbr:get(graph,[activeGeoid.slice(0,2),'state_abbr'],'')})
         }
 
     }
+    componentDidUpdate(newProps,prevState,s) {
+        if (this.props.activeCountyGeoid !== newProps.activeCountyGeoid) {
+            const activeGeoid = this.props.activeCountyGeoid
+            let graph = get(this.props.falcorCache,['geo'],null)
+            const {geoLevel} = this.props;
+            let geojson = null,
+                counties = null,
+                activeCounty = null;
+            if (this.props.geo["merge"] && this.props.geo["merge"][activeGeoid.slice(0, 2)]['counties'].features.length > 0 && graph) {
+
+                switch (geoLevel) {
+                    case 'counties':
+                        geojson = this.props.geo['merge'][activeGeoid.slice(0, 2)]['counties']
+                        counties = this.props.geo['mesh'][activeGeoid.slice(0, 2)]['counties']
+                        activeCounty = this.props.geo[activeGeoid.slice(0, 2)]['counties'].features
+                            .reduce((a, c) => (c.id === activeGeoid) ? c : a, null);
+                        break;
+                }
+                if (!geojson) return;
+                Viewport().fitGeojson(geojson)
+                this.setState({bounds: geojson, countiesGeojson: counties, activeCountyGeoJson: activeCounty,
+                    county_name:get(graph,[activeGeoid,'name'],''),
+                    state_abbr:get(graph,[activeGeoid.slice(0,2),'state_abbr'],'')})
+            }
+
+        }
+    }
+
 
     generateLayers() {
+        //console.log('state',this.state)
         return [
-
             { id: 'state-layer-filled',
                 data: this.state.bounds,
                 filled: true,
@@ -72,10 +114,12 @@ class SvgMapComponent extends React.Component{
         return(
             <div>
                 <div className="max-w-lg h-1/2">
-                    {/*<Search page={'overview'}/>*/}
+                    <Search page={'overview'}/>
                 </div>
                 <div style={{height: '100%', width: '100%'}} className="flex justify-center">
-                    <div className="text-5xl font-bold px-6 py-14 whitespace-no-wrap">{get(this.props.falcorCache,['geo',window.location.pathname.split("/")[2],'name'],'')}</div>
+                    <div className="text-5xl font-bold px-6 py-14 whitespace-no-wrap">{`${this.state.county_name || ''},
+                        ${this.state.state_abbr || ''}`
+                    }</div>
                     <SvgMap layers={ this.generateLayers() }
                             height={ this.props.height }
                             viewport={ Viewport() }
@@ -106,7 +150,7 @@ SvgMapComponent.defaultProps = {
 }
 const mapStateToProps = (state, ownProps) => {
     return {
-        activeStateGeoid : state.stormEvents.activeStateGeoid,
+        activeCountyGeoid : state.overview.activeCountyGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
         graph: state.graph,
         hazards: get(state.graph, 'riskIndex.hazards.value', []),
