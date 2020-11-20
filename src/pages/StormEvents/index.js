@@ -105,7 +105,7 @@ class NationalLanding extends React.Component {
                 value: []
             },
             geography : [{name : 'County',value : 'counties'},{name:'Municipality',value:'cousubs'},{name:'Tracts',value:'tracts'}],
-            geography_filter : 'County',
+            geography_filter : 'counties',
             data : [],
             fips_value : null,
             current_fips_name : "us",
@@ -142,18 +142,8 @@ class NationalLanding extends React.Component {
     }
 
     fetchFalcorDeps() {
-        let geo_fips = this.state.fips_value ? this.fips_domain.reduce((a,c) =>{
-            if(c.name.includes(this.state.fips_value)){
-                a = c.fips
-            }
-            return a
-        },'') : fips
-        let geography = this.state.geography_filter === 'County' ?  'counties': this.state.geography.reduce((a,c) => {
-            if(c.name === this.state.geography_filter){
-                a = c.value
-            }
-            return a
-        },'')
+        let geo_fips = this.state.fips_value ? this.state.fips_value : fips
+        let geography = this.state.geography_filter === 'counties' ?  'counties': this.state.geography_filter
         return this.props.falcor.get(
             ['geo',geo_fips,geography, 'geoid'],
             ['geo',fips,['name']]
@@ -167,7 +157,7 @@ class NationalLanding extends React.Component {
                         }
                         return out
                     }, [])
-                this.fips_domain = Object.keys(graph)
+                this.fips_domain = Object.keys(graph).filter(d => d!=='$__path')
                     .reduce((out, state) => {
                         if(fips.includes(state)){
                             out.push({
@@ -208,9 +198,8 @@ class NationalLanding extends React.Component {
     }
 
     render() {
-
         return (
-            <div className='flex flex-col lg:flex-row h-screen box-border w-full -mt-8'>
+            <div className='flex flex-col lg:flex-row h-screen box-border w-full -mt-8 relative'>
                 <div className='flex-auto h-full order-last lg:order-none'>
                     <div className='h-full'>
                         <div className="mx-auto h-8 w-2/6 pt-20 z-90">
@@ -240,18 +229,8 @@ class NationalLanding extends React.Component {
                                 [this.StormEventsLayer.name]: {
                                     year: this.state.year,
                                     hazard : this.state.hazard,
-                                    fips : this.fips_domain ? this.fips_domain.reduce((a,c) =>{
-                                        if(c.name.includes(this.state.fips_value)){
-                                            a = c.fips
-                                        }
-                                        return a
-                                    },'') : '',
-                                    geography : this.state.geography.reduce((a,c) =>{
-                                        if(c.name === this.state.geography_filter){
-                                            a = c.value
-                                        }
-                                        return a
-                                    },'')
+                                    fips : this.state.fips_value ? this.state.fips_value : null,
+                                    geography : this.state.geography_filter
                                 }
                             }}
                         />
@@ -269,12 +248,7 @@ class NationalLanding extends React.Component {
                                 setYear={this.setYear.bind(this)}
                                 initialLoad={this.state.initialLoad}
                                 hazard={this.state.hazard}
-                                geoid={this.state.fips_value? this.fips_domain.reduce((a,c) =>{
-                                    if(c.name.includes(this.state.fips_value)){
-                                        a = c.fips
-                                    }
-                                    return a
-                                },'') : [""]}
+                                geoid={this.state.fips_value? this.state.fips_value : [""]}
                             />
                         </div>
                     </div>
@@ -283,32 +257,48 @@ class NationalLanding extends React.Component {
                     HeaderTitle={<div>
                         <div>Storm Events Losses</div>
                          <label className="text-sm">Select a State</label>
-                            <Select
-                                domain={this.fips_domain ? this.fips_domain.map(d => d.name.replace('State','')) : []}
-                                value = {this.state.fips_value}
-                                multi={false}
-                                onChange={(e) =>{
-                                    this.setState({
-                                        fips_value: e
-                                    })
-                                }}
-                                placeholder={"Select a State..."}
-                            />
+                            <div className="relative">
+                                <select
+                                    className="rounded-md w-full bg-transparent max-w-md"
+                                    onChange={(e) =>{
+                                        let fips = e.target.value
+                                        this.setState({
+                                            fips_value: fips
+                                        })
+                                    }}
+                                >
+                                    <option value={null} defaultValue={this.state.fips_value}>National</option>
+                                    {this.fips_domain ? this.fips_domain.map((d,i) =>{
+                                        return(
+                                            <option value={d.fips} key={i}>
+                                                {d.name}
+                                            </option>
+                                        )
+                                    }):null}
+                                </select>
+                            </div>
                             {this.state.fips_value ?
-                                <div className="w-full">
-                                    <label className="text-sm">Select a State</label>
-                                    <Select
-                                        domain={this.state.geography.map(d => d.name)}
-                                        value={this.state.geography_filter}
-                                        multi={false}
-                                        onChange = {(e) =>{
+                                <div>
+                                    <label className="text-sm">Select a Geography</label>
+                                    <select
+                                        className="rounded-md w-full bg-transparent max-w-md"
+                                        onChange={(e) =>{
+                                            let filter = e.target.value
                                             this.setState({
-                                                geography_filter: e
+                                                geography_filter: filter
                                             })
                                         }}
-                                        placeholder={"Select a Geography..."}
-                                    />
+                                    >
+                                        {this.state.geography.map((d,i) =>{
+                                            return(
+                                                <option value={d.value} key={i}>
+                                                    {d.name}
+                                                </option>
+                                            )
+                                        })}
+                                    </select>
                                 </div>
+
                                 : null}
                     </div>}
                 >
@@ -318,17 +308,12 @@ class NationalLanding extends React.Component {
                             columns:['total_damage', 'annualized_damage', 'num_episodes'],
                             header:['Damage','Yearly Avg Damage','# Episodes'],
                             sort:"annualized_damage"}}
-                        geoid={this.state.fips_value? this.fips_domain.reduce((a,c) =>{
-                            if(c.name.includes(this.state.fips_value)){
-                                a = c.fips
-                            }
-                            return a
-                        },'') : [""]}
+                        geoid={this.state.fips_value ? this.state.fips_value : [""]}
                         year={this.state.year}
                         setHazard={this.setHazard.bind(this)}
                         activeHazard={this.state.hazard}
                     />
-                    <Modal 
+                    {/*<Modal
                         show={ this.state.showModal }
                         onHide={ e => this.setState({ showModal: false }) }
                         showCloseButton = {false}
@@ -367,7 +352,7 @@ class NationalLanding extends React.Component {
                                 />
                             </div>
                         </div>
-                    </Modal>
+                    </Modal>*/}
                 </SlideOver>
             </div>
         )
