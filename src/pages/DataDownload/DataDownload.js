@@ -242,6 +242,7 @@ class DataDownload extends React.Component{
                     })
                 }
             })
+            counties_data = counties_data.sort((a,b) => a.name.localeCompare(b.name))
             return counties_data
         }
     }
