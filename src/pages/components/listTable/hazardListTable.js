@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {reduxFalcor} from "utils/redux-falcor-new";
+import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor/index";
 import get from 'lodash.get';
 import { falcorGraph } from "store/falcorGraphNew"
 import { fnum } from "utils/sheldusUtils"
@@ -8,6 +8,8 @@ import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 // var format =  d3.format("~s")
 // const fmt = (d) => d < 1000 ? d : format(d)
+import {stormEventsData} from "../../StormEvents/DataFetching/StormEventsDataFecthing";
+import {sbaData} from "../../StormEvents/DataFetching/SBADataFetching";
 const hazards = [
     {value:'wind', name:'Wind'},
     {value:'wildfire', name:'Wildfire'},
@@ -33,68 +35,53 @@ class HazardListTable extends React.Component{
     constructor(props) {
         super(props);
         this.state={
-            hazards: hazards.reduce((a,c) =>{
-                a.push(c.value)
-                return a
-            },[]),
+            isLoading : true,
             currentHazard :''
         }
 
     }
 
-    fetchFalcorDeps(){
-        if(this.props.data.storm_event === 'sba'){
-            return this.props.falcor.get(
-                [this.props.data.storm_event,this.props.data.category,this.props.geoid,this.state.hazards,this.props.year,this.props.data.columns],
-            ).then(response =>{
-                return response
+    componentWillUnmount(){
+        this.setState = (state,callback)=>{
+            return;
+        };
+    }
+
+    componentDidUpdate(oldProps){
+        if(oldProps.hazard !== this.props.hazard){
+            this.fetchFalcorDeps()
+        }
+        if(oldProps.geoid !== this.props.geoid){
+            this.fetchFalcorDeps()
+        }
+        if(oldProps.year !== this.props.year){
+            this.fetchFalcorDeps()
+        }
+    }
+
+    async fetchFalcorDeps(){
+        this.hazards = hazards.reduce((a,c) =>{
+            a.push(c.value)
+            return a
+        },[])
+        if(this.props.data.data_type === 'sba'){
+            this.data = await sbaData(this.props.data.type,this.props.data.columns,this.props.geoid,'counties',this.hazards,this.props.year)
+            this.setState({
+                isLoading : false
             })
         }else{
-            return this.props.falcor.get([this.props.data.storm_event,this.props.geoid,this.state.hazards,this.props.year,this.props.data.columns]) // "" is for the whole country
-                .then(response =>{
-                    return response
-                })
+            this.data = await stormEventsData(this.props.data.type,this.props.data.columns,this.props.geoid,'counties',this.hazards,this.props.year)
+            this.setState({
+                isLoading : false
+            })
+
+
         }
 
     }
 
-    processData(){
-        let data = []
-        let graph = null
-        let header_columns = ["name","value"]
-        if(this.props.data.storm_event === 'sba'){
-            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,this.props.data.category,this.props.geoid],null)
-            header_columns.push(...this.props.data.columns)
-        }else{
-            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,this.props.geoid],null)
-            header_columns.push(...this.props.data.columns)
-        }
-        if(graph){
-            data = Object.keys(graph).map(hazard =>{
-                return header_columns.reduce((a,header) =>{
-                    hazards.forEach(item =>{
-                        if(item.value === hazard){
-                            if (header === 'name' || header === 'value') {
-                                a[header] = item[header]
-                            }
-                            else if(header === 'annualized_damage'){
-                                a[header] = get(graph,[hazard,"allTime",header],0)
-                            }
-                            else{
-                                a[header] = get(graph,[hazard,this.props.year,header],0)
-                            }
-                        }
-                    })
-                    return a
-                },{})
-
-            })
-        }
-        return data
-    }
 
     render(){
-        let listTableData = this.processData()
         return(
                 <div className="align-middle inline-block min-w-full overflow-hidden"
                     key={0}>
@@ -126,8 +113,9 @@ class HazardListTable extends React.Component{
                         </tr>
                         </thead>
                         <tbody>
-                        {   listTableData.length > 0 ?
-                            listTableData
+                        {   this.data && !this.state.isLoading?
+                            this.data.data
+                            .filter(d => Object.keys(d).length !== 0)
                             .sort((a,b) => b[this.props.data.sort] - a[this.props.data.sort])
                             .map((hazard,i) =>{
                                 return(
@@ -136,7 +124,7 @@ class HazardListTable extends React.Component{
                                         <td className="px-4 py-2 whitespace-no-wrap text-md leading-5 font-base text-gray-900" key={i}>
                                             <div
                                                 className="hover:text-blue-600 cursor-pointer"
-                                                
+
                                                 onClick={(e) =>{
                                                     e.persist()
                                                     if(this.state.currentHazard !== hazard.value){

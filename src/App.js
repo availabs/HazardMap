@@ -5,8 +5,8 @@ import ScrollToTop from 'utils/ScrollToTop'
 
 import Routes from 'Routes';
 
-import Layout from 'components/avl-components/DefaultLayout'
-import Messages from "components/avl-components/messages"
+import {DefaultLayout,Messages} from "@availabs/avl-components"
+
 
 import DmsComponents from "components/dms"
 import DmsWrappers from "components/dms/wrappers"
@@ -43,8 +43,9 @@ class App extends Component {
         <ScrollToTop />
         <Switch>
           { Routes.map((route, i) =>
-              <Layout key={ i }
-                { ...route }
+              <DefaultLayout
+                  { ...route }
+                  key={ i }
                 logo={(<div className='px-12'>HazardData.org</div>)}
                 isAuthenticating={ this.props.user.isAuthenticating }
                 menus={ Routes.filter(r => r.mainNav) }

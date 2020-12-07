@@ -20,6 +20,13 @@ export const MapSources = [{
                 }
             },
             {
+                id:'albersusa_zip_codes',
+                source:{
+                    "url":"mapbox://am3081.4jgx8fkw",
+                    "type":"vector"
+                }
+            },
+            {
                 id:'albersusa_tracts',
                 source:{
                     "url":"mapbox://am3081.2n3as7pn",
@@ -91,6 +98,29 @@ export const MapStyles = [{
                 "source": "albersusa_tracts",
                 "source-layer": "albersusa_tracts",
                 "filter": ["match", ["get", "type"],["geoid"],true, false],
+                "layout": {},
+                "paint": {
+                    "fill-color": "hsl(0, 3%, 94%)",
+                    "fill-opacity": [
+                        "case",
+                        ["boolean", ["feature-state", "hover"], false],
+                        0,
+                        1
+                    ],
+                    "fill-outline-color": [
+                        "case",
+                        ["boolean", ["feature-state", "hover"], false],
+                        "hsl(0, 4%, 85%)",
+                        "hsl(0, 4%, 85%)"
+                    ],
+                }
+            },
+            {
+                "id": "zipcodes",
+                "type": "fill",
+                "source": "albersusa_zip_codes",
+                "source-layer": "albersusa_zip_codes",
+                "filter": ["match", ["get", "type"],["ZCTA5CE10"],true, false],
                 "layout": {},
                 "paint": {
                     "fill-color": "hsl(0, 3%, 94%)",

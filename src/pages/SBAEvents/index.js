@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {reduxFalcor} from "utils/redux-falcor-new";
+import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
 import get from 'lodash.get';
 import AvlMap from "components/AvlMap";
 import Legend from "pages/StormEvents/components/Legend"

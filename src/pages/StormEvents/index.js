@@ -5,17 +5,11 @@ import get from 'lodash.get';
 import AvlMap from "components/AvlMap";
 import StormEventsLayerFactory from "./StormEventsLayer"
 import StackedBarGraph from "../components/bar /stackedBarGraph";
-//import HazardStatBox from "./components /statbox/hazardStatBox";
 import Legend from "./components/Legend"
 import {fnumClean } from "utils/sheldusUtils"
 import HazardListTable from "../components/listTable/hazardListTable";
-import Select from "components/avl-components/components/Inputs/select";
-import Modal from "components/avl-components/components/Modal/avl-modal"
-import Table from "components/avl-components/components/Table/index"
 import hazardcolors from "constants/hazardColors";
 import {setActiveStateGeoid} from "store/modules/stormEvents";
-
-import {CSVLink} from 'react-csv';
 import {shmp} from 'pages/components/shmp-theme.js'
 import SlideOver from './components/SlideOver'
 
@@ -96,7 +90,6 @@ class NationalLanding extends React.Component {
     constructor(props) {
         super(props);
         // Don't call this.setState() here!
-        console.log('PROPS', props)
         this.state = {
             layer: 'Tracts Layer',
             year: 'allTime',
@@ -143,8 +136,8 @@ class NationalLanding extends React.Component {
     }
 
     fetchFalcorDeps() {
-        let geo_fips = this.state.fips_value ? this.state.fips_value : fips
-        let geography = this.state.geography_filter === 'counties' ?  'counties': this.state.geography_filter
+            let geo_fips = this.state.fips_value ? this.state.fips_value : fips
+            let geography = this.state.geography_filter === 'counties' ?  'counties': this.state.geography_filter
         return this.props.falcor.get(
             ['geo',geo_fips,geography, 'geoid'],
             ['geo',fips,['name']]

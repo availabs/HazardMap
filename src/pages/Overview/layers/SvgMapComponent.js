@@ -1,6 +1,6 @@
 import React, {Component,useState} from 'react';
 import {connect} from 'react-redux';
-import {reduxFalcor} from "utils/redux-falcor-new";
+import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
 import Viewport from "components/mapping/escmap/Viewport"
 import {getChildGeo, getGeoMerge, getGeoMesh} from 'store/modules/geo'
 import get from "lodash.get";

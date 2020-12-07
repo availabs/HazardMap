@@ -1,10 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { reduxFalcor} from "utils/redux-falcor-new";
-import { falcorGraph } from "store/falcorGraphNew"
+import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor/index";
 import {ResponsiveBar} from '@nivo/bar'
 import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
+import {stormEventsData} from "../../StormEvents/DataFetching/StormEventsDataFecthing";
+import {sbaData} from "../../StormEvents/DataFetching/SBADataFetching";
 const get = require("lodash.get");
 
 const fips = ["01","02","04","05","06","08","09","10","11","12","13","15","16","17","18","19","20",
@@ -49,6 +50,9 @@ class StackedBarGraph extends React.Component{
         if(oldProps.hazard !== this.props.hazard){
             this.fetchFalcorDeps()
         }
+        if(oldProps.geoid !== this.props.geoid){
+            this.fetchFalcorDeps()
+        }
     }
 
     componentWillUnmount(){
@@ -57,76 +61,34 @@ class StackedBarGraph extends React.Component{
         };
     }
 
-    fetchFalcorDeps(){
+    async fetchFalcorDeps(){
         this.setState({
             isLoading : true
         });
-        return this.props.falcor.get(
-            ['geo', fips, 'counties', 'geoid'])
-            .then(response =>{
-                this.counties = Object.values(response.json.geo)
-                    .reduce((out,state) => {
-                        if(state.counties){
-                            out = [...out,...state.counties]
-                        }
-                        return out
-                    },[])
-                if(this.props.hazard !== null){
-                    this.hazards = [this.props.hazard]
-                }else{
-                    this.hazards = hazards.reduce((a,c) =>{
-                        a.push(c.value)
-                        return a
-                    },[])
-                }
-                if(this.props.data.storm_event === 'sba'){
-                    return this.props.falcor.get(
-                        [this.props.data.storm_event,this.props.data.category,"",this.hazards,years,this.props.data.columns],
-                    ).then(response =>{
-                        this.setState({
-                            isLoading : false
-                        })
-                        return response
-                    })
-                }else{
-                    return this.props.falcor.get([this.props.data.storm_event,this.props.geoid,this.hazards,years,this.props.data.columns]) // "" is for the whole country
-                        .then(response =>{
-                            this.setState({
-                                isLoading : false
-                            })
-                            return response
-                        })
-                }
-
-            })
-    }
-
-    transformData(){
-        let graph = null
-        if(this.props.data.storm_event === 'sba'){
-            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,this.props.data.category,""],null)
+        if(this.props.hazard !== null){
+            this.hazards = [this.props.hazard]
         }else{
-            graph = get(falcorGraph.getCache(),[this.props.data.storm_event,this.props.geoid],null)
-        }
-        let graph_data = []
-        if(graph) {
-            graph_data = years.reduce((a, year) => {
-                a.push({
-                    'year': year.toString(),
-                })
+            this.hazards = hazards.reduce((a,c) =>{
+                a.push(c.value)
                 return a
-            }, [])
-            Object.keys(graph).forEach(hazard => {
-                graph_data.forEach(item => {
-                    item[hazard] = get(graph, [hazard,item.year,...this.props.data.columns], 0)
-                })
+            },[])
+        }
+        if(this.props.data.data_type === 'sba'){
+            this.data = await sbaData(this.props.data.type,this.props.data.columns,this.props.geoid,'counties',this.hazards,years)
+            this.setState({
+                isLoading : false
+            })
+
+        }else{
+            this.data = await stormEventsData(this.props.data.type,this.props.data.columns,this.props.geoid,'counties',this.hazards,years)// "" is for the whole country
+            this.setState({
+                isLoading : false
             })
         }
-        return graph_data
     }
+
 
     render(){
-        let data = this.transformData()
         let hazard_list = []
         if(this.props.hazard !== null){
            hazard_list = [this.props.hazard]
@@ -136,14 +98,15 @@ class StackedBarGraph extends React.Component{
                 return a
             },[])
         }
-        if(!this.state.isLoading){
+
+        if(!this.state.isLoading && this.data){
             return(
-                <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
+                <div style={ { width: this.props.width ? this.props.width : '70%', height: this.props.height ? this.props.height : "300px" } }>
                     <ResponsiveBar
-                        data={data}
+                        data={this.data.data}
                         keys={hazard_list}
                         indexBy="year"
-                        margin={{ top: 50, right: 70, bottom: 20, left: 10 }}
+                        margin={{ top: 40, right: 70, bottom: 20, left: 10 }}
                         padding={0.1}
                         colors={(d) => hazardcolors[d.id]}
                         enableLabel={false}
@@ -214,7 +177,7 @@ class StackedBarGraph extends React.Component{
             )
         }else{
             return(
-                <div style={ { width: "100%", height: this.props.height ? this.props.height : "300px" } }>
+                <div style={ { width: this.props.width ? this.props.width : '100%', height: this.props.height ? this.props.height : "300px" } }>
                 Loading ...
                 </div>
             )

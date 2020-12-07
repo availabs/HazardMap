@@ -18,12 +18,12 @@
 
 // --- Public Pages ------
 
-import StormEvents from 'pages/StormEvents'
+import StormEvents from 'pages/StormEvents/index_combined'
 import Home from "pages/home"
 import DataDownload from "pages/DataDownload"
 // import Methodology from "pages/Methodology/methodology"
 import FemaDisasterDeclaration from "./pages/fema_disasters/components/femaDisasterDeclarations";
-import SBAHazardLoans from './pages/SBAEvents/index'
+//import SBAHazardLoans from './pages/SBAEvents/index'
 import FemaHmapV1 from './pages/femaHmapV1/index'
 import FemaDisasters from './pages/fema_disasters/index'
 import NewFemaDisasters from './pages/fema_disasters/fema_index'
@@ -41,7 +41,7 @@ import NoMatch from 'pages/404';
 export default [
 	// -- public
 	...StormEvents,
-	...SBAHazardLoans,
+	//...SBAHazardLoans,
 	...FemaHmapV1,
 	...FemaDisasters,
 	...NewFemaDisasters,

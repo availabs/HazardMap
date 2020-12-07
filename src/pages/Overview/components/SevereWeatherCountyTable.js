@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {reduxFalcor} from "utils/redux-falcor-new";
+import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
 import get from 'lodash.get';
 import Table from '../../../components/avl-components/components/Table/index'
 import {fnum} from "../../../utils/sheldusUtils";

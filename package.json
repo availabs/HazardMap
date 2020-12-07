@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@availabs/avl-components": "^1.0.9",
     "@mapbox/geojson-extent": "^0.3.2",
     "@nivo/bar": "^0.63.1",
     "@nivo/line": "^0.63.1",
@@ -37,18 +38,18 @@
     "papaparse": "^5.2.0",
     "prop-types": "^15.7.2",
     "query-string": "^6.13.1",
-    "react": "^16.13.1",
+    "react": "^16.14.0",
     "react-beautiful-dnd": "^13.0.0",
     "react-bootstrap-typeahead": "^5.1.2",
     "react-csv": "^2.0.3",
-    "react-dom": "^16.13.1",
+    "react-dom": "^16.14.0",
     "react-map-gl": "^5.2.9",
     "react-markdown-renderer": "^1.4.0",
     "react-on-screen": "^2.1.1",
     "react-onclickoutside": "^6.9.0",
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",
-    "react-router-dom": "^5.1.2",
+    "react-router-dom": "^5.2.0",
     "react-router-redux": "^4.0.8",
     "react-scripts": "3.4.1",
     "react-table": "^7.2.0",
@@ -61,7 +62,8 @@
     "styled-components": "^5.2.0",
     "tlds": "^1.207.0",
     "topojson": "^3.0.2",
-    "uplot": "^1.2.2"
+    "uplot": "^1.2.2",
+    "web-vitals": "^1.0.1"
   },
   "eslintConfig": {
     "extends": "react-app"
