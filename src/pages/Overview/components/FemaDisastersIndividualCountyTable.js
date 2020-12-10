@@ -5,7 +5,6 @@ import get from 'lodash.get';
 import Table from '../../../components/avl-components/components/Table/index'
 import {fnum} from "../../../utils/sheldusUtils";
 
-var _ = require('lodash')
 const DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES = [
     'geoid',
     'name',
@@ -165,9 +164,6 @@ const hmgp_properties_tableCols = [
 
 ]
 class FemaDisastersIndividualCountyTable extends React.Component{
-    constructor(props) {
-        super(props);
-    }
 
     async fetchFalcorDeps(){
         const data  = await this.props.falcor.get(['fema','disasters','declarations','byGeoid',this.props.geoid,'length'])

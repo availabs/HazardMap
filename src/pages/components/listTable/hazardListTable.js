@@ -2,12 +2,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor/index";
 import get from 'lodash.get';
-import { falcorGraph } from "store/falcorGraphNew"
 import { fnum } from "utils/sheldusUtils"
-// import * as d3 from "d3";
 import hazardcolors from "constants/hazardColors";
-// var format =  d3.format("~s")
-// const fmt = (d) => d < 1000 ? d : format(d)
 import {stormEventsData} from "../../StormEvents/DataFetching/StormEventsDataFecthing";
 import {sbaData} from "../../StormEvents/DataFetching/SBADataFetching";
 import {femaDisastersData} from "../../StormEvents/DataFetching/FEMADisastersDataFetching";

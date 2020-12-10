@@ -141,7 +141,7 @@ class femaDisastersCombinedTotalCostEventsLayer extends MapLayer {
                 }
                 return a
             },{})
-        let lossDomain = Object.values(lossByFilteredGeoids).sort((a, b) => a - b)
+        //let lossDomain = Object.values(lossByFilteredGeoids).sort((a, b) => a - b)
 
         /*let domain = [0, d3.quantile(lossDomain, 0), d3.quantile(lossDomain, 0.25), d3.quantile(lossDomain, 0.5),
             d3.quantile(lossDomain, 0.75), d3.quantile(lossDomain, 1)]*/

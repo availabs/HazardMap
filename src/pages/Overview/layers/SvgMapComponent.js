@@ -1,4 +1,4 @@
-import React, {Component,useState} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
 import Viewport from "components/mapping/escmap/Viewport"
@@ -51,6 +51,8 @@ class SvgMapComponent extends React.Component{
                     activeCounty = newProps.geo[activeGeoid.slice(0, 2)]['counties'].features
                         .reduce((a, c) => (c.id === activeGeoid) ? c : a, null);
                     break;
+                default:
+                    break;
             }
             if (!geojson) return;
             Viewport().fitGeojson(geojson)
@@ -76,6 +78,8 @@ class SvgMapComponent extends React.Component{
                         counties = this.props.geo['mesh'][activeGeoid.slice(0, 2)]['counties']
                         activeCounty = this.props.geo[activeGeoid.slice(0, 2)]['counties'].features
                             .reduce((a, c) => (c.id === activeGeoid) ? c : a, null);
+                        break;
+                    default:
                         break;
                 }
                 if (!geojson) return;

@@ -27,9 +27,6 @@ const hazards = [
     {value:'coastal', name:'Coastal Hazards'}
 ]
 class SevereWeatherCountyTable extends React.Component{
-    constructor(props) {
-        super(props);
-    }
 
     componentDidUpdate(prevProps,prevState,s){
         if(this.props.geoid !== prevProps.geoid){

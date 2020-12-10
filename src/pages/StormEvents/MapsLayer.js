@@ -5,18 +5,13 @@ import {falcorGraph} from "store/falcorGraphNew"
 import get from "lodash.get"
 import hazardcolors from "../../constants/hazardColors";
 import * as d3scale from 'd3-scale'
-import * as d3 from 'd3'
-import { fnum, /*fnumClean*/} from "utils/sheldusUtils"
 import { extent } from "d3-array"
 import {stormEventsData} from "./DataFetching/StormEventsDataFecthing";
-import {parse} from "query-string";
 import {sbaData} from "./DataFetching/SBADataFetching";
 import {femaDisastersData} from "./DataFetching/FEMADisastersDataFetching";
 
-var format =  d3.format("~s")
 var d3Geo = require('d3-geo')
 var R = 6378137.0 // radius of Earth in meters
-const fmt = (d) => d < 1000 ? d : format(d)
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 const hazards = [
     {value: 'wind', name: 'Wind'},
@@ -122,7 +117,6 @@ class MapsLayer extends MapLayer {
         }
         let geo_fips = this.filters.fips.value ? this.filters.fips.value : fips
         let geography = this.filters.geography.value ? this.filters.geography.value : 'counties'
-        let data = []
         if(this.filters.dataType.value === 'stormevents'){
             this.data = await stormEventsData('map',['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips'],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
         }

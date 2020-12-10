@@ -1,4 +1,3 @@
-import React from "react";
 import get from "lodash.get";
 import {falcorGraph} from "store/falcorGraphNew"
 import { fnum, /*fnumClean*/} from "utils/sheldusUtils"
@@ -6,7 +5,7 @@ import * as d3 from "d3";
 
 var format =  d3.format("~s")
 const fmt = (d) => d < 1000 ? d : format(d)
-var _ = require('lodash')
+
 
 const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
 const hazards = [
@@ -90,7 +89,7 @@ const processGraphData = (geo_fips,columns,fema,hazard) => {
             Object.keys(fema).filter(d => d!== '$__path').forEach(item =>{
                 total_cost += get(fema,[item,hazard,d.year,'total_cost'],0)
             })
-           d[hazard] = total_cost
+           return d[hazard] = total_cost
         })
     }else{
         femaData.map(d => {
@@ -99,7 +98,7 @@ const processGraphData = (geo_fips,columns,fema,hazard) => {
 
                 total_cost += get(fema[item],[d.year,'total_cost'],0)
             })
-            d[hazard] = total_cost
+            return d[hazard] = total_cost
         })
     }
     return femaData
@@ -119,7 +118,7 @@ const processTableData = (geo_fips,columns,graphById,fema,year) =>{
         }, [])
         graph_data.map(d =>{
             let sum = 0
-            Object.keys(graphById).filter(d => d !== '$__path').forEach(item =>{
+            return Object.keys(graphById).filter(d => d !== '$__path').forEach(item =>{
                 if(year === 'allTime') {
                     if(get(graphById[item],['disaster_type'],'').toString() === d.hazard) {
                         sum += +get(graphById[item],['total_cost'],0)
@@ -171,7 +170,9 @@ const processTableData = (geo_fips,columns,graphById,fema,year) =>{
             femaData.map(d =>{
                 if(d.value === dd.hazard){
                     d['total_cost_summaries'] = dd.total_cost_summaries || 0
+
                 }
+                return d
             })
         })
         return femaData

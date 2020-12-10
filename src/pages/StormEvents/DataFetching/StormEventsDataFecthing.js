@@ -1,4 +1,3 @@
-import React from "react";
 import get from "lodash.get";
 import {falcorGraph} from "store/falcorGraphNew"
 import { fnum, /*fnumClean*/} from "utils/sheldusUtils"
