@@ -70,17 +70,6 @@ class NationalLanding extends React.Component {
         this.handleChange = this.handleChange.bind(this)
     }
 
-    /*componentDidUpdate(oldState,newState){
-        if(oldState.fips_value !== this.state.fips_value){
-            this.fetchFalcorDeps()
-        }
-        if(oldState.year !== this.state.year){
-            this.fetchFalcorDeps()
-        }
-        if(oldState.hazard !== this.state.hazard){
-            this.fetchFalcorDeps()
-        }
-    }*/
     setYear = (year) => {
         if (this.state.year !== year) {
             this.setState({year})

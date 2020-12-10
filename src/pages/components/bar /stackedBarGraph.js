@@ -51,6 +51,9 @@ class StackedBarGraph extends React.Component{
         if(oldProps.geoid !== this.props.geoid){
             this.fetchFalcorDeps()
         }
+        if(oldProps.data.data_type !== this.props.data.data_type){
+            this.fetchFalcorDeps()
+        }
     }
 
     componentWillUnmount(){
