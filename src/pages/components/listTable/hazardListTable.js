@@ -10,6 +10,7 @@ import hazardcolors from "constants/hazardColors";
 // const fmt = (d) => d < 1000 ? d : format(d)
 import {stormEventsData} from "../../StormEvents/DataFetching/StormEventsDataFecthing";
 import {sbaData} from "../../StormEvents/DataFetching/SBADataFetching";
+import {femaDisastersData} from "../../StormEvents/DataFetching/FEMADisastersDataFetching";
 const hazards = [
     {value:'wind', name:'Wind'},
     {value:'wildfire', name:'Wildfire'},
@@ -69,13 +70,18 @@ class HazardListTable extends React.Component{
             this.setState({
                 isLoading : false
             })
-        }else{
+        }else if(this.props.data.data_type === 'stormevents'){
             this.data = await stormEventsData(this.props.data.type,this.props.data.columns,this.props.geoid,'counties',this.hazards,this.props.year)
             this.setState({
                 isLoading : false
             })
 
-
+        }
+        else{
+            this.data = await femaDisastersData(this.props.data.type,this.props.data.data_columns,this.props.geoid,'counties',this.hazards,this.props.year)
+            this.setState({
+                isLoading : false
+            })
         }
 
     }
@@ -144,7 +150,7 @@ class HazardListTable extends React.Component{
                                         {this.props.data.columns.map((column,i) =>{
                                             return (
                                                 <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-base text-gray-900 text-right" key={i}>
-                                                    {!column.includes("num") ? fnum(hazard[column]) : hazard[column].toLocaleString()}
+                                                    {!column.includes("num") || !column.includes("total") ? fnum(hazard[column]) : hazard[column].toLocaleString()}
                                                 </td>
                                             )
                                         })}

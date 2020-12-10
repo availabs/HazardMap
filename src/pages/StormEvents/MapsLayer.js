@@ -124,20 +124,33 @@ class MapsLayer extends MapLayer {
         let geography = this.filters.geography.value ? this.filters.geography.value : 'counties'
         let data = []
         if(this.filters.dataType.value === 'stormevents'){
-            data = await stormEventsData('map',['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips'],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
+            this.data = await stormEventsData('map',['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips'],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
         }
         else if(this.filters.dataType.value === 'sba'){
-            data = await sbaData('map',['total_loss','loan_total','num_loans','state_abbrev'],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
+            this.data = await sbaData('map',['total_loss','loan_total','num_loans','state_abbrev'],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
         }
         else if(this.filters.dataType.value === 'fema') {
-            data = await femaDisastersData(geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
+            this.data = await femaDisastersData('map',[
+                'ia_ihp_amount',
+                'ia_ihp_count',
+                'pa_project_amount',
+                'pa_federal_share_obligated',
+                'hma_prop_actual_amount_paid',
+                'hma_prop_number_of_properties',
+                'hma_proj_project_amount',
+                'hma_proj_project_amount_count',
+                'hma_proj_federal_share_obligated',
+                'hma_proj_federal_share_obligated_count',
+                'total_cost',
+                "total_disasters"
+            ],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
         }else{
             return Promise.resolve()
         }
         if(this.filters.fips.value){
             await falcorGraph.get(['geo',this.filters.fips.value,'boundingBox'])
         }
-        this.render(this.map,data)
+        this.render(this.map,this.data)
 
     }
 
@@ -172,17 +185,17 @@ class MapsLayer extends MapLayer {
 
     render(map,data) {
         if (data) {
-            let measure = this.filters.dataType.value === 'stormevents'? 'total_damage': this.filters.dataType.value === 'sba' ? 'total_loss' : ''
+            let measure = this.filters.dataType.value === 'stormevents'? 'total_damage': this.filters.dataType.value === 'sba' ? 'total_loss' : 'total_cost'
             let sw = get(data,'data',[])
             let filtered_geographies = get(data,'filtered_geographies')
             let zip_codes = get(data,'zip_codes')
             let geography = this.filters.fips.value ? this.filters.geography.value : 'counties'
 
             let lossByFilteredGeoids = sw.reduce((a,c)=>{
-                if(geography!== 'zip_codes' && filtered_geographies.includes(c.geoid) ){
+                if(geography!== 'zip_codes' &&  filtered_geographies.includes(c.geoid) ){
                     a[c.geoid] = c[measure]
                 }
-                if(geography === 'zip_codes' && zip_codes.includes(c.geoid)){
+                if(geography === 'zip_codes'  && zip_codes.includes(c.geoid)){
                     a[c.geoid] = c[measure]
                 }
                return a
@@ -321,58 +334,43 @@ export default (props = {}) =>
             pinned:false,
             dataFunc: function (d) {
                 const {properties} = d
-                let graph = falcorGraph.getCache()
+                let graph = this.data.data.reduce((a,c) =>{
+                    if(c.geoid === properties.county_fips){
+                        a = c
+                    }
+                    return a
+                },{})
                 return [
-                    [   (<div className='text-sm text-bold text-left'>
-                        {`${get(graph,['geo',d.properties.county_fips,'name'],'')},${get(properties,['state_abbrev'],'')}`}
-                    </div>)
-                    ],
-                    [   (<div className='text-xs text-gray-500 text-left'>
-                        {this.filters.year.value.toString().replace('allTime','1996-2019')}
-                    </div>)
-                    ],
-                    [
-                        (
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                <tr className="bg-white">
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs text-left leading-5 font-medium text-gray-900">
-                                        Property Damage
-                                    </td>
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
-                                        {fnum(get(graph,['severeWeather',d.properties.county_fips,this.filters.hazard.value,this.filters.year.value,'property_damage'],'0'))}
-                                    </td>
-                                </tr>
-                                <tr className="bg-gray-50">
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs text-left leading-5 font-medium text-gray-900">
-                                        Crop Damage
-                                    </td>
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
-                                        {fnum(get(graph,['severeWeather',d.properties.county_fips,this.filters.hazard.value,this.filters.year.value,'crop_damage'],'0'))}
-                                    </td>
-                                </tr>
-                                <tr className="bg-white">
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs text-left leading-5 font-medium text-gray-900">
-                                        Injuries
-                                    </td>
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
-                                        {fmt(get(graph,['severeWeather',d.properties.county_fips,this.filters.hazard.value,this.filters.year.value,'injuries'],'0'))}
-                                    </td>
-                                </tr>
-                                <tr className="bg-gray-50">
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs text-left leading-5 font-medium text-gray-900">
-                                        Fatalities
-                                    </td>
-                                    <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
-                                        {fmt(get(graph,['severeWeather',d.properties.county_fips,this.filters.hazard.value,this.filters.year.value,'fatalities'],'0'))}
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        [   (<div className='text-sm text-bold text-left'>
+                            {`${get(graph,'county_fips_name','')}`}
+                        </div>)
+                        ],
+                        [   (<div className='text-xs text-gray-500 text-left'>
+                            {this.filters.year.value.toString().replace('allTime','1996-2019')}
+                        </div>)
+                        ],
+                        [
+                            (
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    {this.data.popover.map((pop,i) =>{
+                                        return (
+                                            <tr className="bg-white" key={i}>
+                                                <td className="px-6 py-3 whitespace-no-wrap text-xs text-left leading-5 font-medium text-gray-900">
+                                                    {pop.name}
+                                                </td>
+                                                <td className="px-6 py-3 whitespace-no-wrap text-xs leading-5 text-gray-500">
+                                                    {pop.type(get(graph,[pop.value],'0'))}
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                    </tbody>
+                                </table>
+                            )
+                        ]
 
-                        )
                     ]
-                ]
             }
         },
         onHover: {

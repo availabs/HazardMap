@@ -121,7 +121,20 @@ class NationalLanding extends React.Component {
             })
         }
         else if(this.props.match.params.datatype === 'fema') {
-            this.data = await femaDisastersData(geo_fips,geography,this.state.hazard,this.state.year)
+            this.data = await femaDisastersData('map',[
+                'ia_ihp_amount',
+                'ia_ihp_count',
+                'pa_project_amount',
+                'pa_federal_share_obligated',
+                'hma_prop_actual_amount_paid',
+                'hma_prop_number_of_properties',
+                'hma_proj_project_amount',
+                'hma_proj_project_amount_count',
+                'hma_proj_federal_share_obligated',
+                'hma_proj_federal_share_obligated_count',
+                'total_cost',
+                "total_disasters"
+            ],geo_fips,geography,this.state.hazard,this.state.year)
             this.setState({
                 isLoading: false
             })
@@ -146,30 +159,30 @@ class NationalLanding extends React.Component {
                                 format= {fnumClean}
                             />
                         </div>
-                        <AvlMap
-                            layers={[
-                                this.MapsLayer
-                            ]}
-                            height={'90%'}
-                            center={[0, 0]}
-                            zoom={4}
-                            year={2018}
-                            fips={''}
-                            styles={[
-                                {name: 'Blank', style: 'mapbox://styles/am3081/ckaml4r1e1uip1ipgtx5vm9zk'}
-                            ]}
-                            sidebar={false}
-                            attributes={false}
-                            layerProps={{
-                                [this.MapsLayer.name]: {
-                                    year: this.state.year,
-                                    hazard : this.state.hazard,
-                                    fips : this.state.fips_value ? this.state.fips_value : null,
-                                    geography : this.state.geography_filter,
-                                    dataType : this.props.match.params.datatype
-                                }
-                            }}
-                        />
+                            <AvlMap
+                                layers={[
+                                    this.MapsLayer
+                                ]}
+                                height={'90%'}
+                                center={[0, 0]}
+                                zoom={4}
+                                year={2018}
+                                fips={''}
+                                styles={[
+                                    {name: 'Blank', style: 'mapbox://styles/am3081/ckaml4r1e1uip1ipgtx5vm9zk'}
+                                ]}
+                                sidebar={false}
+                                attributes={false}
+                                layerProps={{
+                                    [this.MapsLayer.name]: {
+                                        year: this.state.year,
+                                        hazard : this.state.hazard,
+                                        fips : this.state.fips_value ? this.state.fips_value : null,
+                                        geography : this.state.geography_filter,
+                                        dataType : this.props.match.params.datatype
+                                    }
+                                }}
+                            />
                         <div className='absolute bottom-20 h-40 z-30 md:w-full md:px-12'>
                             <div className="text-xs absolute pt-8">Click on a bar to filter the data by year</div>
                             <StackedBarGraph
@@ -179,8 +192,23 @@ class NationalLanding extends React.Component {
                                     data_type: this.props.match.params.datatype,
                                     category: this.props.match.params.datatype ==='sba' ? ['all'] : [""],
                                     columns: this.props.match.params.datatype === 'stormevents' ? ['total_damage'] :
-                                        this.props.match.params.datatype === 'sba' ? ['total_loss'] : [],
-                                    sort:"annualized_damage"
+                                        this.props.match.params.datatype === 'sba' ? ['total_loss'] : ["total_cost","total_cost_summaries"]
+                                    ,
+                                    data_columns : [
+                                        'ia_ihp_amount',
+                                        'ia_ihp_count',
+                                        'pa_project_amount',
+                                        'pa_federal_share_obligated',
+                                        'hma_prop_actual_amount_paid',
+                                        'hma_prop_number_of_properties',
+                                        'hma_proj_project_amount',
+                                        'hma_proj_project_amount_count',
+                                        'hma_proj_federal_share_obligated',
+                                        'hma_proj_federal_share_obligated_count',
+                                        'total_cost',
+                                        "total_disasters"
+                                    ],
+                                    sort: this.props.match.params.datatype !== 'fema' ? 'annualized_damage' : 'total_cost'
                                 }}
                                 setYear={this.setYear.bind(this)}
                                 initialLoad={this.state.initialLoad}
@@ -193,7 +221,7 @@ class NationalLanding extends React.Component {
                 </div>
                 <SlideOver
                     HeaderTitle={<div>
-                        <div>{this.props.match.params.datatype === 'stormevents' ? `Storm Event Losses` : this.props.match.params.datatype === "sba" ? `SBA Loans`: ""}</div>
+                        <div>{this.props.match.params.datatype === 'stormevents' ? `Storm Event Losses` : this.props.match.params.datatype === "sba" ? `SBA Loans`: "FEMA Disasters"}</div>
                         <label className="text-sm">Select a State</label>
                         <div className="relative">
                             <select
@@ -227,7 +255,7 @@ class NationalLanding extends React.Component {
                                         })
                                     }}
                                 >
-                                    { this.props.match.params.datatype === "sba" ? this.state.geography_sba.map((d,i) =>{
+                                    { this.props.match.params.datatype === "sba" || this.props.match.params.datatype === "fema"? this.state.geography_sba.map((d,i) =>{
                                         return(
                                             <option value={d.value} key={i}>
                                                 {d.name}
@@ -255,12 +283,26 @@ class NationalLanding extends React.Component {
                                 data_type:this.props.match.params.datatype,
                                 category: this.props.match.params.datatype ==='sba' ? ['all'] : [""],
                                 columns: this.props.match.params.datatype === 'stormevents' ? ['total_damage', 'annualized_damage', 'num_episodes'] :
-                                    this.props.match.params.datatype === 'sba' ? ['total_loss', 'loan_total', 'num_loans'] : []
+                                    this.props.match.params.datatype === 'sba' ? ['total_loss', 'loan_total', 'num_loans'] : ["total_cost","total_cost_summaries"]
                                 ,
+                                data_columns : [
+                                    'ia_ihp_amount',
+                                    'ia_ihp_count',
+                                    'pa_project_amount',
+                                    'pa_federal_share_obligated',
+                                    'hma_prop_actual_amount_paid',
+                                    'hma_prop_number_of_properties',
+                                    'hma_proj_project_amount',
+                                    'hma_proj_project_amount_count',
+                                    'hma_proj_federal_share_obligated',
+                                    'hma_proj_federal_share_obligated_count',
+                                    'total_cost',
+                                    "total_disasters"
+                                ],
                                 header: this.props.match.params.datatype === 'stormevents' ? ['Damage','Yearly Avg Damage','# Episodes'] :
-                                    this.props.match.params.datatype === 'sba' ? ['Total Loss',' $ Loan','# Loans'] : []
+                                    this.props.match.params.datatype === 'sba' ? ['Total Loss',' $ Loan','# Loans'] : ['$ Total Cost','$ Total Cost Summaries']
                                 ,
-                                sort: this.props.match.params.datatype === 'stormevents' ? "annualized_damage" : this.props.match.params.datatype === "sba" ? "total_loss": ""}}
+                                sort: this.props.match.params.datatype === 'stormevents' ? "annualized_damage" : this.props.match.params.datatype === "sba" ? "total_loss": "total_cost"}}
                         geoid={this.state.fips_value ? this.state.fips_value : null}
                         year={this.state.year}
                         setHazard={this.setHazard.bind(this)}

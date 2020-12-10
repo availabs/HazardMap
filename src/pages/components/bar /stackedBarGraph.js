@@ -6,6 +6,7 @@ import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import {stormEventsData} from "../../StormEvents/DataFetching/StormEventsDataFecthing";
 import {sbaData} from "../../StormEvents/DataFetching/SBADataFetching";
+import {femaDisastersData} from "../../StormEvents/DataFetching/FEMADisastersDataFetching";
 const get = require("lodash.get");
 
 const fips = ["01","02","04","05","06","08","09","10","11","12","13","15","16","17","18","19","20",
@@ -79,12 +80,18 @@ class StackedBarGraph extends React.Component{
                 isLoading : false
             })
 
-        }else{
+        }if(this.props.data.data_type === 'stormevents'){
             this.data = await stormEventsData(this.props.data.type,this.props.data.columns,this.props.geoid,'counties',this.hazards,years)// "" is for the whole country
             this.setState({
                 isLoading : false
             })
+        }if(this.props.data.data_type === 'fema'){
+            this.data = await femaDisastersData(this.props.data.type,this.props.data.data_columns,this.props.geoid,'counties',this.hazards,years)
+            this.setState({
+                isLoading : false
+            })
         }
+
     }
 
 
