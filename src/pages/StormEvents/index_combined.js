@@ -331,7 +331,7 @@ export default [
     {
         path: '/maps/:datatype',
         mainNav: false,
-        exact: true,
+        exact: false,
         name: 'Maps',
         authed:false,
         component:withRouter(ConnectedComponent),
@@ -342,5 +342,51 @@ export default [
             nav: 'top',
             theme: shmp,
         }
-    }]
+    },{
+        path: '/maps/stormevents',
+        mainNav: true,
+        exact: true,
+        name: 'Storm Events',
+        authed:false,
+        component:withRouter(ConnectedComponent),
+        layoutSettings: {
+            fixed: true,
+            maxWidth: '',//'max-w-7xl',
+            headerBar: false,
+            nav: 'top',
+            theme: shmp,
+        }
+    },
+    {
+        path: '/maps/sba',
+        mainNav: true,
+        exact: true,
+        name: 'SBA',
+        authed:false,
+        component:withRouter(ConnectedComponent),
+        layoutSettings: {
+            fixed: true,
+            maxWidth: '',//'max-w-7xl',
+            headerBar: false,
+            nav: 'top',
+            theme: shmp,
+        }
+    },
+    {
+        path: '/maps/fema',
+        mainNav: true,
+        exact: true,
+        name: 'fema',
+        authed:false,
+        component:withRouter(ConnectedComponent),
+        layoutSettings: {
+            fixed: true,
+            maxWidth: '',//'max-w-7xl',
+            headerBar: false,
+            nav: 'top',
+            theme: shmp,
+        }
+    }
+
+    ]
 

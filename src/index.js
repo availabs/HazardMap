@@ -30,13 +30,15 @@ import reportWebVitals from './reportWebVitals';
 // addComponents(AmsComponents);
 // addWrappers(AmsWrappers);
 
+import Theme from './Theme'
+
 import 'styles/tailwind.css';
 
 ReactDOM.render(
 	<React.StrictMode>
 		<Provider store={ store }>
 			<FalcorProvider falcor={ falcorGraph(API_HOST) }>
-				<ThemeContext.Provider value={ get(Themes, PROJECT_THEME, Themes["light"]) }>
+				<ThemeContext.Provider value={ Theme }>
 					<App/>
 					{ /*<AuthEnabledApp />*/ }
 				</ThemeContext.Provider>
