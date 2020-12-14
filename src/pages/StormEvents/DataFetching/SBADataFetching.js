@@ -41,7 +41,7 @@ const processMapData = (sba,geo_names,filtered_geographies,geography,hazard, yea
         Object.keys(sba).filter(d => d !== '$__path').forEach(item => {
             data.push({
                 geoid : item,
-                county_fips_name: `${get(geo_names, `${item}.name`, '')},${get(sba, `${item}.${hazard}.${year}.${'state_abbrev'}`, '')}`,
+                county_fips_name: `${get(geo_names, `${item}.name`, '')}`,
                 year: year,
                 hazard: hazards.reduce((a, c) => {
                     if (c.value === hazard) {
@@ -153,7 +153,7 @@ export const sbaData = async (type='',columns=[],fips_value,geography_filter,haz
                 return out
             }, [])
         sbaData_fips = await falcorGraph.get(
-            ['sba','all',["36"],hazard,year,columns])
+            ['sba','all',geo_fips,hazard,year,columns])
         if(geography === 'counties' && filtered_geographies.length > 0) {
             geoNames = await falcorGraph.get(['geo',filtered_geographies,['name']])
             sbaData = await falcorGraph.get(
@@ -178,6 +178,7 @@ export const sbaData = async (type='',columns=[],fips_value,geography_filter,haz
         }
 
     }else{
+
         sba_US = await falcorGraph.get(['sba','all',[""],hazard,year,columns])
     }
     if(type === 'map'){

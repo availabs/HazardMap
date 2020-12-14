@@ -110,6 +110,7 @@ class NationalLanding extends React.Component {
             })
         }
         else if(this.props.match.params.datatype === 'fema') {
+            console.time('fema all time index combined')
             this.data = await femaDisastersData('map',[
                 'ia_ihp_amount',
                 'ia_ihp_count',
@@ -127,6 +128,7 @@ class NationalLanding extends React.Component {
             this.setState({
                 isLoading: false
             })
+            console.timeEnd('fema all time index combined')
         }else{
             return Promise.resolve()
         }

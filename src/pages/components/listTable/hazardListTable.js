@@ -77,10 +77,12 @@ class HazardListTable extends React.Component{
 
         }
         else{
+            console.time('fema all time table')
             this.data = await femaDisastersData(this.props.data.type,this.props.data.data_columns,this.props.geoid,'counties',this.hazards,this.props.year)
             this.setState({
                 isLoading : false
             })
+            console.timeEnd('fema all time table')
         }
 
     }

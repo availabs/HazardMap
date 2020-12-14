@@ -42,7 +42,7 @@ const processMapData = (fema,geo_names,filtered_geographies,geography,hazard, ye
         Object.keys(fema).filter(d => d !== '$__path').forEach(item =>{
             data.push({
                 geoid : item,
-                county_fips_name : item,
+                county_fips_name : `${get(geo_names,`${item}.name`,'')}`,
                 year: year,
                 hazard : hazards.reduce((a,c) => {
                     if(c.value === hazard){
@@ -59,7 +59,7 @@ const processMapData = (fema,geo_names,filtered_geographies,geography,hazard, ye
         Object.keys(fema).filter(d => d !== '$__path').forEach(item =>{
             data.push({
                 geoid : item,
-                county_fips_name : `${get(geo_names,`${item}.name`,'')},${get(fema,`${item}.${hazard}.${year}.${'state'}`,'')}`,
+                county_fips_name : item,
                 year: year,
                 hazard : hazards.reduce((a,c) => {
                     if(c.value === hazard){
@@ -224,7 +224,9 @@ export const femaDisastersData = async (type,columns,geo_fips,geography,hazard,y
             }, [])
         if(geography === 'counties' && filtered_geographies.length > 0){
             geoNames = await falcorGraph.get(['geo',filtered_geographies,['name']])
+            console.time('fema all time data fetching')
             FemaDisastersCombinedTotalCostData = await falcorGraph.get(['fema','disasters',filtered_geographies,hazard,year,columns])
+            console.timeEnd('fema all time data fetching')
         }
         if(geography === 'zip_codes' && filtered_geographies.length > 0){
             const zipData = await falcorGraph.get(['geo',filtered_geographies,'byZip',['zip_codes']])

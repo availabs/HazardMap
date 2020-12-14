@@ -86,10 +86,12 @@ class StackedBarGraph extends React.Component{
                 isLoading : false
             })
         }if(this.props.data.data_type === 'fema'){
+            console.time('fema all time graph')
             this.data = await femaDisastersData(this.props.data.type,this.props.data.data_columns,this.props.geoid,'counties',this.hazards,years)
             this.setState({
                 isLoading : false
             })
+            console.timeEnd('fema all time graph')
         }
 
     }

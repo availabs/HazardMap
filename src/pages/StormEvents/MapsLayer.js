@@ -118,12 +118,14 @@ class MapsLayer extends MapLayer {
         let geo_fips = this.filters.fips.value ? this.filters.fips.value : fips
         let geography = this.filters.geography.value ? this.filters.geography.value : 'counties'
         if(this.filters.dataType.value === 'stormevents'){
-            this.data = await stormEventsData('map',['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips'],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
+            this.data = await stormEventsData('map',
+                ['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips'],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
         }
         else if(this.filters.dataType.value === 'sba'){
             this.data = await sbaData('map',['total_loss','loan_total','num_loans','state_abbrev'],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
         }
         else if(this.filters.dataType.value === 'fema') {
+            console.time('fema all time map layer')
             this.data = await femaDisastersData('map',[
                 'ia_ihp_amount',
                 'ia_ihp_count',
@@ -138,6 +140,7 @@ class MapsLayer extends MapLayer {
                 'total_cost',
                 "total_disasters"
             ],geo_fips,geography,this.filters.hazard.value,this.filters.year.value)
+            console.timeEnd('fema all time map layer')
         }else{
             return Promise.resolve()
         }
@@ -336,7 +339,7 @@ export default (props = {}) =>
                 },{})
                 return [
                         [   (<div className='text-sm text-bold text-left'>
-                            {`${get(graph,'county_fips_name','')}`}
+                            {`${get(graph,'county_fips_name','')},${get(properties,['state_abbrev'])}`}
                         </div>)
                         ],
                         [   (<div className='text-xs text-gray-500 text-left'>
@@ -431,24 +434,6 @@ export default (props = {}) =>
                 value: null,
                 domain: []
             }
-        },
-
-        // infoBoxes:{
-        //     overview.js:{
-        //         title:"",
-        //         comp:(props)  =>{
-        //             return (
-        //                 <ControlBase
-        //                     layer={props}
-        //                     state_fips = {props.layer.state_fips}
-        //                     state_name = {props.layer.state_name}
-        //                 />
-        //             )
-        //         },
-        //         show:true
-        //     }
-        // },
-        state_fips: null,
-        state_name : null,
+        }
 
     })

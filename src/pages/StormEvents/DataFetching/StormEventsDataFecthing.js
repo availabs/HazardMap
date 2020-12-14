@@ -38,7 +38,7 @@ const processMapData = (sw,geo_names,filtered_geographies,hazard, year) =>{
     Object.keys(sw).filter(d => d !== '$__path').forEach(item =>{
         data.push({
             geoid : item,
-            county_fips_name : `${get(geo_names,`${item}.name`,'')},${get(sw,`${item}.${hazard}.${year}.${'state'}`,'')}`,
+            county_fips_name : `${get(geo_names,`${item}.name`,'')}`,
             year: year,
             hazard : hazards.reduce((a,c) => {
                 if(c.value === hazard){
