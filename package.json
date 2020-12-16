@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@availabs/avl-components": "^1.0.9",
+    "@availabs/avl-components": "^1.0.23",
+    "@draft-js-plugins/editor": "^4.0.0-beta4",
     "@mapbox/geojson-extent": "^0.3.2",
     "@nivo/bar": "^0.63.1",
     "@nivo/line": "^0.63.1",
@@ -33,7 +34,7 @@
     "lodash.get": "^4.4.2",
     "lodash.pick": "^4.4.0",
     "mapbox-gl": "^1.11.0",
-    "match-sorter": "^4.1.0",
+    "match-sorter": "^4.2.1",
     "moment": "^2.27.0",
     "papaparse": "^5.2.0",
     "prop-types": "^15.7.2",

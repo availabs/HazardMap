@@ -1,10 +1,10 @@
 import React from "react"
 // import get from 'lodash.get'
-import {useTheme} from "components/avl-components/wrappers/with-theme"
+import {useTheme} from "components/avl-components/src/wrappers/with-theme"
 
 import {DmsButton} from "components/dms/components/dms-button"
 
-import {TopNav} from 'components/avl-components/components'
+import {TopNav} from 'components/avl-components/src/components'
 
 import SectionManager from './SectionManager'
 //import SectionView from './SectionView'

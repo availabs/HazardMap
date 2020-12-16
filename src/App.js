@@ -11,20 +11,20 @@ import {DefaultLayout,Messages} from "@availabs/avl-components"
 import DmsComponents from "components/dms"
 import DmsWrappers from "components/dms/wrappers"
 
-import { auth } from 'components/ams/api/auth';
-import AmsComponents from "components/ams"
-import AmsWrappers from "components/ams/wrappers"
+import { auth } from 'components/ams/src/api/auth';
+//import AmsComponents from "components/ams"
+import AmsWrappers from "components/ams/src/wrappers"
 
 import {
   addComponents,
   addWrappers
-} from "components/avl-components/ComponentFactory"
+} from "components/avl-components/src/ComponentFactory"
 
 addComponents(DmsComponents);
 addWrappers(DmsWrappers);
 
-addComponents(AmsComponents);
-addWrappers(AmsWrappers);
+//addComponents(AmsComponents);
+//addWrappers(AmsWrappers);
 
 class App extends Component {
   componentDidMount() {

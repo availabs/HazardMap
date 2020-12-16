@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
-import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
+import {reduxFalcor} from "../../utils/redux-falcor-new";
 import get from "lodash.get";
 import {setActiveStateGeoid} from "../../store/modules/stormEvents";
 import {CSVLink} from "react-csv";
@@ -534,6 +534,7 @@ class DataDownload extends React.Component{
 
 const mapStateToProps = (state, ownProps) => {
     return {
+        falcorCache: state.falcorCache,
         activeStateGeoid : state.stormEvents.activeStateGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
         graph: state.graph,

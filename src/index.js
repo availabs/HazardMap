@@ -9,12 +9,15 @@ import { Provider } from 'react-redux';
 import store from 'store';
 import {
 	Themes,
-	FalcorProvider,
 	ThemeContext,
+	/*//FalcorProvider,
+
 	falcorGraph,
-	// addComponents,
-	// addWrappers
+	addComponents,
+	addWrappers*/
 } from "@availabs/avl-components"
+import { falcorGraph } from 'store/falcorGraphNew'
+import { FalcorProvider } from 'utils/redux-falcor-new'
 
 import reportWebVitals from './reportWebVitals';
 
@@ -24,21 +27,21 @@ import reportWebVitals from './reportWebVitals';
 // import AmsComponents from "components/ams"
 // import AmsWrappers, { enableAuth } from "components/ams/wrappers"
 
-// addComponents(DmsComponents);
+//addComponents(DmsComponents);
 // addWrappers(DmsWrappers);
 //
 // addComponents(AmsComponents);
 // addWrappers(AmsWrappers);
 
 import Theme from './Theme'
-
+import {useTheme} from "@availabs/avl-components/dist/wrappers";
 import 'styles/tailwind.css';
-
+//const theme = useTheme()
 ReactDOM.render(
 	<React.StrictMode>
 		<Provider store={ store }>
-			<FalcorProvider falcor={ falcorGraph(API_HOST) }>
-				<ThemeContext.Provider value={ Theme }>
+			<FalcorProvider falcor={ falcorGraph}>
+				<ThemeContext.Provider value={ Themes["light"]}>
 					<App/>
 					{ /*<AuthEnabledApp />*/ }
 				</ThemeContext.Provider>

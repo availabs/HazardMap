@@ -1,14 +1,15 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
 import get from 'lodash.get';
 import StackedBarGraph from "./components/StackedBarGraph";
 import {setActiveStateGeoid} from "store/modules/stormEvents";
-import Header from "../../components/avl-components/components/Header/Header";
+import Header from "../../components/avl-components/src/components/Header/Header";
 import SvgMapComponent from "./layers/SvgMapComponent";
 import SevereWeatherCountyTable from "./components/SevereWeatherCountyTable";
 import FemaDisastersTotalCountyTable from "./components/FemaDisastersTotalCountyTable";
 import FemaDisastersIndividualCountyTable from "./components/FemaDisastersIndividualCountyTable";
+//import {falcorGraph} from "store/falcorGraphNew"
+import {reduxFalcor}  from "utils/redux-falcor-new";
 let years = []
 const start_year = 1996
 const end_year = 2019
@@ -58,6 +59,9 @@ class Overview extends React.Component {
         };
     }
 
+    componentDidMount(){
+        this.fetchFalcorDeps()
+    }
 
     componentDidUpdate(prevProps,prevState,s){
 
@@ -92,6 +96,7 @@ class Overview extends React.Component {
             sba,
             fema_disasters_combined,
             fema_disasters_by_id
+
         }
     }
 
@@ -262,6 +267,7 @@ class Overview extends React.Component {
 }
 const mapStateToProps = (state, ownProps) => {
     return {
+        falcorCache: state.falcorCache,
         activeCountyGeoid : state.overview.activeCountyGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,
         graph: state.graph,

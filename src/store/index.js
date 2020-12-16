@@ -7,7 +7,7 @@ import falcorCache from "utils/redux-falcor-new/falcorCache"
 
 
 import messages from './messages';
-import reducers from "components/ams/reducers"
+import reducers from "components/ams/src/reducers"
 import overview from "./modules/overview";
 import stormEvents from "./modules/stormEvents";
 import femaDisasterDeclarations from "./modules/femaDisasterDeclarations";

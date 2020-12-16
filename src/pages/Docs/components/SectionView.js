@@ -1,6 +1,6 @@
 import React from "react"
 import ReadOnlyEditor from "components/dms/components/editor/editor.read-only"
-import { Button } from "components/avl-components/components/Button"
+import { Button } from "components/avl-components/src/components/Button"
 
 export default ({value, edit, remove}) => {
     if(!value) return false

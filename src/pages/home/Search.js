@@ -1,10 +1,11 @@
 import React, {Fragment} from 'react';
 import {connect} from 'react-redux';
-import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
+import {reduxFalcor} from "../../utils/redux-falcor-new";
 import get from "lodash.get";
 import {asyncContainer, Typeahead} from 'react-bootstrap-typeahead';
 import './style.css';
 import {setActiveCountyGeoid} from "../../store/modules/overview";
+
 
 var _ = require('lodash')
 const AsyncTypeahead = asyncContainer(Typeahead);
@@ -103,6 +104,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state,ownProps) => {
     return {
+        falcorCache: state.falcorCache,
         activeStateGeoid : state.user.activeStateGeoid,
         geoid:ownProps.geoid,
         censusKey:ownProps.censusKey,

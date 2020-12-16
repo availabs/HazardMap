@@ -1,4 +1,4 @@
-import {handler} from 'components/avl-components/components/Themes'
+//import {handler} from 'components/avl-components/components/Themes'
 
 const light_base = {
     shadow: 'shadow',
@@ -47,7 +47,7 @@ const light_base = {
     sidebarBorder: ' border-r border-gray-200',
     navitemSide: 'font-sans group flex pl-8 pr-4 py-2 border-l-4 border-transparent text-base font-base text-gray-600 hover:text-blue-600 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out',
     navitemSideActive: 'group flex pl-8 pr-4 py-2 border-l-4 border-blue-500 text-base font-base text-gray-600 focus:outline-none hover:text-indigo-800 focus:text-indigo-800 focus:bg-indigo-200 focus:border-indigo-700 transition duration-150 ease-in-out',
-    
+
 
     menuBg: 'bg-gray-100 z-50',
     menuBgHover: 'hover:bg-gray-300',
@@ -88,7 +88,7 @@ const light_base = {
     highlight4: "bg-teal-500",
 
     width: '',
-    
+
     transition: "transition ease-in-out duration-150",
     button: `
 		inline-flex items-center
@@ -154,7 +154,7 @@ const textbutton = [
 const list = [
     { $default: "@transition rounded"
     },
-    { 
+    {
         $default: "p-2 pb-0 bg-white shadow",
         Dragging: "p-2 pb-0 bg-white",
         Item: "py-1 px-3 bg-gray-300 mb-2 border-b"
@@ -192,4 +192,3 @@ const TEST_THEME_BASE = {
     $compositions
 }
 
-export default new Proxy(TEST_THEME_BASE, handler);

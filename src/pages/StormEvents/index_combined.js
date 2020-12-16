@@ -1,9 +1,8 @@
-import React from 'react';
+import React  from 'react';
 import {connect} from 'react-redux';
 import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
 import get from 'lodash.get';
 import {setActiveStateGeoid} from "store/modules/stormEvents";
-import {shmp} from 'pages/components/shmp-theme.js'
 import {withRouter} from "react-router";
 import {stormEventsData} from "./DataFetching/StormEventsDataFecthing";
 import {sbaData} from "./DataFetching/SBADataFetching";
@@ -45,8 +44,10 @@ const hazards = [
     {value:'coastal', name:'Coastal Hazards'}
 ]
 
+
 class NationalLanding extends React.Component {
     MapsLayer = MapsLayerFactory({active: true});
+
     constructor(props) {
         super(props);
         // Don't call this.setState() here!
@@ -69,7 +70,6 @@ class NationalLanding extends React.Component {
         };
         this.handleChange = this.handleChange.bind(this)
     }
-
     setYear = (year) => {
         if (this.state.year !== year) {
             this.setState({year})
@@ -98,6 +98,7 @@ class NationalLanding extends React.Component {
         let geography = this.state.geography_filter === 'counties' ?  'counties': this.state.geography_filter
         if(this.props.match.params.datatype === 'stormevents'){
             this.data = await stormEventsData('map',['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips'],geo_fips,geography,this.state.hazard,this.state.year)
+
             this.setState({
                 isLoading: false
             })
@@ -330,8 +331,7 @@ export default [
             fixed: true,
             maxWidth: '',//'max-w-7xl',
             headerBar: false,
-            nav: 'top',
-            theme: shmp,
+            nav: 'top'
         }
     },{
         path: '/maps/stormevents',
@@ -343,9 +343,8 @@ export default [
         layoutSettings: {
             fixed: true,
             maxWidth: '',//'max-w-7xl',
-            headerBar: false,
-            nav: 'top',
-            theme: shmp,
+            headerBar: true,
+            nav: 'top'
         }
     },
     {
@@ -358,9 +357,8 @@ export default [
         layoutSettings: {
             fixed: true,
             maxWidth: '',//'max-w-7xl',
-            headerBar: false,
-            nav: 'top',
-            theme: shmp,
+            headerBar: true,
+            nav: 'top'
         }
     },
     {
@@ -373,9 +371,8 @@ export default [
         layoutSettings: {
             fixed: true,
             maxWidth: '',//'max-w-7xl',
-            headerBar: false,
-            nav: 'top',
-            theme: shmp,
+            headerBar: true,
+            nav: 'top'
         }
     }
 

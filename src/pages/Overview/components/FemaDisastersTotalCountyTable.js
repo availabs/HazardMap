@@ -1,9 +1,10 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
+import {reduxFalcor} from "../../../utils/redux-falcor-new";
 import get from 'lodash.get';
-import Table from '../../../components/avl-components/components/Table/index'
+import Table from '../../../components/avl-components/src/components/Table/index'
 import {fnum} from "../../../utils/sheldusUtils";
+
 
 const DISASTER_DECLARATION_BY_GEOID_ATTRIBUTES = [
     'geoid',
@@ -150,6 +151,7 @@ class FemaDisastersTotalCountyTable extends React.Component{
 
 const mapStateToProps = (state) => {
     return {
+        falcorCache: state.falcorCache,
         activeAmount:state.femaDisasterDeclarations.activeAmount,
         activeStateGeoid : state.stormEvents.activeStateGeoid,
         activeStateAbbrev : state.stormEvents.activeStateAbbrev,

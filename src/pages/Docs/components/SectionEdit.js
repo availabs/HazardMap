@@ -9,7 +9,7 @@ import { useSetSections } from "components/dms/wrappers/dms-create"
 import { createEmpty } from "components/dms/components/editor"
 
 import { useDmsSections } from "components/dms/components/utils/dms-input-utils"
-import { Button } from "components/avl-components/components/Button"
+import { Button } from "components/avl-components/src/components/Button"
 
 
 import get from 'lodash.get'

@@ -1,7 +1,7 @@
 import React, { useState  }  from "react"
 import { Link } from 'react-router-dom'
 
-import { Input, DndList } from 'components/avl-components/components'
+import { Input, DndList } from 'components/avl-components/src/components'
 import { DmsButton } from "components/dms/components/dms-button"
 
 import AdminLayout from './AdminLayout'

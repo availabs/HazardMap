@@ -1,7 +1,7 @@
 import React from "react"
 import get from 'lodash.get'
 
-import {TopNav} from 'components/avl-components/components'
+import {TopNav} from 'components/avl-components/src/components'
 //import AuthMenu from 'pages/Auth/AuthMenu'
 import SectionView from './SectionView'
 

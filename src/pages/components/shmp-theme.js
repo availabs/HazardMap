@@ -1,4 +1,5 @@
-import {handler} from 'components/avl-components/components/Themes'
+
+//import {handler} from 'components/avl-components/components/Themes'
 
 const light_base = {
     shadow: 'shadow',
@@ -146,7 +147,7 @@ const textbutton = [
 const list = [
     { $default: "@transition rounded"
     },
-    { 
+    {
         $default: "p-2 pb-0 bg-white shadow",
         Dragging: "p-2 pb-0 bg-white",
         Item: "py-1 px-3 bg-gray-300 mb-2 border-b"
@@ -184,4 +185,4 @@ const TEST_THEME_BASE = {
     $compositions
 }
 
-export const shmp = new Proxy(TEST_THEME_BASE, handler);
+//export const shmp = new Proxy(TEST_THEME_BASE, handler);

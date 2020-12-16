@@ -1,8 +1,8 @@
 import React from "react"
 
- import { Button } from "components/avl-components/components/Button"
+ import { Button } from "components/avl-components/src/components/Button"
 // import { ValueContainer, ValueItem } from "components/avl-components/components/Inputs/parts"
-import { verifyValue as utilityVerify, hasValue as defaultHasValue } from "components/avl-components/components/Inputs/utils"
+import { verifyValue as utilityVerify, hasValue as defaultHasValue } from "components/avl-components/src/components/Inputs/utils"
 //import { useSetRefs } from "components/avl-components/components/utils"
 import SectionView from './SectionView'
 import SectionEdit from './SectionEdit'
