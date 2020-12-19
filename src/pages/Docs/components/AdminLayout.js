@@ -1,6 +1,6 @@
 import React  from "react"
 // import {SideNav} from 'components/avl-components/components'
-import {useTheme} from "components/avl-components/wrappers/with-theme"
+import {useTheme} from "components/avl-components/src/wrappers/with-theme"
 
 const AdminLayout = ({children}) => {
 	const theme = useTheme()

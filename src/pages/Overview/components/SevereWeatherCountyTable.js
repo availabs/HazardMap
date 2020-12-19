@@ -59,11 +59,9 @@ class SevereWeatherCountyTable extends React.Component{
         let wide_total = []
         if(graph && severeWeather){
             Object.keys(severeWeather).forEach(geo =>{
-                if(geo.slice(0,2) === this.props.geoid.slice(0,2)){
+                if(this.cousubs.includes(geo)){
                     let value = hazards.reduce((a,c) =>{
-
                         a[c.value] = get(severeWeather,[geo,c.value,'allTime','total_damage'],0)
-
                         return a
                     },{})
                     data.push({

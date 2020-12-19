@@ -36,7 +36,7 @@ class DataDownload extends React.Component{
         super(props);
         this.state={
             dataset : 'severeWeather',
-            datasets :[{name : 'Severe Weather',value : 'severeWeather'},{name:'SBA',value:'sba'},{name:'FEMA HMAP V1',value:'hmap_v1'}],
+            datasets :[{name : 'Severe Weather',value : 'severeWeather'},{name:'SBA',value:'sba'},{name:'FEMA Disasters',value:'fema'}],
             state_fips:null,
             county:'',
             geolevel: 'counties',
@@ -125,7 +125,21 @@ class DataDownload extends React.Component{
 
     fetchFalcorDeps(){
         const attributes = this.state.dataset === 'severeWeather' ? ['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events'] :
-            this.state.dataset === 'hmap_v1' ? ['actual_amount_paid'] : ['total_loss','loan_total','num_loans']
+            this.state.dataset === 'fema' ? [
+                'ia_ihp_amount',
+                'ia_ihp_count',
+                'pa_project_amount',
+                'pa_federal_share_obligated',
+                'hma_prop_actual_amount_paid',
+                'hma_prop_number_of_properties',
+                'hma_proj_project_amount',
+                'hma_proj_project_amount_count',
+                'hma_proj_federal_share_obligated',
+                'hma_proj_federal_share_obligated_count',
+                'total_cost',
+                "total_cost_summaries",
+                "total_disasters"
+            ] : ['total_loss','loan_total','num_loans']
         return this.props.falcor.get(['geo',fips,'name'])
             .then(response =>{
                 if(this.state.state_fips){
@@ -147,25 +161,27 @@ class DataDownload extends React.Component{
                                             }
                                             return out
                                         }, [])
+
                                     await this.props.falcor.get(['geo',this.filtered_geo,'name'])
-                                    if(this.filtered_geo.length > 0 && this.state.dataset!== 'sba' && this.state.user_hazards.length ){
-                                        let chunks = _.chunk(this.filtered_geo,20)
-                                        let disaster_requests = []
-                                        chunks.forEach(chunk =>{
-                                            disaster_requests.push([this.state.dataset,chunk,this.state.user_hazards,[{
-                                                from: 1996,
-                                                to: 2019
-                                            }], attributes])
-                                        })
-                                        return disaster_requests.reduce((a, c, cI) => a.then(() => {
-                                            this.props.falcor.get(c)
+                                    if(this.filtered_geo.length > 0 && this.state.dataset!== 'sba' && this.state.user_hazards.length && this.state.geolevel !== 'zip_codes'){
+                                        let dataset =  this.state.dataset === 'fema' ? ['fema','disasters'] : [this.state.dataset]
+                                            let chunks = _.chunk(this.filtered_geo,20)
+                                            let disaster_requests = []
+                                            chunks.forEach(chunk =>{
+                                                disaster_requests.push([...dataset,chunk,this.state.user_hazards,[{
+                                                    from: 1996,
+                                                    to: 2019
+                                                }], attributes])
+                                            })
+                                            return disaster_requests.reduce((a, c, cI) => a.then(() => {
+                                                this.props.falcor.get(c)
+                                                    .then(response =>{
+                                                        return response
+                                                    })
+                                            }), Promise.resolve())
                                                 .then(response =>{
                                                     return response
                                                 })
-                                        }), Promise.resolve())
-                                            .then(response =>{
-                                                return response
-                                            })
                                     }
                                     if(this.state.dataset === 'sba' && this.state.user_hazards.length){
                                         if(this.state.geolevel === 'zip_codes' && this.state.county !== "") {
@@ -201,6 +217,21 @@ class DataDownload extends React.Component{
                                                     return response
                                                 })
                                         }
+                                    }
+                                    if(this.state.dataset === 'fema' && this.state.geolevel === 'zip_codes' && this.state.county !== ""){
+                                        this.props.falcor.get(['geo',this.state.county, 'byZip', ['zip_codes']])
+                                            .then(async response =>{
+                                                this.zip_codes = Object.values(response.json.geo).reduce((out, geo) => {
+                                                    if (geo.byZip) {
+                                                        out = [...out, ...geo.byZip['zip_codes']]
+                                                    }
+                                                    return out
+                                                }, [])
+                                                return await this.props.falcor.get(['fema','disasters','byZip',this.zip_codes,this.state.user_hazards, [{
+                                                    from: 1996,
+                                                    to: 2019
+                                                }], attributes])
+                                            })
                                     }
                                     return response
                                 })
@@ -249,36 +280,50 @@ class DataDownload extends React.Component{
 
     async processData(){
         let attributes = this.state.dataset === 'severeWeather' ? ['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events'] :
-            this.state.dataset === 'hmap_v1' ? ['actual_amount_paid'] : ['total_loss','loan_total','num_loans']
+            this.state.dataset === 'fema' ? [
+                'ia_ihp_amount',
+                'ia_ihp_count',
+                'pa_project_amount',
+                'pa_federal_share_obligated',
+                'hma_prop_actual_amount_paid',
+                'hma_prop_number_of_properties',
+                'hma_proj_project_amount',
+                'hma_proj_project_amount_count',
+                'hma_proj_federal_share_obligated',
+                'hma_proj_federal_share_obligated_count',
+                'total_cost',
+                "total_cost_summaries",
+                "total_disasters"
+            ] : ['total_loss','loan_total','num_loans']
         let data = []
-        let data_set = this.state.dataset
+        let data_set = this.state.geolevel !== 'zip_codes' ?
+            this.state.dataset === 'fema' ? `fema.disasters` : this.state.dataset :
+            this.state.dataset === 'fema' ? `fema.disasters.byZip` : this.state.dataset
         let user_hazards = this.state.user_hazards
         let falcorCache = await this.props.falcorCache
         if(data_set !== 'sba' && hazards.length ){
-            let fetchedData = get(falcorCache,[data_set],{})
+            let fetchedData = get(falcorCache,data_set,{})
             Object.keys(fetchedData).filter(d => d!== '$__path').forEach(geo =>{
-                if(this.filtered_geo && this.filtered_geo.includes(geo)){
-                    user_hazards.forEach(hazard =>{
-                        let d = get(fetchedData[geo],[hazard],{})
-                        Object.keys(d).filter(d => d!=='$__path').forEach(item =>{
-                            data.push(
-                                attributes.reduce((a,c) =>{
-                                    a[c]= get(fetchedData[geo], [hazard, item,c], 0)
-                                    a['name'] = get(falcorCache,['geo',geo,'name'],'')
-                                    a['year'] = item
-                                    a['hazard'] = hazards.reduce((a,c) =>{
-                                        if(c.value === hazard){
-                                            a = c.name
-                                        }
-                                        return a
-                                    },'')
-                                    return a
-                                },{})
-                            )
-                        })
-                    })
-                }
+                user_hazards.forEach(hazard =>{
+                    let d = get(fetchedData[geo],[hazard],{})
+                    Object.keys(d).filter(d => d!=='$__path').forEach(item =>{
 
+                        data.push(
+                            attributes.reduce((a,c) =>{
+                                a[c]= this.state.dataset === 'fema' ? get(fetchedData[geo], [hazard, item,c,'value'], 0):get(fetchedData[geo], [hazard, item,c], 0)
+                                a['name'] = get(falcorCache,['geo',geo,'name'],'')
+                                a['year'] = item
+                                a['hazard'] = hazards.reduce((a,c) =>{
+                                    if(c.value === hazard){
+                                        a = c.name
+                                    }
+                                    return a
+                                },'')
+                                return a
+                            },{})
+                        )
+                    })
+                })
             })
         }
         if(data_set === 'sba' && hazards.length){
@@ -308,6 +353,7 @@ class DataDownload extends React.Component{
             })
 
         }
+        console.log('data',data)
         return data
     }
 
@@ -422,7 +468,7 @@ class DataDownload extends React.Component{
                                         required
                                     >
                                         <option key={0} value={""}>---Select a GeoLevel---</option>
-                                        {this.state.dataset !== 'sba' ? this.state.geolevels.map((item,i) =>{
+                                        {this.state.dataset === 'severeWeather' ? this.state.geolevels.map((item,i) =>{
                                                 return(
                                                     <option key={i+1} value={item.value}
                                                             disabled={item.value ==='counties' && this.state.county === "" ? false : this.state.county === "" }>

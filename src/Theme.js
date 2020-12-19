@@ -1,4 +1,4 @@
-//import {handler} from 'components/avl-components/components/Themes'
+import {composeTheme} from "@availabs/avl-components/dist/Themes/utils";
 
 const light_base = {
     shadow: 'shadow',
@@ -192,3 +192,4 @@ const TEST_THEME_BASE = {
     $compositions
 }
 
+export default composeTheme(TEST_THEME_BASE)

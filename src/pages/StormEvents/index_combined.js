@@ -1,8 +1,8 @@
 import React  from 'react';
 import {connect} from 'react-redux';
-import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor";
+import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
-import {setActiveStateGeoid} from "store/modules/stormEvents";
+import config from './components/config'
 import {withRouter} from "react-router";
 import {stormEventsData} from "./DataFetching/StormEventsDataFecthing";
 import {sbaData} from "./DataFetching/SBADataFetching";
@@ -10,39 +10,12 @@ import {femaDisastersData} from "./DataFetching/FEMADisastersDataFetching";
 import Legend from "./components/Legend";
 import hazardcolors from "../../constants/hazardColors";
 import {fnumClean} from "../../utils/sheldusUtils";
-import StackedBarGraph from "../components/bar /stackedBarGraph";
+import StackedBarGraph from "../components/bar/stackedBarGraph";
 import SlideOver from "./components/SlideOver";
 import HazardListTable from "../components/listTable/hazardListTable";
 import MapsLayerFactory from "./MapsLayer";
 import AvlMap from "../../components/AvlMap";
 
-const fips = ["01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53", "54", "55", "56"]
-let years = []
-const start_year = 1996
-const end_year = 2019
-for (let i = start_year; i <= end_year; i++) {
-    years.push(i)
-}
-const hazards = [
-    {value:'wind', name:'Wind'},
-    {value:'wildfire', name:'Wildfire'},
-    {value:'tsunami', name:'Tsunami/Seiche'},
-    {value:'tornado', name:'Tornado'},
-    {value:'riverine', name:'Flooding'},
-    {value:'lightning', name:'Lightning'},
-    {value:'landslide', name:'Landslide'},
-    {value:'icestorm', name:'Ice Storm'},
-    {value:'hurricane', name:'Hurricane'},
-    {value:'heatwave', name:'Heat Wave'},
-    {value:'hail', name:'Hail'},
-    {value:'earthquake', name:'Earthquake'},
-    {value:'drought', name:'Drought'},
-    {value:'avalanche', name:'Avalanche'},
-    {value:'coldwave', name:'Coldwave'},
-    {value:'winterweat', name:'Snow Storm'},
-    {value:'volcano', name:'Volcano'},
-    {value:'coastal', name:'Coastal Hazards'}
-]
 
 
 class NationalLanding extends React.Component {
@@ -56,7 +29,7 @@ class NationalLanding extends React.Component {
             year: 'allTime',
             hazard: 'riverine',
             select: {
-                domain: [...years, 'allTime'],
+                domain: [...config['years'], 'allTime'],
                 value: []
             },
             geography_storm : [{name : 'County',value : 'counties'},{name:'Municipality',value:'cousubs'},{name:'Tracts',value:'tracts'}],
@@ -93,61 +66,70 @@ class NationalLanding extends React.Component {
         this.setState({ year: e })
     }
 
-    async fetchFalcorDeps(){
-        let geo_fips = this.state.fips_value ? this.state.fips_value : fips
-        let geography = this.state.geography_filter === 'counties' ?  'counties': this.state.geography_filter
-        if(this.props.match.params.datatype === 'stormevents'){
-            this.data = await stormEventsData('map',['total_damage', 'num_episodes','property_damage','crop_damage','num_episodes','num_events','state','state_fips'],geo_fips,geography,this.state.hazard,this.state.year)
-
-            this.setState({
-                isLoading: false
-            })
+    componentDidUpdate(oldProps,oldState){
+        if(this.state.hazard !== oldState.hazard){
+            this.fetchFalcorDeps()
         }
-        else if(this.props.match.params.datatype === 'sba'){
-
-            this.data = await sbaData('map',['total_loss','loan_total','num_loans','state_abbrev'],geo_fips,geography,this.state.hazard,this.state.year)
-            this.setState({
-                isLoading: false
-            })
+        if(this.state.fips_value !== oldState.fips_value){
+            this.fetchFalcorDeps()
         }
-        else if(this.props.match.params.datatype === 'fema') {
-            console.time('fema all time index combined')
-            this.data = await femaDisastersData('map',[
-                'ia_ihp_amount',
-                'ia_ihp_count',
-                'pa_project_amount',
-                'pa_federal_share_obligated',
-                'hma_prop_actual_amount_paid',
-                'hma_prop_number_of_properties',
-                'hma_proj_project_amount',
-                'hma_proj_project_amount_count',
-                'hma_proj_federal_share_obligated',
-                'hma_proj_federal_share_obligated_count',
-                'total_cost',
-                "total_disasters"
-            ],geo_fips,geography,this.state.hazard,this.state.year)
-            this.setState({
-                isLoading: false
-            })
-            console.timeEnd('fema all time index combined')
-        }else{
-            return Promise.resolve()
+        if(this.state.year !== oldState.year){
+            this.fetchFalcorDeps()
+        }
+        if(this.props.match.params.datatype !== oldProps.match.params.datatype){
+            this.fetchFalcorDeps()
+        }
+        if(this.state.geography_filter !== oldState.geography_filter){
+            this.fetchFalcorDeps()
+        }
+    }
+
+    fetchFalcorDeps(){
+        switch (this.props.match.params.datatype) {
+            case 'sba':
+                return sbaData('map',config[this.props.match.params.datatype].data_columns,this.state.fips_value,this.state.geography_filter,this.state.hazard,this.state.year)
+            case 'stormevents':
+                return stormEventsData('map',config[this.props.match.params.datatype].data_columns,this.state.fips_value,this.state.geography_filter,this.state.hazard,this.state.year)// "" is for the whole country
+            case 'fema':
+                return femaDisastersData('map',config[this.props.match.params.datatype].data_columns,this.state.fips_value,this.state.geography_filter,this.state.hazard,this.state.year)
+            default:
+                return Promise.resolve({})
         }
 
-        return this.data
+
+    }
+
+    processFipsDomain(){
+        const geoFipsData = get(this.props.falcorCache,['geo'],null)
+        let domain = []
+        if(geoFipsData){
+            domain = Object.keys(geoFipsData).filter(d => d!=='$__path')
+                .reduce((out, state) => {
+                    if(config.fips.includes(state)){
+                        out.push({
+                            'fips':state,
+                            'name': geoFipsData[state].name || ''
+                        })
+                    }
+                    return out
+                }, [])
+        }
+
+        return domain
     }
 
     render() {
+
         return (
             <div className='flex flex-col lg:flex-row h-screen box-border w-full -mt-4 fixed overflow-hidden'>
                 <div className='flex-auto h-full order-last lg:order-none'>
                     <div className='h-full'>
                         <div className="mx-auto h-8 w-2/6 pt-20 z-90">
                             <Legend
-                                title = {`Losses in each County from ${hazards.filter(d => d.value === this.state.hazard)[0].name}, ${this.state.year.replace('allTime', '1996-2019')}`}
+                                title = {`Losses in each County from ${config['Hazards'].filter(d => d.value === this.state.hazard)[0].name}, ${this.state.year.replace('allTime', '1996-2019')}`}
                                 type = {"threshold"}
                                 range= {["#F1EFEF",...hazardcolors[this.state.hazard + '_range']]}
-                                domain = {this.data ? this.data.domain : []}
+                                domain = {this.state.geography === 'counties' ? config[this.props.match.params.datatype].counties_domain : config[this.props.match.params.datatype].other_domain}
                                 format= {fnumClean}
                             />
                         </div>
@@ -171,7 +153,8 @@ class NationalLanding extends React.Component {
                                         hazard : this.state.hazard,
                                         fips : this.state.fips_value ? this.state.fips_value : null,
                                         geography : this.state.geography_filter,
-                                        dataType : this.props.match.params.datatype
+                                        dataType : this.props.match.params.datatype,
+                                        falcorCache: this.props.falcorCache
                                     }
                                 }}
                             />
@@ -179,31 +162,9 @@ class NationalLanding extends React.Component {
                             <div className="text-xs absolute pt-8">Click on a bar to filter the data by year</div>
                             <StackedBarGraph
                                 height={200}
-                                data={{
-                                    type: 'graph',
-                                    data_type: this.props.match.params.datatype,
-                                    category: this.props.match.params.datatype ==='sba' ? ['all'] : [""],
-                                    columns: this.props.match.params.datatype === 'stormevents' ? ['total_damage'] :
-                                        this.props.match.params.datatype === 'sba' ? ['total_loss'] : ["total_cost","total_cost_summaries"]
-                                    ,
-                                    data_columns : [
-                                        'ia_ihp_amount',
-                                        'ia_ihp_count',
-                                        'pa_project_amount',
-                                        'pa_federal_share_obligated',
-                                        'hma_prop_actual_amount_paid',
-                                        'hma_prop_number_of_properties',
-                                        'hma_proj_project_amount',
-                                        'hma_proj_project_amount_count',
-                                        'hma_proj_federal_share_obligated',
-                                        'hma_proj_federal_share_obligated_count',
-                                        'total_cost',
-                                        "total_disasters"
-                                    ],
-                                    sort: this.props.match.params.datatype !== 'fema' ? 'annualized_damage' : 'total_cost'
-                                }}
+                                type={'graph'}
+                                data_type={this.props.match.params.datatype}
                                 setYear={this.setYear.bind(this)}
-                                initialLoad={this.state.initialLoad}
                                 hazard={this.state.hazard}
                                 geoid={this.state.fips_value? this.state.fips_value : null}
                             />
@@ -215,7 +176,7 @@ class NationalLanding extends React.Component {
                     HeaderTitle={<div>
                         <div>{this.props.match.params.datatype === 'stormevents' ? `Storm Event Losses` : this.props.match.params.datatype === "sba" ? `SBA Loans`: "FEMA Disasters"}</div>
                         <label className="text-sm">Select a State</label>
-                        <div className="relative">
+                        {this.processFipsDomain() ? <div className="relative">
                             <select
                                 className="rounded-md w-full bg-transparent max-w-md"
                                 onChange={(e) =>{
@@ -226,7 +187,7 @@ class NationalLanding extends React.Component {
                                 }}
                             >
                                 <option value={null}>National</option>
-                                {this.data && !this.state.isLoading? this.data.fips_domain.map((d,i) =>{
+                                {this.processFipsDomain() ? this.processFipsDomain().map((d,i) =>{
                                     return(
                                         <option value={d.fips} key={i}>
                                             {d.name}
@@ -234,7 +195,8 @@ class NationalLanding extends React.Component {
                                     )
                                 }):null}
                             </select>
-                        </div>
+                        </div> : null}
+
                         {this.state.fips_value ?
                             <div>
                                 <label className="text-sm">Select a Geography</label>
@@ -269,32 +231,8 @@ class NationalLanding extends React.Component {
                     </div>}
                 >
                     <HazardListTable
-                        data={
-                            {
-                                type: 'table',
-                                data_type:this.props.match.params.datatype,
-                                category: this.props.match.params.datatype ==='sba' ? ['all'] : [""],
-                                columns: this.props.match.params.datatype === 'stormevents' ? ['total_damage', 'annualized_damage', 'num_episodes'] :
-                                    this.props.match.params.datatype === 'sba' ? ['total_loss', 'loan_total', 'num_loans'] : ["total_cost","total_cost_summaries"]
-                                ,
-                                data_columns : [
-                                    'ia_ihp_amount',
-                                    'ia_ihp_count',
-                                    'pa_project_amount',
-                                    'pa_federal_share_obligated',
-                                    'hma_prop_actual_amount_paid',
-                                    'hma_prop_number_of_properties',
-                                    'hma_proj_project_amount',
-                                    'hma_proj_project_amount_count',
-                                    'hma_proj_federal_share_obligated',
-                                    'hma_proj_federal_share_obligated_count',
-                                    'total_cost',
-                                    "total_disasters"
-                                ],
-                                header: this.props.match.params.datatype === 'stormevents' ? ['Damage','Yearly Avg Damage','# Episodes'] :
-                                    this.props.match.params.datatype === 'sba' ? ['Total Loss',' $ Loan','# Loans'] : ['$ Total Cost','$ Total Cost Summaries']
-                                ,
-                                sort: this.props.match.params.datatype === 'stormevents' ? "annualized_damage" : this.props.match.params.datatype === "sba" ? "total_loss": "total_cost"}}
+                        type={'table'}
+                        data_type={this.props.match.params.datatype}
                         geoid={this.state.fips_value ? this.state.fips_value : null}
                         year={this.state.year}
                         setHazard={this.setHazard.bind(this)}
@@ -308,14 +246,11 @@ class NationalLanding extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     return {
-        activeStateGeoid : state.stormEvents.activeStateGeoid,
-        activeStateAbbrev : state.stormEvents.activeStateAbbrev,
-        graph: state.graph,
-        hazards: get(state.graph, 'riskIndex.hazards.value', [])
+        falcorCache: state.falcorCache,
     };
 };
 const mapDispatchToProps = {
-    setActiveStateGeoid
+
 };
 const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(NationalLanding))
 

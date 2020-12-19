@@ -1,32 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {reduxFalcor} from "@availabs/avl-components/dist/redux-falcor/index";
+import {reduxFalcor} from "utils/redux-falcor-new";
 import get from 'lodash.get';
 import { fnum } from "utils/sheldusUtils"
 import hazardcolors from "constants/hazardColors";
 import {stormEventsData} from "../../StormEvents/DataFetching/StormEventsDataFecthing";
 import {sbaData} from "../../StormEvents/DataFetching/SBADataFetching";
 import {femaDisastersData} from "../../StormEvents/DataFetching/FEMADisastersDataFetching";
-const hazards = [
-    {value:'wind', name:'Wind'},
-    {value:'wildfire', name:'Wildfire'},
-    {value:'tsunami', name:'Tsunami/Seiche'},
-    {value:'tornado', name:'Tornado'},
-    {value:'riverine', name:'Flooding'},
-    {value:'lightning', name:'Lightning'},
-    {value:'landslide', name:'Landslide'},
-    {value:'icestorm', name:'Ice Storm'},
-    {value:'hurricane', name:'Hurricane'},
-    {value:'heatwave', name:'Heat Wave'},
-    {value:'hail', name:'Hail'},
-    {value:'earthquake', name:'Earthquake'},
-    {value:'drought', name:'Drought'},
-    {value:'avalanche', name:'Avalanche'},
-    {value:'coldwave', name:'Coldwave'},
-    {value:'winterweat', name:'Snow Storm'},
-    {value:'volcano', name:'Volcano'},
-    {value:'coastal', name:'Coastal Hazards'}
-]
+import config from "../../StormEvents/components/config";
 
 class HazardListTable extends React.Component{
     constructor(props) {
@@ -54,41 +35,141 @@ class HazardListTable extends React.Component{
         if(oldProps.year !== this.props.year){
             this.fetchFalcorDeps()
         }
-        if(oldProps.data.data_type !== this.props.data.data_type){
+        if(oldProps.data_type !== this.props.data_type){
             this.fetchFalcorDeps()
         }
     }
 
     async fetchFalcorDeps(){
-        this.hazards = hazards.reduce((a,c) =>{
-            a.push(c.value)
-            return a
-        },[])
-        if(this.props.data.data_type === 'sba'){
-            this.data = await sbaData(this.props.data.type,this.props.data.columns,this.props.geoid,'counties',this.hazards,this.props.year)
-            this.setState({
-                isLoading : false
-            })
-        }else if(this.props.data.data_type === 'stormevents'){
-            this.data = await stormEventsData(this.props.data.type,this.props.data.columns,this.props.geoid,'counties',this.hazards,this.props.year)
-            this.setState({
-                isLoading : false
-            })
-
-        }
-        else{
-            console.time('fema all time table')
-            this.data = await femaDisastersData(this.props.data.type,this.props.data.data_columns,this.props.geoid,'counties',this.hazards,this.props.year)
-            this.setState({
-                isLoading : false
-            })
-            console.timeEnd('fema all time table')
+        switch (this.props.data_type) {
+            case 'sba':
+                return sbaData(this.props.type,config[this.props.data_type].data_columns,this.props.geoid,'counties',config['hazards'],this.props.year)
+            case 'stormevents':
+                return stormEventsData(this.props.type,config[this.props.data_type].data_columns,this.props.geoid,'counties',config['hazards'],this.props.year)// "" is for the whole country
+            case 'fema':
+                return femaDisastersData(this.props.type,config[this.props.data_type].data_columns,this.props.geoid,'counties',config['hazards'],this.props.year)
+            default:
+                return Promise.resolve({})
         }
 
     }
 
+    processData(){
+        const graph = this.props.geoid ? get(this.props.falcorCache,`${config[this.props.data_type].fetch_url}.${this.props.geoid}`,null) :
+                get(this.props.falcorCache,`${config[this.props.data_type].fetch_url}.[""]`,null)
+        let header_columns =["name","value",...config[this.props.data_type].table_column]
+        let data = []
+        if(graph){
+            data = Object.keys(graph).map(hazard =>{
+                return header_columns.reduce((a,header) =>{
+                    config['Hazards'].forEach(item =>{
+                        if(item.value === hazard){
+                            switch(header) {
+                                case 'name':
+                                    a[header] = item.name
+                                    break;
+                                case 'value':
+                                    a[header] = item.value
+                                    break;
+                                case 'annualized_damage':
+                                    a[header] = get(graph,[item.value,"allTime",header],0)
+                                    break;
+                                default :
+                                    a[header] = get(graph,[item.value,this.props.year,header],0)
+                            }
+
+                        }
+                    })
+                    return a
+                },{})
+            })
+
+        }
+
+        return data
+    }
+
+    processFemaData(){
+        const graph = this.props.geoid ? get(this.props.falcorCache,`${config[this.props.data_type].fetch_url}`,null) :
+            get(this.props.falcorCache,`${config[this.props.data_type].fetch_url}.[""]`,null)
+        const graphById = get(this.props.falcorCache,`${config[this.props.data_type].fetch_url}.byId`,null)
+        let graph_data = []
+        let femaData = []
+        if(graphById && graph) {
+            graph_data = config['Hazards'].reduce((a, c) => {
+                a.push({
+                    'hazard': c.value,
+                    'count' : 0
+                })
+                return a
+            }, [])
+            graph_data.map(d =>{
+                let sum = 0
+                return Object.keys(graphById).filter(d => d !== '$__path').forEach(item =>{
+                    if(this.props.year === 'allTime') {
+                        if(get(graphById[item],['disaster_type','value'],'').toString() === d.hazard) {
+                            sum += +get(graphById[item],['total_cost','value'],0)
+                            return d['total_cost_summaries'] = sum
+                        }
+                    }else{
+                        if(get(graphById[item],['disaster_type','value'],'').toString() === d.hazard && get(graphById[item],['year','value'],'').toString() === this.props.year.toString()){
+                            sum += +get(graphById[item],['total_cost','value'],0)
+                            return d['total_cost_summaries'] = sum
+                        }
+                    }
+
+                })
+            })
+            if(this.props.geoid){
+                config['Hazards'].forEach(hazard =>{
+                    let total_cost = 0
+                    let total_cost_summaries = 0
+                    Object.keys(graph).filter(d => d!== '$__path').forEach(item =>{
+                        total_cost += get(graph[item],[hazard.value,this.props.year,'total_cost','value'],0)
+                        total_cost_summaries += get(graph[item],[hazard.value,this.props.year,'total_cost_summaries','value'],0)
+                    })
+                    femaData.push({
+                        'name': hazard.name,
+                        'value': hazard.value,
+                        'total_cost': total_cost,
+                        'total_cost_summaries': total_cost_summaries
+                    })
+                })
+            }else{
+                femaData =Object.keys(graph).filter(d => d!=="$__path").map(hazard => {
+                    return ["name", "value", "total_cost", "total_cost_summaries"].reduce((a, header) => {
+                        config['Hazards'].forEach(item => {
+                            if (item.value === hazard) {
+                                if (header === 'name' || header === 'value') {
+                                    a[header] = item[header]
+                                } else {
+                                    a[header] = get(graph[hazard], [this.props.year, header,'value'], 0)
+                                }
+                            }
+                        })
+                        return a
+                    }, {})
+                })
+
+            }
+
+            graph_data.forEach(dd =>{
+                femaData.map(d =>{
+                    if(d.value === dd.hazard){
+                        d['total_cost_summaries'] = dd.total_cost_summaries || 0
+
+                    }
+                    return d
+                })
+            })
+        }
+        return femaData
+
+    }
 
     render(){
+        const data = this.props.data_type !== 'fema' ?
+            this.processData() : this.processFemaData()
         return(
                 <div className="align-middle inline-block min-w-full overflow-hidden"
                     key={0}>
@@ -98,7 +179,7 @@ class HazardListTable extends React.Component{
                             <th className="px-3  py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase ">
                                 Hazard
                             </th>
-                            {this.props.data.header.map((header,i) =>{
+                            {config[this.props.data_type].table_header.map((header,i) =>{
                                 if(header === 'Damage' || header === 'Total Loss' || header === 'Actual Amount Paid'){
                                     return (
                                         <th className="px-3 text-right py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase "
@@ -120,10 +201,10 @@ class HazardListTable extends React.Component{
                         </tr>
                         </thead>
                         <tbody>
-                        {   this.data && !this.state.isLoading?
-                            this.data.data
+                        {   data.length ?
+                            data
                             .filter(d => Object.keys(d).length !== 0)
-                            .sort((a,b) => b[this.props.data.sort] - a[this.props.data.sort])
+                            .sort((a,b) => b[config[this.props.data_type].sort] - a[config[this.props.data_type].sort])
                             .map((hazard,i) =>{
                                 return(
                                     <tr className={`bg-white  ${this.props.activeHazard === hazard.value ? 'border-b-2 border-blue-500' : 'border-b border-gray-200' }` }
@@ -148,7 +229,7 @@ class HazardListTable extends React.Component{
                                                 <div style={{backgroundColor:hazardcolors[hazard.value]}} className='w-3 h-3 mr-2 inline-block' />{hazard.name}
                                             </div>
                                         </td>
-                                        {this.props.data.columns.map((column,i) =>{
+                                        {config[this.props.data_type].table_column.map((column,i) =>{
                                             return (
                                                 <td className="px-4 py-2 whitespace-no-wrap text-sm leading-5 font-base text-gray-900 text-right" key={i}>
                                                     {!column.includes("num") || !column.includes("total") ? fnum(hazard[column]) : hazard[column].toLocaleString()}
@@ -173,11 +254,8 @@ const mapDispatchToProps = { };
 
 const mapStateToProps = (state,ownProps) => {
     return {
-        activeStateGeoid : state.user.activeStateGeoid,
+        falcorCache : state.falcorCache,
         geoid:ownProps.geoid,
-        censusKey:ownProps.censusKey,
-        graph: state.graph,
-        severeWeatherData : get(state.graph,['severeWeather'])
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(HazardListTable))

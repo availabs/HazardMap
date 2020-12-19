@@ -8,8 +8,8 @@ import SvgMapComponent from "./layers/SvgMapComponent";
 import SevereWeatherCountyTable from "./components/SevereWeatherCountyTable";
 import FemaDisastersTotalCountyTable from "./components/FemaDisastersTotalCountyTable";
 import FemaDisastersIndividualCountyTable from "./components/FemaDisastersIndividualCountyTable";
-//import {falcorGraph} from "store/falcorGraphNew"
 import {reduxFalcor}  from "utils/redux-falcor-new";
+import {withRouter} from "react-router-dom";
 let years = []
 const start_year = 1996
 const end_year = 2019
@@ -71,7 +71,8 @@ class Overview extends React.Component {
     }
 
     async fetchFalcorDeps() {
-        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid : window.location.pathname.split("/")[2]
+
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid :this.props.match.params.geoid
         this.hazards = hazards.reduce((a,c) =>{
             a.push(c.value)
             return a
@@ -101,7 +102,7 @@ class Overview extends React.Component {
     }
 
     processSevereWeatherData(){
-        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid : window.location.pathname.split("/")[2]
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid :this.props.match.params.geoid
         let graph = get(this.props.falcorCache,['severeWeather',geoid],null)
         let graph_data = []
         if(graph) {
@@ -121,7 +122,7 @@ class Overview extends React.Component {
     }
 
     processSbaData(){
-        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid :this.props.match.params.geoid
         let graph = get(this.props.falcorCache,['sba','all',geoid],null)
         let graph_data = []
         if(graph) {
@@ -142,7 +143,7 @@ class Overview extends React.Component {
     }
 
     processFemaDisasterData(){
-        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid :this.props.match.params.geoid
         let graph = get(this.props.falcorCache,['fema','disasters','byId'],null)
         let graph_data = []
         if(graph) {
@@ -174,7 +175,7 @@ class Overview extends React.Component {
     }
 
     processFemaDisastersCombined(){
-        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid : window.location.pathname.split("/")[2]
+        let geoid = this.props.activeCountyGeoid ? this.props.activeCountyGeoid : this.props.match.params.geoid
         let graph = get(this.props.falcorCache,['fema','disasters',geoid],null)
         let graph_data = []
         if(graph) {
@@ -209,7 +210,7 @@ class Overview extends React.Component {
                     </div>
                     <div>
                         <SevereWeatherCountyTable
-                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid : window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid : this.props.match.params.geoid}
                         />
                     </div>
                     <div>
@@ -228,35 +229,35 @@ class Overview extends React.Component {
                     <div>
                         <div className="text-sm">Disaster Declaration Summaries V2 & Fema Web Disaster Summaries</div>
                         <FemaDisastersTotalCountyTable
-                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :this.props.match.params.geoid}
                         />
                     </div>
                     <div>
                         <div className="text-sm">Individual and Households Programs Valid Registration</div>
                         <FemaDisastersIndividualCountyTable
                             type={'ia'}
-                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :this.props.match.params.geoid}
                         />
                     </div>
                     <div>
                         <div className="text-sm">Public Assistance Applicants V1 & Public Assistance Funded Projects Details V1</div>
                         <FemaDisastersIndividualCountyTable
                             type={'pa'}
-                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :this.props.match.params.geoid}
                         />
                     </div>
                     <div>
                         <div className="text-sm">Hazard Mitigation Assistance Projects V2</div>
                         <FemaDisastersIndividualCountyTable
                             type={'hmgp_projects'}
-                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :this.props.match.params.geoid}
                         />
                     </div>
                     <div>
                         <div className="text-sm">Hazard Mitigation Assistance Mitigated Properties V2</div>
                         <FemaDisastersIndividualCountyTable
                             type={'hmgp_properties'}
-                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :window.location.pathname.split("/")[2]}
+                            geoid ={this.props.activeCountyGeoid ? this.props.activeCountyGeoid :this.props.match.params.geoid}
                         />
                     </div>
 
@@ -277,6 +278,8 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = {
     setActiveStateGeoid
 };
+const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(Overview))
+
 export default [
 
     {
@@ -291,16 +294,7 @@ export default [
             nav: 'top',
             theme: 'flat',
         },
-        component: {
-            type: 'div',
-            props: {
-                className: 'w-full overflow-hidden pt-16 focus:outline-none',
-                style: {height: 'calc(100vh)'}
-            },
-            children: [
-                connect(mapStateToProps, mapDispatchToProps)(reduxFalcor(Overview))
-            ]
-        }
+        component: withRouter(ConnectedComponent)
     },
 
 

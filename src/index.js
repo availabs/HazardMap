@@ -41,7 +41,7 @@ ReactDOM.render(
 	<React.StrictMode>
 		<Provider store={ store }>
 			<FalcorProvider falcor={ falcorGraph}>
-				<ThemeContext.Provider value={ Themes["light"]}>
+				<ThemeContext.Provider value={ Theme}>
 					<App/>
 					{ /*<AuthEnabledApp />*/ }
 				</ThemeContext.Provider>
