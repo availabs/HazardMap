@@ -353,7 +353,7 @@ class DataDownload extends React.Component{
             })
 
         }
-        console.log('data',data)
+
         return data
     }
 
